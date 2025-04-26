@@ -3,119 +3,100 @@
 <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>BLUE16</title>
+      <title>Buttons</title>
       <style>
-            body {
-                  margin: 0;
+            .gradient-background {
+                  background: linear-gradient(300deg, #000000, #ada799, #76736a, #1a84ef);
+                  background-size: 240% 240%;
+                  animation: gradient-animation 24s ease infinite;
                   height: 100vh;
                   display: flex;
-                  flex-direction: column;
                   justify-content: center;
                   align-items: center;
-                  background: linear-gradient(to bottom, #1a1a1a, #4d4d4d);
-                  font-family: Arial, sans-serif;
-                  color: white;
+                  flex-direction: column;
+                  margin: 0;
             }
 
-            h1 {
-                  font-size: 3rem;
-                  font-weight: bold;
-                  background: linear-gradient(to right, darkblue, blue);
-                  -webkit-background-clip: text;
-                  -webkit-text-fill-color: transparent;
-                  margin-bottom: 50px;
-            }
-
-            body {
-                    margin: 0;
-                    height: 100vh;
-                  display: flex;
-                  .gradient-background {
-                        background: linear-gradient(300deg, #000000, #ada799, #76736a, #1a84ef);
-                        background-size: 240% 240%;
-                        animation: gradient-animation 24s ease infinite;
-                  }
-
-                  @keyframes gradient-animation {
-                        0% {
-                              background-position: 0% 50%;
-                        }
-                        50% {
-                              background-position: 100% 50%;
-                        }
-                        100% {
-                              background-position: 0% 50%;
-                        }
-                  }
-            }
-            body::before {
-                  content: '';
-                  position: absolute;
-                  top: 0;
-                  left: 0;
-                  width: 100%;
-                  height: 100%;
-                  background: linear-gradient(to bottom, #1a1a1a, #4d4d4d);
-                  animation: gradient-animation 5s infinite alternate;
-                  z-index: -1;
-            }
-            h1 {
-                  display: none;
-            }
             @keyframes gradient-animation {
-                    0% {
-                              background: linear-gradient(to bottom, #1a1a1a, #4d4d4d);
-                    }
-                    100% {
-                              background: linear-gradient(to bottom, #0d0d0d, #333333);
-                    }
+                  0% {
+                        background-position: 0% 50%;
+                  }
+                  50% {
+                        background-position: 100% 50%;
+                  }
+                  100% {
+                        background-position: 0% 50%;
+                  }
             }
 
-            h1 {
-                    font-size: 3rem;
-                    font-weight: bold;
-                    background: linear-gradient(to right, darkblue, blue);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    margin-bottom: 20px;
-                    position: absolute;
-                    top: 20px;
-            }
-
-            .buttons {
-                    display: flex;
-                    gap: 20px;
-                    justify-content: center;
-                    align-items: center;
-            }
-
-            .button {
-                  padding: 15px 30px;
-                  font-size: 1rem;
-                  font-weight: bold;
-                  color: white;
-                  background-color: darkblue;
-                  border: none;
-                  border-radius: 5px;
+            .button-3 {
+                  appearance: none;
+                  background-color: #2ea44f;
+                  border: 1px solid rgba(27, 31, 35, .15);
+                  border-radius: 6px;
+                  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+                  box-sizing: border-box;
+                  color: #fff;
                   cursor: pointer;
-                  transition: all 0.3s ease;
+                  display: inline-block;
+                  font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+                  font-size: 14px;
+                  font-weight: 600;
+                  line-height: 20px;
+                  padding: 6px 16px;
+                  position: relative;
+                  text-align: center;
+                  text-decoration: none;
+                  user-select: none;
+                  -webkit-user-select: none;
+                  touch-action: manipulation;
+                  vertical-align: middle;
+                  white-space: nowrap;
+                  margin: 10px;
             }
 
-            .button.sign-in:hover {
-                  border: 2px solid white;
-                  background-color: transparent;
+            .button-3:focus:not(:focus-visible):not(.focus-visible) {
+                  box-shadow: none;
+                  outline: none;
             }
 
-            .button.log-in:hover {
-                  background-color: green;
+            .button-3:hover {
+                  background-color: #2c974b;
+            }
+
+            .button-3:focus {
+                  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+                  outline: none;
+            }
+            .button-3:focus-visible {
+                    background-color: #2c974b;
+                    box-shadow: rgba(46, 164, 79, .6) 0 0 0 3px;
+                    outline: none;
+            }
+            .button-3:disabled {
+                  background-color: #94d3a2;
+                  border-color: rgba(27, 31, 35, .1);
+                  color: rgba(255, 255, 255, .8);
+                  cursor: default;
+            }
+
+            .button-3:active {
+                  background-color: #298e46;
+                  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+            }
+
+            .image-container img {
+                  width: 100px;
+                  height: auto;
+                  margin-bottom: 20px;
             }
       </style>
 </head>
-<body>
-      <h1>BLUE16</h1>
-      <div class="buttons">
-            <a href="#" class="button sign-in">Sign In</a>
-            <a href="#" class="button log-in">Log In</a>
+<body class="gradient-background">
+      <div class="image-container">
+            <img src="media/blue16.png" alt="Blue16 Logo">
       </div>
+      <button class="button-3" role="button">Log In</button>
+      <button class="button-3" role="button">Sign Up</button>
 </body>
 </html>
