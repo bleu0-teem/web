@@ -26,9 +26,44 @@
                   margin-bottom: 50px;
             }
 
+            body {
+                    margin: 0;
+                    height: 100vh;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    background: linear-gradient(to bottom, #1a1a1a, #4d4d4d);
+                    font-family: Arial, sans-serif;
+                    color: white;
+                    animation: gradient-animation 5s infinite alternate;
+            }
+
+            @keyframes gradient-animation {
+                    0% {
+                              background: linear-gradient(to bottom, #1a1a1a, #4d4d4d);
+                    }
+                    100% {
+                              background: linear-gradient(to bottom, #0d0d0d, #333333);
+                    }
+            }
+
+            h1 {
+                    font-size: 3rem;
+                    font-weight: bold;
+                    background: linear-gradient(to right, darkblue, blue);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    margin-bottom: 20px;
+                    position: absolute;
+                    top: 20px;
+            }
+
             .buttons {
-                  display: flex;
-                  gap: 20px;
+                    display: flex;
+                    gap: 20px;
+                    justify-content: center;
+                    align-items: center;
             }
 
             .button {
