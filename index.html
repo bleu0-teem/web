@@ -3,61 +3,61 @@
 <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Nothing to see here</title>
+      <title>BLUE16</title>
       <style>
             body {
                   margin: 0;
-                  overflow: hidden;
-                  background: black;
-                  color: white;
-                  font-family: Arial, sans-serif;
+                  height: 100vh;
                   display: flex;
+                  flex-direction: column;
                   justify-content: center;
                   align-items: center;
-                  height: 100vh;
+                  background: linear-gradient(to bottom, #1a1a1a, #4d4d4d);
+                  font-family: Arial, sans-serif;
+                  color: white;
             }
 
-            #text {
-                  position: absolute;
-                  z-index: 1;
-                  font-size: 2rem;
-                  text-align: center;
+            h1 {
+                  font-size: 3rem;
+                  font-weight: bold;
+                  background: linear-gradient(to right, darkblue, blue);
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  margin-bottom: 50px;
             }
 
-            .rain {
-                  position: absolute;
-                  width: 2px;
-                  height: 100px;
-                  background: rgba(255, 255, 255, 0.5);
-                  animation: fall linear infinite;
+            .buttons {
+                  display: flex;
+                  gap: 20px;
             }
 
-            @keyframes fall {
-                  0% {
-                        transform: translateY(-100vh);
-                  }
-                  100% {
-                        transform: translateY(100vh);
-                  }
+            .button {
+                  padding: 15px 30px;
+                  font-size: 1rem;
+                  font-weight: bold;
+                  color: white;
+                  background-color: darkblue;
+                  border: none;
+                  border-radius: 5px;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+            }
+
+            .button.sign-in:hover {
+                  border: 2px solid white;
+                  background-color: transparent;
+            }
+
+            .button.log-in:hover {
+                  background-color: green;
             }
       </style>
 </head>
 <body>
-      <div id="text">Nothing to see here...</div>
-      <script>
-            const createRainDrop = () => {
-                  const rainDrop = document.createElement('div');
-                  rainDrop.classList.add('rain');
-                  rainDrop.style.left = Math.random() * window.innerWidth + 'px';
-                  rainDrop.style.animationDuration = Math.random() * 2 + 2 + 's';
-                  document.body.appendChild(rainDrop);
-
-                  setTimeout(() => {
-                        rainDrop.remove();
-                  }, 4000);
-            };
-
-            setInterval(createRainDrop, 50);
-      </script>
+      <h1>BLUE16</h1>
+      <div class="buttons">
+            <a href="#" class="button sign-in">Sign In</a>
+            <a href="#" class="button log-in">Log In</a>
+      </div>
 </body>
 </html>
