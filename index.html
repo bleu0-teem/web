@@ -29,17 +29,24 @@
             body {
                     margin: 0;
                     height: 100vh;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                  background: linear-gradient(300deg, #000000, #ada799, #76736a, #1a84ef);
-                  background-size: 240% 240%;
-                  animation: gradient-animation 24s ease infinite;
-                  font-family: Arial, sans-serif;
-                  transition: background 5s ease-in-out;
-                    color: white;
-                    animation: gradient-animation 5s infinite alternate;
+                  display: flex;
+                  .gradient-background {
+                        background: linear-gradient(300deg, #000000, #ada799, #76736a, #1a84ef);
+                        background-size: 240% 240%;
+                        animation: gradient-animation 24s ease infinite;
+                  }
+
+                  @keyframes gradient-animation {
+                        0% {
+                              background-position: 0% 50%;
+                        }
+                        50% {
+                              background-position: 100% 50%;
+                        }
+                        100% {
+                              background-position: 0% 50%;
+                        }
+                  }
             }
             body::before {
                   content: '';
