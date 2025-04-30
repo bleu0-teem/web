@@ -1,254 +1,154 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
-<link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>blue16</title>
-
-    <style>
-
-        body {
-
-            margin: 0;
-
-            overflow: hidden;
-
-            background-color: black;
-
-        }
-
-
-
-        #loading-screen {
-
-            position: fixed;
-
-            top: 50%;
-
-            left: 50%;
-
-            transform: translate(-50%, -50%);
-
-            text-align: center;
-
-            color: #fff;
-
-            font-family: 'Code', monospace;
-
-            font-size: 24px;
-
-            text-shadow: 0 0 10px #fff;
-
-            display: flex;
-
-            flex-direction: column;
-
-            align-items: center;
-
-            visibility: visible;
-
-            transition: visibility 0s linear 3s;
-
-        }
-
-
-
-        #loading-screen.hide {
-
-            visibility: hidden;
-
-        }
-
-
-
-        #background-image {
-
-            position: fixed;
-
-            top: 0;
-
-            left: 0;
-
-            width: 100%;
-
-            height: 100%;
-
-            z-index: -1;
-
-            filter: blur(10px);
-
-            transition: filter 3s ease;
-
-        }
-
-
-
-        #enter-text {
-
-            cursor: pointer;
-
-            margin-top: 20px;
-
-            opacity: 0;
-
-            transition: opacity 1s ease-in-out;
-
-            color: #fff;
-
-            font-family: 'Montserrat';
-
-        }
-
-
-
-        .frame {
-
-            position: fixed;
-
-            opacity: 0;
-
-            transition: opacity 1s ease-in-out;
-
-            border: 2px solid #fff;
-
-            border-radius: 15px;
-
-            background-color: rgba(0, 0, 0, 0.7);
-
-            backdrop-filter: blur(10px);
-
-            color: #fff;
-
-            padding: 20px;
-
-            overflow: auto;
-
-        }
-
-
-
-        #note {
-
-            top: 20px;
-
-            left: 20px;
-
-            width: calc(50% - 40px);
-
-            height: 60%;
-
-            font-family: 'Montserrat'
-
-        }
-
-
-
-        #links {
-
-            bottom: 20px;
-
-            left: 20px;
-
-            width: calc(50% - 40px);
-
-            height: 30%;
-
-            font-family: 'Montserrat';
-
-        }
-
-
-
-        #right-text {
-
-            top: 0;
-
-            right: 0;
-
-            bottom: 0;
-
-            position: fixed;
-
-            width: 45%;
-
-            text-align: center;
-
-            opacity: 0;
-
-            transition: opacity 1s ease-in-out;
-
-            color: #fff;
-
-            font-family: 'Code', monospace;
-
-            font-size: 10px;
-
-            text-shadow: 0 0 5px #fff;
-
-            white-space: pre-line;
-
-            margin-right: 20px; /*fucking margin*/
-
-        }
-
-    </style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>blue16</title>
+  <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: black;
+    }
+
+    #loading-screen {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #fff;
+      font-family: 'Code', monospace;
+      font-size: 24px;
+      text-shadow: 0 0 10px #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      visibility: visible;
+      transition: visibility 0s linear 3s;
+    }
+
+    #loading-screen.hide {
+      visibility: hidden;
+    }
+
+    #background-image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      filter: blur(10px);
+      transition: filter 3s ease;
+    }
+
+    #enter-text {
+      cursor: pointer;
+      margin-top: 20px;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      color: #fff;
+      font-family: 'Montserrat';
+    }
+
+    .frame {
+      position: fixed;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      border: 2px solid #fff;
+      border-radius: 15px;
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      padding: 20px;
+      overflow: auto;
+      font-family: 'Montserrat';
+    }
+
+    #note {
+      top: 20px;
+      left: 20px;
+      width: calc(50% - 40px);
+      height: 60%;
+    }
+
+    #links {
+      bottom: 20px;
+      left: 20px;
+      width: calc(50% - 40px);
+      height: 30%;
+    }
+
+    #right-text {
+      top: 0;
+      right: 0;
+      bottom: 0;
+      position: fixed;
+      width: 45%;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      color: #fff;
+      font-family: 'Code', monospace;
+      font-size: 10px;
+      text-shadow: 0 0 5px #fff;
+      white-space: pre-line;
+      margin-right: 20px;
+    }
+
+    @media (max-width: 768px) {
+      #note, #links {
+        width: 90%;
+        height: auto;
+        left: 5%;
+        top: auto;
+        bottom: auto;
+        position: relative;
+        margin: 10px auto;
+      }
+
+      #right-text {
+        display: none;
+      }
+
+      .frame {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      #loading-screen {
+        font-size: 18px;
+      }
+    }
+  </style>
 </head>
 
-
-
 <body onclick="enterSite()">
+  <audio id="audio" preload="auto" src="https://files.catbox.moe/mlfdi3.mp3"></audio>
+  <audio id="music" preload="auto" loop></audio>
 
-    <audio id="audio" preload="auto" src="https://files.catbox.moe/mlfdi3.mp3"></audio>
+  <div id="loading-screen">
+    jst wait!!! (click to skip loading)
+    <div id="enter-text">click anywhere to enter :3</div>
+  </div>
 
-    <audio id="music" preload="auto" loop src="https://files.catbox.moe/xusrpo.mp3"></audio> <!--hitmusic mm? changes sometimes-->
+  <img id="background-image" src="https://files.catbox.moe/8blpgn.png" alt="Background Image">
 
+  <div id="note" class="frame">
+    if you wonder why are you here: it means blue16 is working on currently... thanks for waiting!
+  </div>
 
+  <div id="links" class="frame">
+    <a href="https://dsc.gg/notblue16" style="color: #fff;">BLUE16 Discord</a><br>
+    <a href="https://github.com/blue16-team" style="color: #fff;">Blue16 Github</a>
+  </div>
 
-    <div id="loading-screen">
+  <div id="right-text" class="frame">
+<pre>
+    
 
-        jst wait!!! (click to skip loading)
-
-        <div id="enter-text">click anywhere to enter :3</div>
-
-    </div>
-
-
-
-    <img id="background-image" src="https://files.catbox.moe/8blpgn.png" alt="Background Image">
-
-
-
-    <div id="note" class="frame">
-
-        if you wonder why are you here: it means blue16 is working on currently... thanks for waiting!
-
-    </div>
-
-
-
-    <div id="links" class="frame">
-
-        <!--js some links to where we go-->
-
-        <a href="https://dsc.gg/notblue16" style="color: #fff;">BLUE16 Discord</a><br>
-
-        <a href="https://github.com/blue16-team" style="color: #fff;">Blue16 Github</a>
-
-    </div>
-
-
-
-    <div id="right-text" class="frame">
-
-        <pre>
 
                                                                                                     
 
@@ -352,54 +252,45 @@
 
 
 
-        </pre>
-
-    </div>
+        
 
 
+</pre>
+  </div>
 
-    <script>
+  <script>
+    const musicTracks = [
+      "https://files.catbox.moe/xusrpo.mp3",
+      "https://files.catbox.moe/t6oilh.mp3",
+      "https://files.catbox.moe/8krew8.mp3",
+      "https://files.catbox.moe/o0yrni.mp3",
+      "https://files.catbox.moe/3ikesa.mp3",
+      "https://files.catbox.moe/l50pmd.mp3",
+      "https://files.catbox.moe/ndocck.mp3"
+    ];
 
-        window.onload = function () {
+    window.onload = function () {
+      //random music <3
+      const randomTrack = musicTracks[Math.floor(Math.random() * musicTracks.length)];
+      const music = document.getElementById('music');
+      music.src = randomTrack;
 
-            setTimeout(function () {
+      setTimeout(function () {
+        document.getElementById('loading-screen').classList.add('hide');
+        document.getElementById('background-image').style.filter = 'blur(0)';
+        document.getElementById('enter-text').style.opacity = 1;
+        document.getElementById('audio').play();
+        music.play();
+      }, 3000);
+    };
 
-                document.getElementById('loading-screen').classList.add('hide');
-
-                document.getElementById('background-image').style.filter = 'blur(0)';
-
-                document.getElementById('enter-text').style.opacity = 1;
-
-                document.getElementById('audio').play();
-
-                document.getElementById('music').play();
-
-            }, 3000);
-
-        }
-
-
-
-        function enterSite() {
-
-            document.getElementById('enter-text').style.marginTop = '10px';
-
-            document.getElementById('note').style.opacity = 1;
-
-            document.getElementById('links').style.opacity = 1;
-
-            document.getElementById('right-text').style.opacity = 1;
-
-            document.getElementById('loading-screen').style.visibility = 'hidden';
-
-        }
-
-    </script>
-
+    function enterSite() {
+      document.getElementById('enter-text').style.marginTop = '10px';
+      document.getElementById('note').style.opacity = 1;
+      document.getElementById('links').style.opacity = 1;
+      document.getElementById('right-text').style.opacity = 1;
+      document.getElementById('loading-screen').style.visibility = 'hidden';
+    }
+  </script>
 </body>
-
-
-
 </html>
-
-<!--have fun XD-->
