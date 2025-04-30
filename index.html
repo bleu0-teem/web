@@ -1,102 +1,400 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
+
+
 <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>BLUE16</title>
-      <style>
-            .gradient-background {
-                  background: linear-gradient(300deg, #000000, #ada799, #76736a, #1a84ef);
-                  background-size: 240% 240%;
-                  animation: gradient-animation 24s ease infinite;
-                  height: 100vh;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                  flex-direction: column;
-                  margin: 0;
-            }
 
-            @keyframes gradient-animation {
-                  0% {
-                        background-position: 0% 50%;
-                  }
-                  50% {
-                        background-position: 100% 50%;
-                  }
-                  100% {
-                        background-position: 0% 50%;
-                  }
-            }
+    <meta charset="UTF-8">
 
-            .button-3 {
-                  appearance: none;
-                  background-color: #2ea44f;
-                  border: 1px solid rgba(27, 31, 35, .15);
-                  border-radius: 6px;
-                  box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
-                  box-sizing: border-box;
-                  color: #fff;
-                  cursor: pointer;
-                  display: inline-block;
-                  font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-                  font-size: 14px;
-                  font-weight: 600;
-                  line-height: 20px;
-                  padding: 6px 16px;
-                  position: relative;
-                  text-align: center;
-                  text-decoration: none;
-                  user-select: none;
-                  -webkit-user-select: none;
-                  touch-action: manipulation;
-                  vertical-align: middle;
-                  white-space: nowrap;
-                  margin: 10px;
-            }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-            .button-3:focus:not(:focus-visible):not(.focus-visible) {
-                  box-shadow: none;
-                  outline: none;
-            }
+    <title>blue16</title>
 
-            .button-3:hover {
-                  background-color: #2c974b;
-            }
+    <style>
 
-            .button-3:focus {
-                  box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
-                  outline: none;
-            }
-            .button-3:focus-visible {
-                    background-color: #2c974b;
-                    box-shadow: rgba(46, 164, 79, .6) 0 0 0 3px;
-                  outline: none;
-            }
-            .button-3:disabled {
-                  background-color: #94d3a2;
-                  border-color: rgba(27, 31, 35, .1);
-                  color: rgba(255, 255, 255, .8);
-                  cursor: default;
-            }
+        body {
 
-            .button-3:active {
-                  background-color: #298e46;
-                  box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
-            }
+            margin: 0;
 
-            .image-container img {
-                  width: 200px;
-                  height: auto;
-                  margin-bottom: 20px;
-            }
-      </style>
+            overflow: hidden;
+
+            background-color: black;
+
+        }
+
+
+
+        #loading-screen {
+
+            position: fixed;
+
+            top: 50%;
+
+            left: 50%;
+
+            transform: translate(-50%, -50%);
+
+            text-align: center;
+
+            color: #fff;
+
+            font-family: 'Code', monospace;
+
+            font-size: 24px;
+
+            text-shadow: 0 0 10px #fff;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            visibility: visible;
+
+            transition: visibility 0s linear 3s;
+
+        }
+
+
+
+        #loading-screen.hide {
+
+            visibility: hidden;
+
+        }
+
+
+
+        #background-image {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            z-index: -1;
+
+            filter: blur(10px);
+
+            transition: filter 3s ease;
+
+        }
+
+
+
+        #enter-text {
+
+            cursor: pointer;
+
+            margin-top: 20px;
+
+            opacity: 0;
+
+            transition: opacity 1s ease-in-out;
+
+            color: #fff;
+
+        }
+
+
+
+        .frame {
+
+            position: fixed;
+
+            opacity: 0;
+
+            transition: opacity 1s ease-in-out;
+
+            border: 2px solid #fff;
+
+            border-radius: 15px;
+
+            background-color: rgba(0, 0, 0, 0.7);
+
+            backdrop-filter: blur(10px);
+
+            color: #fff;
+
+            padding: 20px;
+
+            overflow: auto;
+
+        }
+
+
+
+        #note {
+
+            top: 20px;
+
+            left: 20px;
+
+            width: calc(50% - 40px);
+
+            height: 60%;
+
+        }
+
+
+
+        #links {
+
+            bottom: 20px;
+
+            left: 20px;
+
+            width: calc(50% - 40px);
+
+            height: 30%;
+
+        }
+
+
+
+        #right-text {
+
+            top: 0;
+
+            right: 0;
+
+            bottom: 0;
+
+            position: fixed;
+
+            width: 45%;
+
+            text-align: center;
+
+            opacity: 0;
+
+            transition: opacity 1s ease-in-out;
+
+            color: #fff;
+
+            font-family: 'Code', monospace;
+
+            font-size: 10px;
+
+            text-shadow: 0 0 5px #fff;
+
+            white-space: pre-line;
+
+            margin-right: 20px; /*fucking margin*/
+
+        }
+
+    </style>
+
 </head>
-<body class="gradient-background">
-      <div class="image-container">
-            <img src="media/blue16.png" alt="Blue16 Logo">
-      </div>
-      <button class="button-3" role="button">Log In</button>
-      <button class="button-3" role="button">Sign Up</button>
+
+
+
+<body onclick="enterSite()">
+
+    <audio id="audio" preload="auto" src="https://files.catbox.moe/mlfdi3.mp3"></audio>
+
+    <audio id="music" preload="auto" loop src="https://files.catbox.moe/xusrpo.mp3"></audio> <!--hitmusic mm? changes sometimes-->
+
+
+
+    <div id="loading-screen">
+
+        jst wait!!! (click to skip loading)
+
+        <div id="enter-text">click anywhere to enter :3</div>
+
+    </div>
+
+
+
+    <img id="background-image" src="https://files.catbox.moe/8blpgn.png" alt="Background Image">
+
+
+
+    <div id="note" class="frame">
+
+        if you wonder why are you here: it means blue16 is working on currently... thanks for waiting!
+
+    </div>
+
+
+
+    <div id="links" class="frame">
+
+        <!--js some links to where we go-->
+
+        <a href="https://dsc.gg/notblue16" style="color: #fff;">BLUE16 Discord</a><br>
+
+        <a href="https://github.com/blue16-team" style="color: #fff;">Blue16 Github</a>
+
+    </div>
+
+
+
+    <div id="right-text" class="frame">
+
+        <pre>
+
+                                                                                                    
+
+                                                                                                    
+
+                                                                                                    
+
+                                                                                                    
+
+                                                                                                    
+
+                                                                                                    
+
+                                                  ++++++++++++++++                                  
+
+                                            ++++++==-:.........:-=++++                              
+
+                                       ++++++=:..                  .-+++                            
+
+                                  +++++=-..                          .:++                           
+
+                             +++++=:..                                 .=++                         
+
+                       ++++++-....                                      .-++                        
+
+                 ++++++=:...                                             .=+                        
+
+            +++++=-:...                                                  ..++                       
+
+       +++++=:...                                                         .-++                      
+
+       ++:..                                                               .++                      
+
+       *++.                             ...--===-.                         .++                      
+
+        *+=.                            .-+++***++-.                       :++                       
+
+         ++:.                            .=+    **+:.                     .=+                       
+
+         *++.                             :++    *++.                    .-++                       
+
+          *+-.                            .=++  **+=.                   .-++                        
+
+          *++:.                            .=+ **+=.                   .-++++++                     
+
+           *++.                            .:+++=..                       ....=+++                  
+
+            *+-.                            ....                              ..:+++                
+
+             *++.                                                                 .-++               
+
+              *+=.                                                                 .-++              
+
+               *+:                                                                  .=+              
+
+               *++.                             ..:-=+++-..                          :++             
+
+                *+=.                            .=++   **+=.                         .++             
+
+                 ++:.                           .:++    **+=.                        .++             
+
+                 *++..                           .-++    **+:.                       :++             
+
+                  *+=.                            .++    **+:.                      .-+              
+
+                   ++:.                           .:++ ***+-.                      .:++              
+
+                   *++.                            .-+*++=..                       .++               
+
+                    *+=.                            .+=:..                       .-++                
+
+                     *+-.                            .                          .=++                
+
+                     *++.                                                    ..=++                  
+
+                      *+=.                                                ..-+++                    
+
+                       *+-.                                           ..:=++++                       
+
+                        ++.                                      ...:=+++++                          
+
+                        *+=.                                 ...-+++++                              
+
+                         *+-.                            ...-++++                                   
+
+                         *++.                         ..=++++                                       
+
+                          *++.                    .:+++++                                           
+
+                           ++-.              ..-=++++                                               
+
+                           *++:.        ..:=+++++                                                   
+
+                            *+=.    ..:=+++++                                                       
+
+                             *+-..-=++++                                                            
+
+                              ++++++                                                                
+
+                                                                                                    
+
+
+
+        </pre>
+
+    </div>
+
+
+
+    <script>
+
+        window.onload = function () {
+
+            setTimeout(function () {
+
+                document.getElementById('loading-screen').classList.add('hide');
+
+                document.getElementById('background-image').style.filter = 'blur(0)';
+
+                document.getElementById('enter-text').style.opacity = 1;
+
+                document.getElementById('audio').play();
+
+                document.getElementById('music').play();
+
+            }, 3000);
+
+        }
+
+
+
+        function enterSite() {
+
+            document.getElementById('enter-text').style.marginTop = '10px';
+
+            document.getElementById('note').style.opacity = 1;
+
+            document.getElementById('links').style.opacity = 1;
+
+            document.getElementById('right-text').style.opacity = 1;
+
+            document.getElementById('loading-screen').style.visibility = 'hidden';
+
+        }
+
+    </script>
+
 </body>
+
+
+
 </html>
+
+<!--have fun XD-->
+
