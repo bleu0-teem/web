@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BLUE16</title>
+    <script>
+        fetch('https://blue16-team.github.io/blue16-web/values.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.offline === true) {
+                    window.location.href = 'https://blue16-team.github.io/blue16-web/offline';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching JSON:', error);
+            });
+    </script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
