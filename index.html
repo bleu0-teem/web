@@ -9,12 +9,13 @@
             fetch('https://blue16-team.github.io/blue16-web/values.json')
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                        console.warn('Network response was not ok:', response.statusText);
+                        return null; // Return null to handle gracefully
                     }
                     return response.json();
                 })
                 .then(data => {
-                    if (data.offline === true) {
+                    if (data && data.offline === true) {
                         window.location.href = 'offline.html';
                     }
                 })
