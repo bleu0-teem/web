@@ -7,6 +7,12 @@
   font-family: "Poppins", sans-serif;
 }
 
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 section {
   position: relative;
   width: 100%;
@@ -43,33 +49,9 @@ section .wave span {
   position: relative;
   z-index: 1;
   text-align: center;
+  font-size: 4em;
+  letter-spacing: 2px;
   color: #fff;
-}
-
-.content h1 {
-  font-size: 3em;
-  margin-bottom: 20px;
-}
-
-.content .buttons {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-}
-
-.btn {
-  padding: 10px 20px;
-  font-size: 1em;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.7);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.btn:hover {
-  background: rgba(0, 0, 0, 0.9);
 }
 
 section .wave span:nth-child(1) {
@@ -97,6 +79,27 @@ section .wave span:nth-child(3) {
   100% {
     transform: translate(-50%, -75%) rotate(360deg);
   }
+}
+
+.buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.btn {
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn:hover {
+  background: rgba(0, 0, 0, 0.9);
 }
 
 body {
