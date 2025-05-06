@@ -1,32 +1,43 @@
 <!DOCTYPE html>
- <html lang="en">
- <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>BLUE16</title>
-     <script>
-         fetch('https://blue16-team.github.io/blue16-web/values.json')
-             .then(response => {
-                 if (!response.ok) {
-                     throw new Error('Network response was not ok');
-                 }
-                 return response.json();
-             })
-             .then(data => {
-                 if (data.offline === true) {
-                     window.location.href = 'offline.html';
-                 }
-             })
-             .catch(error => {
-                 console.error('Error fetching JSON:', error);
-             });
-     </script>
-     <link rel="stylesheet" href="styles.css">
- </head>
- <body>
-     <div class="main-page">
-         <button class="btn" onclick="location.href='login.html'">Login</button>
-         <button class="btn" onclick="location.href='register.html'">Register</button>
-     </div>
- </body>
- </html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLUE16</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <script>
+        fetch('https://blue16-team.github.io/blue16-web/values.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.offline === true) {
+                    window.location.href = 'offline.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching JSON:', error);
+            });
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <section>
+        <div class="wave">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="content">
+            <h1>BLUE16</h1>
+            <div class="buttons">
+                <button class="btn" onclick="location.href='login.html'">Login</button>
+                <button class="btn" onclick="location.href='register.html'">Register</button>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
