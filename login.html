@@ -66,11 +66,10 @@
             try {
                 // super super note: these accounts are not for test and are reall!!!! / jk
                 const response = await fetch('https://blue16-team.github.io/blue16-web/accounts.json', {
-                    method: 'POST',
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password }),
+                    }
                 });
 
                 if (!response.ok) {
