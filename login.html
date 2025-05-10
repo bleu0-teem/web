@@ -10,6 +10,36 @@
     <!--=============== CSS ===============-->
     <link rel="stylesheet" href="login_design.css">
 
+    <style>
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 15px 20px;
+            background-color: #333;
+            color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification.error {
+            background-color: #e74c3c;
+        }
+
+        .notification.success {
+            background-color: #2ecc71;
+        }
+    </style>
+
     <title>Login - BLUE16</title>
 </head>
 <body>
@@ -51,7 +81,28 @@
             </p>
         </div>
     </section>
+
+    <div id="notification-container"></div>
+
     <script>
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+
+            container.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
         document.getElementById('login-button').addEventListener('click', async (event) => {
             event.preventDefault();
 
@@ -59,7 +110,7 @@
             const password = document.getElementById('login-pass').value;
 
             if (!username || !password) {
-                alert('Please fill in both fields.');
+                showNotification('Please fill in both fields.', 'error');
                 return;
             }
 
@@ -79,14 +130,16 @@
                 const validAccount = accounts.find(account => account.username === username && account.password === password);
 
                 if (validAccount) {
-                    console.log('Login successful:', validAccount);
-                    window.location.href = 'dashboard.html';
+                    showNotification('Login successful!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
                 } else {
-                    alert('Invalid username or password. Please try again.');
+                    showNotification('Invalid username or password. Please try again.', 'error');
                 }
             } catch (error) {
                 console.error('Error during login:', error);
-                alert('Login failed. Please try again.');
+                showNotification('Login failed. Please try again.', 'error');
             }
         });
 
