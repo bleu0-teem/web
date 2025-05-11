@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>BLUE16 - Dashboard</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link href="/css/dashoard_styles.css" rel="stylesheet" />
+  <style>
+    /* Hide content until JS check is done */
+    body { visibility: hidden; }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <h1 id="dashboard-title" class="title">Color Changing Title
+      <div class="aurora">
+        <div class="clr"></div>
+        <div class="clr"></div>
+        <div class="clr"></div>
+        <div class="clr"></div>
+      </div>
+    </h1>
+  </div>
+
+  <script>
+    (function() {
+      // 1. Try to get the username from localStorage
+      const username = localStorage.getItem('username');
+
+      // 2. If not present, redirect away
+      if (!username) {
+        window.location.href = '/blue16-web/login.html';
+        return;
+      }
+
+      // 3. Otherwise, personalize the page
+      const titleEl = document.getElementById('dashboard-title');
+      titleEl.textContent = `Hey there, ${username}!`;
+
+      // Now that check is done, reveal the page
+      document.body.style.visibility = 'visible';
+    })();
+  </script>
+</body>
+</html>

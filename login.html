@@ -1,178 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <!--=============== REMIXICONS ===============-->
+  <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+    rel="stylesheet"
+  />
 
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="login_design.css">
+  <!--=============== CSS ===============-->
+  <link rel="stylesheet" href="login_design.css" />
 
-    <style>
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 15px 20px;
-            background-color: #333;
-            color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
+  <style>
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      padding: 15px 20px;
+      background-color: #333;
+      color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .notification.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .notification.error {
+      background-color: #e74c3c;
+    }
+    .notification.success {
+      background-color: #2ecc71;
+    }
+  </style>
 
-        .notification.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .notification.error {
-            background-color: #e74c3c;
-        }
-
-        .notification.success {
-            background-color: #2ecc71;
-        }
-    </style>
-
-    <title>Login - BLUE16</title>
+  <title>Login - BLUE16</title>
 </head>
 <body>
-    <section>
-        <div class="wave">
-            <span></span>
-            <span></span>
-            <span></span>
+  <section>
+    <div class="wave">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <div class="container">
+      <h1 class="login__title">Login</h1>
+
+      <div class="login__content">
+        <div class="login__box">
+          <i class="ri-user-3-line login__icon"></i>
+          <div class="login__box-input">
+            <input
+              type="text"
+              required
+              class="login__input"
+              id="login-username"
+              placeholder=" "
+            />
+            <label for="login-username" class="login__label">Username</label>
+          </div>
         </div>
 
-        <div class="container">
-            <h1 class="login__title">Login</h1>
-
-            <div class="login__content">
-                <div class="login__box">
-                    <i class="ri-user-3-line login__icon"></i>
-
-                    <div class="login__box-input">
-                        <input type="text" required class="login__input" id="login-username" placeholder=" ">
-                        <label for="login-username" class="login__label">Username</label>
-                    </div>
-                </div>
-
-                <div class="login__box">
-                    <i class="ri-lock-2-line login__icon"></i>
-
-                    <div class="login__box-input">
-                        <input type="password" required class="login__input" id="login-pass" placeholder=" ">
-                        <label for="login-pass" class="login__label">Password</label>
-                        <i class="ri-eye-off-line login__eye" id="login-eye"></i>
-                    </div>
-                </div>
-            </div>
-
-            <button id="login-button" class="login__button">Login</button>
-
-            <p class="login__register">
-                Don't have an account? <a href="/blue16-web/register.html">Register</a>
-            </p>
+        <div class="login__box">
+          <i class="ri-lock-2-line login__icon"></i>
+          <div class="login__box-input">
+            <input
+              type="password"
+              required
+              class="login__input"
+              id="login-pass"
+              placeholder=" "
+            />
+            <label for="login-pass" class="login__label">Password</label>
+            <i class="ri-eye-off-line login__eye" id="login-eye"></i>
+          </div>
         </div>
-    </section>
+      </div>
 
-    <div id="notification-container"></div>
+      <button id="login-button" class="login__button">Login</button>
 
-    <script>
-        function showNotification(message, type = 'success') {
-            const container = document.getElementById('notification-container');
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
+      <p class="login__register">
+        Don't have an account?
+        <a href="/register.html">Register</a>
+      </p>
+    </div>
+  </section>
 
-            container.appendChild(notification);
+  <div id="notification-container"></div>
 
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 10);
+  <script>
+    function showNotification(message, type = 'success') {
+      const container = document.getElementById('notification-container');
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      container.appendChild(notification);
 
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
+      // animate in
+      setTimeout(() => notification.classList.add('show'), 10);
+      // remove after show
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    document
+      .getElementById('login-button')
+      .addEventListener('click', async (event) => {
+        event.preventDefault();
+
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-pass').value;
+
+        if (!username || !password) {
+          showNotification('Please fill in both fields.', 'error');
+          return;
         }
 
-        document.getElementById('login-button').addEventListener('click', async (event) => {
-            event.preventDefault();
-
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-pass').value;
-
-            if (!username || !password) {
-                showNotification('Please fill in both fields.', 'error');
-                return;
+        try {
+          const response = await fetch(
+            'https://blue16-team.github.io/blue16-web/accounts.json',
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
             }
+          );
 
-            try {
-                const response = await fetch('https://blue16-team.github.io/blue16-web/accounts.json', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
+          if (!response.ok) {
+            throw new Error('Failed to fetch account data.');
+          }
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch account data.');
-                }
+          const accounts = await response.json();
+          const validAccount = accounts.find(
+            (acct) => acct.username === username && acct.password === password
+          );
 
-                const accounts = await response.json();
-                const validAccount = accounts.find(account => account.username === username && account.password === password);
+          if (validAccount) {
+            // 1) Save username so dashboard can check registration
+            localStorage.setItem('username', username);
 
-                if (validAccount) {
-                    showNotification('Login successful!', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1000);
-                } else {
-                    showNotification('Invalid username or password. Please try again.', 'error');
-                }
-            } catch (error) {
-                console.error('Error during login:', error);
-                showNotification('Login failed. Please try again.', 'error');
-            }
-        });
+            showNotification('Login successful!', 'success');
 
-        const passwordInput = document.getElementById('login-pass');
-        const eyeIcon = document.getElementById('login-eye');
+            // 2) Redirect to dashboard
+            setTimeout(() => {
+              window.location.href = '/dashboard.html';
+            }, 1000);
+          } else {
+            showNotification(
+              'Invalid username or password. Please try again.',
+              'error'
+            );
+          }
+        } catch (error) {
+          console.error('Error during login:', error);
+          showNotification('Login failed. Please try again.', 'error');
+        }
+      });
 
-        eyeIcon.addEventListener('click', () => {
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.classList.remove('ri-eye-off-line');
-                eyeIcon.classList.add('ri-eye-line');
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.classList.remove('ri-eye-line');
-                eyeIcon.classList.add('ri-eye-off-line');
-            }
-        });
+    // Toggle password visibility
+    const passwordInput = document.getElementById('login-pass');
+    const eyeIcon = document.getElementById('login-eye');
+    eyeIcon.addEventListener('click', () => {
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.replace('ri-eye-off-line', 'ri-eye-line');
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.replace('ri-eye-line', 'ri-eye-off-line');
+      }
+    });
 
-        fetch('https://blue16-team.github.io/blue16-web/values.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.offline === true) {
-                    window.location.href = 'offline.html';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching JSON:', error);
-            });
-    </script>
+    // Offline check
+    fetch('https://blue16-team.github.io/blue16-web/values.json')
+      .then((response) => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then((data) => {
+        if (data.offline === true) {
+          window.location.href = 'offline.html';
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching JSON:', error);
+      });
+  </script>
 </body>
 </html>
