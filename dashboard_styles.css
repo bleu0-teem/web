@@ -1,202 +1,60 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap");
-
-:root {
-  --bg: #000000;
-  --clr-1: #00c2ff;
-  --clr-2: #be33ff;
-  --clr-3: #40d9ff;
-  --clr-4: #76ff4c;
-
-  --blur: 1rem;
-  --fs: clamp(2rem, 8vw, 5rem);
-  --ls: clamp(-1.75px, -0.25vw, -3.5px);
-}
-
-body {
-  background-color: var(--bg);
-  color: #fff;
-  font-family: "Inter", "DM Sans", Arial, sans-serif;
-}
-
-*,
-*::before,
-*::after {
-  font-family: inherit;
-  box-sizing: border-box;
-}
-
-.content {
-  text-align: center;
-}
-
-.title {
-  font-size: var(--fs);
-  font-weight: 800;
-  letter-spacing: var(--ls);
-  position: relative;
-  overflow: hidden;
-  background: var(--bg);
-  margin: 0;
-}
-
-.aurora {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  mix-blend-mode: darken;
-  pointer-events: none;
-}
-
-.clr {
-  overflow: hidden;
-  position: absolute;
-  width: 60vw;
-  height: 60vw;
-  background-color: var(--clr-1);
-  border-radius: 37% 29% 27% 27% / 28% 25% 41% 37%;
-  filter: blur(var(--blur));
-  mix-blend-mode: overlay;
-}
-
-.clr:nth-of-type(1) {
-  top: -50%;
-  animation: aurora-border 6s ease-in-out infinite,
-    aurora-1 12s ease-in-out infinite alternate;
-}
-
-.clr:nth-of-type(2) {
-  background-color: var(--clr-3);
-  right: 0;
-  top: 0;
-  animation: aurora-border 6s ease-in-out infinite,
-    aurora-2 12s ease-in-out infinite alternate;
-}
-
-.clr:nth-of-type(3) {
-  background-color: var(--clr-2);
-  left: 0;
-  bottom: 0;
-  animation: aurora-border 6s ease-in-out infinite,
-    aurora-3 8s ease-in-out infinite alternate;
-}
-
-.clr:nth-of-type(4) {
-  background-color: var(--clr-4);
-  right: 0;
-  bottom: -50%;
-  animation: aurora-border 6s ease-in-out infinite,
-    aurora-4 24s ease-in-out infinite alternate;
-}
-
-@keyframes aurora-1 {
-  0% {
-    top: 0;
-    right: 0;
+/* reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
-
-  50% {
-    top: 100%;
-    right: 75%;
+  
+  html, body {
+    height: 100%;
+    font-family: 'Ubuntu', sans-serif;
   }
-
-  75% {
-    top: 100%;
-    right: 25%;
+  
+  body {
+    background: linear-gradient(135deg, #0078d7 0%, #00bcf2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-
-  100% {
-    top: 0;
-    right: 0;
+  
+  .loading-container {
+    text-align: center;
+    color: #fff;
   }
-}
-
-@keyframes aurora-2 {
-  0% {
-    top: -50%;
-    left: 0%;
+  
+  .loading-text {
+    margin-top: 1rem;
+    font-size: 1.25rem;
+    position: relative;
   }
-
-  60% {
-    top: 100%;
-    left: 75%;
+  
+  /* animated ellipsis */
+  .loading-text::after {
+    content: '';
+    display: inline-block;
+    width: 1em;
+    text-align: left;
+    animation: dots 1s steps(3, end) infinite;
   }
-
-  85% {
-    top: 100%;
-    left: 25%;
+  
+  @keyframes dots {
+    0%, 20% { content: ''; }
+    40%      { content: '.'; }
+    60%      { content: '..'; }
+    80%,100% { content: '...'; }
   }
-
-  100% {
-    top: -50%;
-    left: 0%;
+  
+  /* simple spinner */
+  .spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
   }
-}
-
-@keyframes aurora-3 {
-  0% {
-    bottom: 0;
-    left: 0;
-  }
-
-  40% {
-    bottom: 100%;
-    left: 75%;
-  }
-
-  65% {
-    bottom: 40%;
-    left: 50%;
-  }
-
-  100% {
-    bottom: 0;
-    left: 0;
-  }
-}
-
-@keyframes aurora-4 {
-  0% {
-    bottom: -50%;
-    right: 0;
-  }
-
-  50% {
-    bottom: 0%;
-    right: 40%;
-  }
-
-  90% {
-    bottom: 50%;
-    right: 25%;
-  }
-
-  100% {
-    bottom: -50%;
-    right: 0;
-  }
-}
-
-@keyframes aurora-border {
-  0% {
-    border-radius: 37% 29% 27% 27% / 28% 25% 41% 37%;
-  }
-
-  25% {
-    border-radius: 47% 29% 39% 49% / 61% 19% 66% 26%;
-  }
-
-  50% {
-    border-radius: 57% 23% 47% 72% / 63% 17% 66% 33%;
-  }
-
-  75% {
-    border-radius: 28% 49% 29% 100% / 93% 20% 64% 25%;
-  }
-
-  100% {
-    border-radius: 37% 29% 27% 27% / 28% 25% 41% 37%;
-  }
-}		
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }  

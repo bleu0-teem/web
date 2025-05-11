@@ -1,45 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>BLUE16 - Dashboard</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <link href="dashboard_styles.css" rel="stylesheet" />
-  <style>
-    /* Hide content until JS check is done */
-    body { visibility: hidden; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Loading</title>
+
+  <!-- Ubuntu font -->
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard_styles.css" />
 </head>
 <body>
-  <div class="content">
-    <h1 id="dashboard-title" class="title">Color Changing Title
-      <div class="aurora">
-        <div class="clr"></div>
-        <div class="clr"></div>
-        <div class="clr"></div>
-        <div class="clr"></div>
-      </div>
-    </h1>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p class="loading-text">
+      We're getting things ready for you (<span id="username">no user detected. did you logged in?</span>)
+    </p>
   </div>
 
-  <script>
-    (function() {
-      // 1. Try to get the username from localStorage
-      const username = localStorage.getItem('username');
-
-      // 2. If not present, redirect away
-      if (!username) {
-        window.location.href = '/blue16-web/login.html';
-        return;
-      }
-
-      // 3. Otherwise, personalize the page
-      const titleEl = document.getElementById('dashboard-title');
-      titleEl.textContent = `Hey there, ${username}!`;
-
-      // Now that check is done, reveal the page
-      document.body.style.visibility = 'visible';
-    })();
-  </script>
+  <script src="dashboard.js"></script>
 </body>
 </html>
