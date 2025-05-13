@@ -25,7 +25,6 @@ $filename = "place_" . $placeId;
 if (!empty($version)) {
     $filename .= "_v" . $version;
 }
-$filename .= ".rbxl";
 
 file_put_contents($filename, $data);
 echo "File downloaded and saved as '$filename'";
