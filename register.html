@@ -82,6 +82,15 @@
                         <i class="ri-eye-off-line login__eye" id="confirm-eye"></i>
                     </div>
                 </div>
+
+                <!-- Invite Key -->
+                <div class="login__box">
+                    <i class="ri-key-line login__icon"></i>
+                    <div class="login__box-input">
+                        <input type="text" required class="login__input" id="reg-invite-key" placeholder=" ">
+                        <label for="reg-invite-key" class="login__label">Invite Key</label>
+                    </div>
+                </div>
             </div>
 
             <button id="register-button" class="login__button">Register</button>
@@ -117,14 +126,22 @@
             const username = document.getElementById('reg-username').value.trim();
             const password = document.getElementById('reg-pass').value;
             const confirm  = document.getElementById('reg-pass-confirm').value;
+            const inviteKey = document.getElementById('reg-invite-key').value.trim();
 
             // basic validation
-            if (!username || !password || !confirm) {
+            if (!username || !password || !confirm || !inviteKey) {
                 showNotification('Please fill in all fields.', 'error');
                 return;
             }
             if (password !== confirm) {
                 showNotification('Passwords do not match.', 'error');
+                return;
+            }
+
+            // validate invite key
+            const validInviteKey = 'test';
+            if (inviteKey !== validInviteKey) {
+                showNotification('Invalid invite key.', 'error');
                 return;
             }
 
@@ -140,8 +157,8 @@
                     return;
                 }
 
-                // Here you would POST the new account to your backend.
-                // Since this is a static JSON, we'll just simulate success.
+                // here i would post the new account to your backend.
+                // since this is a static json i ll just simulate success
                 showNotification('Registration successful!', 'success');
                 setTimeout(() => window.location.href = 'login.html', 1000);
 
