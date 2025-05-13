@@ -1,7 +1,12 @@
 {
   "functions": {
-    "api/*.php": {
+    "api/**/*.php": {
       "runtime": "vercel-php@0.7.3"
+    }
+  },
+  "build": {
+    "env": {
+      "NOW_PHP_DEBUG": "1"
     }
   }
 }
