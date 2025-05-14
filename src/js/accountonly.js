@@ -7,8 +7,3 @@ if (!storedUser) {
 
 // -- SHOW USERNAME & LOAD --
 document.getElementById('username').textContent = storedUser;
-
-// After a brief pause, go to the real dashboard:
-setTimeout(() => {
-  window.location.href = 'dashboard.html';
-}, 3000);
