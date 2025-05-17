@@ -25,19 +25,21 @@ ul {
 	padding: 0;
 	margin-left: auto; 
 	margin-right: auto;
-	background-color: #05043e;
+	// Changed from #05043e (deep purple) to #185adb (blue)
+	background-color: #185adb;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 	padding: .75rem;
 	border-radius: 10px;
-	box-shadow: 0 10px 50px 0 rgba(#05043e, .25);
+	box-shadow: 0 10px 50px 0 rgba(#185adb, .25);
 }
 
 li:nth-child(6) {
 	margin-top: 5rem; 
 	padding-top: 1.25rem;
-	border-top: 1px solid #363664;
+	// Changed from #363664 (muted purple) to #2694fc (light blue)
+	border-top: 1px solid #2694fc;
 }
 
 li + li {
@@ -55,7 +57,8 @@ a {
 	border-radius: 8px;
 	position: relative;
 	&:hover, &:focus, &.active {
-		background-color: #30305a;
+		// Changed from #30305a (purple) to #2694fc (lighter blue)
+		background-color: #2694fc;
 		outline: 0;
 		
 		span { 
@@ -70,7 +73,8 @@ a {
 	
 	span {
 		position: absolute;
-		background-color: #30305a;
+		// Changed from #30305a (purple) to #2694fc (blue)
+		background-color: #2694fc;
 		white-space: nowrap;
 		padding: .5rem 1rem;
 		border-radius: 6px;
@@ -85,7 +89,8 @@ a {
 			width: 12px;
 			height: 12px;
 			position: absolute;
-			background-color: #30305a;
+			// Changed from #30305a (purple) to #2694fc (blue)
+			background-color: #2694fc;
 			left: -5px;
 			top: 50%;
 			transform: translatey(-50%) rotate(45deg);
@@ -101,7 +106,8 @@ details {
 	right: 1rem;
 	bottom: 1rem;
 	margin-top: 2rem;
-	color: #05043e; 
+	// Changed from #05043e (deep purple) to #185adb (blue)
+	color: #185adb; 
 	display: flex;
 	flex-direction: column;
 
@@ -180,6 +186,7 @@ summary {
 
 	&:hover,
 	&:focus {
+		// Changed from mix(#000, #185adb, 20%) (which is slightly dark blue) - keeping as is, since it's already blue
 		background-color: mix(#000, #185adb, 20%);
 		// color: #6366f1;
 	}
@@ -198,4 +205,3 @@ summary {
 		transform: scale(1);
 	}
 }
-
