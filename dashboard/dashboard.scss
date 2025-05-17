@@ -14,10 +14,8 @@ body {
 	justify-content: center;
 	padding-top: 5vh;
 	padding-bottom: 5vh;
-	background-color: #f2f5f7;
+	background-color: #e3f2fd; /* soft sky blue */
 }
-
- 
 
 ul { 
 	list-style: none;
@@ -25,21 +23,19 @@ ul {
 	padding: 0;
 	margin-left: auto; 
 	margin-right: auto;
-	// Changed from #05043e (deep purple) to #185adb (blue)
-	background-color: #185adb;
+	background-color: #1565c0; /* strong blue */
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 	padding: .75rem;
 	border-radius: 10px;
-	box-shadow: 0 10px 50px 0 rgba(#185adb, .25);
+	box-shadow: 0 10px 30px rgba(21, 101, 192, 0.3); /* blue shadow */
 }
 
 li:nth-child(6) {
 	margin-top: 5rem; 
 	padding-top: 1.25rem;
-	// Changed from #363664 (muted purple) to #2694fc (light blue)
-	border-top: 1px solid #2694fc;
+	border-top: 1px solid #42a5f5; /* lighter blue divider */
 }
 
 li + li {
@@ -56,9 +52,11 @@ a {
 	height: 3rem;
 	border-radius: 8px;
 	position: relative;
+	transition: box-shadow 0.2s ease;
+	
 	&:hover, &:focus, &.active {
-		// Changed from #30305a (purple) to #2694fc (lighter blue)
-		background-color: #2694fc;
+		background-color: #42a5f5; /* hover blue */
+		box-shadow: 0 4px 15px rgba(66, 165, 245, 0.4); /* soft hover shadow */
 		outline: 0;
 		
 		span { 
@@ -73,8 +71,7 @@ a {
 	
 	span {
 		position: absolute;
-		// Changed from #30305a (purple) to #2694fc (blue)
-		background-color: #2694fc;
+		background-color: #42a5f5;
 		white-space: nowrap;
 		padding: .5rem 1rem;
 		border-radius: 6px;
@@ -89,31 +86,26 @@ a {
 			width: 12px;
 			height: 12px;
 			position: absolute;
-			// Changed from #30305a (purple) to #2694fc (blue)
-			background-color: #2694fc;
+			background-color: #42a5f5;
 			left: -5px;
 			top: 50%;
-			transform: translatey(-50%) rotate(45deg);
+			transform: translateY(-50%) rotate(45deg);
 			border-radius: 3px;
 		}
 	}
-	
-
 }
 
 details {
 	position: fixed;
 	right: 1rem;
 	bottom: 1rem;
-	margin-top: 2rem;
-	// Changed from #05043e (deep purple) to #185adb (blue)
-	color: #185adb; 
+	color: #1565c0; 
 	display: flex;
 	flex-direction: column;
-
+	
 	div {
 		background-color: #fff;
-		box-shadow: 0 5px 10px rgba(#000, 0.15);
+		box-shadow: 0 5px 20px rgba(21, 101, 192, 0.2);
 		padding: 1.25rem;
 		border-radius: 8px;
 		position: absolute;
@@ -142,7 +134,7 @@ details {
 		p > code {
 			font-size: 1rem;
 			font-family: monospace;
-			color: #185adb;
+			color: #1565c0;
 			font-weight: 600;
 		}
 
@@ -154,7 +146,6 @@ details {
 			font-family: monospace;
 			padding: 0.75em;
 			font-size: 0.875rem;
-			// color: #fff;
 		}
 	}
 
@@ -170,25 +161,23 @@ summary {
 	justify-content: center;
 	align-items: center;
 	font-weight: 600;
-	padding: 0.625em 1.25em .625em 1.25em;
+	padding: 0.625em 1.25em;
 	border-radius: 99em;
 	color: #fff;
-	background-color: #185adb;
-	box-shadow: 0 5px 15px rgba(#000, 0.1);
-	list-style: none;
-	text-align: center;
+	background-color: #1565c0;
+	box-shadow: 0 5px 15px rgba(21, 101, 192, 0.3);
 	cursor: pointer;
-	transition: 0.15s ease;
+	transition: background-color 0.2s ease, box-shadow 0.2s ease;
 	position: relative;
+
 	&::-webkit-details-marker {
 		display: none;
 	}
 
 	&:hover,
 	&:focus {
-		// Changed from mix(#000, #185adb, 20%) (which is slightly dark blue) - keeping as is, since it's already blue
-		background-color: mix(#000, #185adb, 20%);
-		// color: #6366f1;
+		background-color: #0d47a1; /* darker hover */
+		box-shadow: 0 5px 20px rgba(13, 71, 161, 0.4);
 	}
 
 	i {
