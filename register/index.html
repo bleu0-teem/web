@@ -174,7 +174,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
             }
 
             showNotification('Registration successful! Check your email for confirmation.', 'success');
-            setTimeout(() => window.location.href = 'login.html', 1500);
+            setTimeout(() => window.location.href = 'login/', 1500);
 
         } catch (err) {
             console.error(err);
