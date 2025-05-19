@@ -25,13 +25,16 @@
       transform: translateY(-20px);
       transition: opacity 0.3s ease, transform 0.3s ease;
     }
+
     .notification.show {
       opacity: 1;
       transform: translateY(0);
     }
+
     .notification.error {
       background-color: #e74c3c;
     }
+
     .notification.success {
       background-color: #2ecc71;
     }
@@ -54,13 +57,7 @@
         <div class="login__box">
           <i class="ri-user-3-line login__icon"></i>
           <div class="login__box-input">
-            <input
-              type="text"
-              required
-              class="login__input"
-              id="login-username"
-              placeholder=" "
-            />
+            <input type="text" required class="login__input" id="login-username" placeholder=" " />
             <label for="login-username" class="login__label">Username</label>
           </div>
         </div>
@@ -68,13 +65,7 @@
         <div class="login__box">
           <i class="ri-lock-2-line login__icon"></i>
           <div class="login__box-input">
-            <input
-              type="password"
-              required
-              class="login__input"
-              id="login-pass"
-              placeholder=" "
-            />
+            <input type="password" required class="login__input" id="login-pass" placeholder=" " />
             <label for="login-pass" class="login__label">Password</label>
             <i class="ri-eye-off-line login__eye" id="login-eye"></i>
           </div>
@@ -93,11 +84,10 @@
   <div id="notification-container"></div>
 
   <script>
-
-import { createClient } from '@supabase/supabase-js'
-const supabaseUrl = 'https://pspjvpipyvpvyixahsku.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzcGp2cGlweXZwdnlpeGFoc2t1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyODU4MTQsImV4cCI6MjA2Mjg2MTgxNH0.K3qGEv9Pz-oSNfocFlVkh8ujQp0YZ85z9VlKGI1WXD8'
-const supabase = createClient(supabaseUrl, supabaseKey)
+    // Initialize Supabase client
+    const supabaseUrl = 'https://pspjvpipyvpvyixahsku.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzcGp2cGlweXZwdnlpeGFoc2t1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyODU4MTQsImV4cCI6MjA2Mjg2MTgxNH0.K3qGEv9Pz-oSNfocFlVkh8ujQp0YZ85z9VlKGI1WXD8';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     function showNotification(message, type = 'success') {
       const container = document.getElementById('notification-container');
@@ -106,9 +96,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
       notification.textContent = message;
       container.appendChild(notification);
 
-      // animate in
       setTimeout(() => notification.classList.add('show'), 10);
-      // remove after show
       setTimeout(() => {
         notification.classList.remove('show');
         setTimeout(() => notification.remove(), 300);
@@ -138,7 +126,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
     document.getElementById('login-button').addEventListener('click', async (event) => {
       event.preventDefault();
 
-      const username = document.getElementById('login-username').value;
+      const username = document.getElementById('login-username').value.trim();
       const password = document.getElementById('login-pass').value;
 
       if (!username || !password) {
@@ -147,23 +135,21 @@ const supabase = createClient(supabaseUrl, supabaseKey)
       }
 
       try {
-        // Check breach
+        // Check if password is breached
         const breaches = await isPwned(password);
         if (breaches > 0) {
-          showNotification(`Your password appeared in ${breaches} breaches. Please change the password adter you log-in.`, 'success');
-          setTimeout(() => {
-  window.location.href = '/dashboard/';
-}, 3000);
+          showNotification(`Your password appeared in ${breaches} breaches. Please consider changing it after logging in.`, 'error');
+          return;
         }
 
-        // Supabase Auth
+        // Supabase authentication
         const { data, error } = await supabase.auth.signInWithPassword({
           email: username,
-          password: password
+          password: password,
         });
 
         if (error) {
-          showNotification(error.message, 'error');
+          showNotification(`Login failed: ${error.message}`, 'error');
         } else {
           localStorage.setItem('username', username);
           showNotification('Login successful!', 'success');
@@ -173,7 +159,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
         }
       } catch (err) {
         console.error('Login failed:', err);
-        showNotification('Login failed for unknown reason. Please try again.', 'error');
+        showNotification('An unknown error occurred. Please try again.', 'error');
       }
     });
 
@@ -192,9 +178,12 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
     // Offline check
     fetch('https://blue16-team.github.io/blue16-web/values.json')
-      .then(res => res.json())
-      .then(data => { if (data.offline) window.location.href = 'offline.html'; })
-      .catch(console.error);
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.offline) window.location.href = 'offline.html';
+      })
+      .catch((err) => console.error('Failed to fetch offline status:', err));
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </body>
 </html>
