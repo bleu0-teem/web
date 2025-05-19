@@ -40,7 +40,7 @@
         }
     </style>
 
-    <title>BLUE16 - register</title>
+    <title>BLUE16 - Register</title>
 </head>
 <body>
     <section>
@@ -103,100 +103,99 @@
 
     <div id="notification-container"></div>
 
-    
-
     <script>
-    
-import { createClient } from '@supabase/supabase-js'
-const supabaseUrl = 'https://pspjvpipyvpvyixahsku.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzcGp2cGlweXZwdnlpeGFoc2t1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyODU4MTQsImV4cCI6MjA2Mjg2MTgxNH0.K3qGEv9Pz-oSNfocFlVkh8ujQp0YZ85z9VlKGI1WXD8'
-const supabase = createClient(supabaseUrl, supabaseKey)
+        // Initialize Supabase client
+        const supabaseUrl = 'https://pspjvpipyvpvyixahsku.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzcGp2cGlweXZwdnlpeGFoc2t1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyODU4MTQsImV4cCI6MjA2Mjg2MTgxNH0.K3qGEv9Pz-oSNfocFlVkh8ujQp0YZ85z9VlKGI1WXD8';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    function showNotification(message, type = 'success') {
-        const container = document.getElementById('notification-container');
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        container.appendChild(notification);
-        setTimeout(() => notification.classList.add('show'), 10);
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
-
-    async function isPasswordPwned(password) {
-        const sha1 = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(password));
-        const hash = Array.from(new Uint8Array(sha1)).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-        const prefix = hash.slice(0, 5);
-        const suffix = hash.slice(5);
-
-        const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
-        const text = await res.text();
-        return text.includes(suffix);
-    }
-
-    document.getElementById('register-button').addEventListener('click', async (e) => {
-        e.preventDefault();
-
-        const email = document.getElementById('reg-username').value.trim();
-        const password = document.getElementById('reg-pass').value;
-        const confirm  = document.getElementById('reg-pass-confirm').value;
-        const inviteKey = document.getElementById('reg-invite-key').value.trim();
-
-        if (!email || !password || !confirm || !inviteKey) {
-            showNotification('Please fill in all fields.', 'error');
-            return;
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            container.appendChild(notification);
+            setTimeout(() => notification.classList.add('show'), 10);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
 
-        if (password !== confirm) {
-            showNotification('Passwords do not match.', 'error');
-            return;
+        async function isPasswordPwned(password) {
+            const sha1 = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(password));
+            const hash = Array.from(new Uint8Array(sha1)).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+            const prefix = hash.slice(0, 5);
+            const suffix = hash.slice(5);
+
+            const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+            const text = await res.text();
+            return text.includes(suffix);
         }
 
-        const validInviteKey = 'test';
-        if (inviteKey !== validInviteKey) {
-            showNotification('Invalid invite key.', 'error');
-            return;
-        }
+        document.getElementById('register-button').addEventListener('click', async (e) => {
+            e.preventDefault();
 
-        try {
-            const isPwned = await isPasswordPwned(password);
-            if (isPwned) {
-                showNotification('Password has been found in a breach. Please choose a different one.', 'error');
+            const email = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-pass').value;
+            const confirm = document.getElementById('reg-pass-confirm').value;
+            const inviteKey = document.getElementById('reg-invite-key').value.trim();
+
+            if (!email || !password || !confirm || !inviteKey) {
+                showNotification('Please fill in all fields.', 'error');
                 return;
             }
 
-            const { error } = await supabase.auth.signUp({ email, password });
-            if (error) {
-                showNotification(`Registration failed: ${error.message}`, 'error');
+            if (password !== confirm) {
+                showNotification('Passwords do not match.', 'error');
                 return;
             }
 
-            showNotification('Registration successful! Check your email for confirmation.', 'success');
-            setTimeout(() => window.location.href = 'login/', 1500);
+            const validInviteKey = 'test';
+            if (inviteKey !== validInviteKey) {
+                showNotification('Invalid invite key.', 'error');
+                return;
+            }
 
-        } catch (err) {
-            console.error(err);
-            showNotification('Something went wrong. Please try again later.', 'error');
-        }
-    });
+            try {
+                const isPwned = await isPasswordPwned(password);
+                if (isPwned) {
+                    showNotification('Password has been found in a breach. Please choose a different one.', 'error');
+                    return;
+                }
 
-    function setupEyeToggle(inputId, eyeId) {
-        const input = document.getElementById(inputId);
-        const eye   = document.getElementById(eyeId);
-        eye.addEventListener('click', () => {
-            if (input.type === 'password') {
-                input.type = 'text';
-                eye.classList.replace('ri-eye-off-line', 'ri-eye-line');
-            } else {
-                input.type = 'password';
-                eye.classList.replace('ri-eye-line', 'ri-eye-off-line');
+                const { error } = await supabase.auth.signUp({ email, password });
+                if (error) {
+                    showNotification(`Registration failed: ${error.message}`, 'error');
+                    return;
+                }
+
+                showNotification('Registration successful! Check your email for confirmation.', 'success');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+
+            } catch (err) {
+                console.error(err);
+                showNotification('Something went wrong. Please try again later.', 'error');
             }
         });
-    }
-    setupEyeToggle('reg-pass', 'pass-eye');
-    setupEyeToggle('reg-pass-confirm', 'confirm-eye');
-</script>
+
+        function setupEyeToggle(inputId, eyeId) {
+            const input = document.getElementById(inputId);
+            const eye = document.getElementById(eyeId);
+            eye.addEventListener('click', () => {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    eye.classList.replace('ri-eye-off-line', 'ri-eye-line');
+                } else {
+                    input.type = 'password';
+                    eye.classList.replace('ri-eye-line', 'ri-eye-off-line');
+                }
+            });
+        }
+
+        setupEyeToggle('reg-pass', 'pass-eye');
+        setupEyeToggle('reg-pass-confirm', 'confirm-eye');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </body>
 </html>
