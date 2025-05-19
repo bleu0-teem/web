@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!--=============== REMIXICONS ===============-->
-  <link
-    href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
-    rel="stylesheet"
-  />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
 
   <!--=============== CSS ===============-->
   <link rel="stylesheet" href="login_design.css" />
@@ -95,7 +92,13 @@
 
   <div id="notification-container"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    // Initialize Supabase
+    const supabaseUrl = 'https://pspjvpipyvpvyixahsku.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzcGp2cGlweXZwdnlpeGFoc2t1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyODU4MTQsImV4cCI6MjA2Mjg2MTgxNH0.K3qGEv9Pz-oSNfocFlVkh8ujQp0YZ85z9VlKGI1WXD8';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
     function showNotification(message, type = 'success') {
       const container = document.getElementById('notification-container');
       const notification = document.createElement('div');
@@ -112,58 +115,67 @@
       }, 3000);
     }
 
-    document
-      .getElementById('login-button')
-      .addEventListener('click', async (event) => {
-        event.preventDefault();
+    async function isPwned(password) {
+      const buffer = new TextEncoder().encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-1', buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+      const prefix = hashHex.slice(0, 5);
+      const suffix = hashHex.slice(5);
 
-        const username = document.getElementById('login-username').value;
-        const password = document.getElementById('login-pass').value;
+      const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+      const text = await response.text();
+      const lines = text.split('\r\n');
+      for (const line of lines) {
+        const [hashTail, count] = line.split(':');
+        if (hashTail === suffix) {
+          return parseInt(count, 10);
+        }
+      }
+      return 0;
+    }
 
-        if (!username || !password) {
-          showNotification('Please fill in both fields.', 'error');
-          return;
+    document.getElementById('login-button').addEventListener('click', async (event) => {
+      event.preventDefault();
+
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-pass').value;
+
+      if (!username || !password) {
+        showNotification('Please fill in both fields.', 'error');
+        return;
+      }
+
+      try {
+        // Check breach
+        const breaches = await isPwned(password);
+        if (breaches > 0) {
+          showNotification(`Your password appeared in ${breaches} breaches. Please change the password adter you log-in.`, 'success');
+          setTimeout(() => {
+  window.location.href = '/dashboard/';
+}, 3000);
         }
 
-        try {
-          const response = await fetch(
-            'https://files.catbox.moe/pvt49w.json',
-            {
-              method: 'GET',
-              headers: { 'Content-Type': 'application/json' },
-            }
-          );
+        // Supabase Auth
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: username,
+          password
+        });
 
-          if (!response.ok) {
-            throw new Error('Failed to fetch account data.');
-          }
-
-          const accounts = await response.json();
-          const validAccount = accounts.find(
-            (acct) => acct.username === username && acct.password === password
-          );
-
-          if (validAccount) {
-            // 1) Save username so dashboard can check registration
-            localStorage.setItem('username', username);
-
-            showNotification('Login successful!', 'success');
-
-            // 2) Redirect to dashboard
-            setTimeout(() => {
-              window.location.href = '/blue16-web/dashboard.html';
-            }, 1000);
-          } else {
-            showNotification(
-              'Invalid username or password. Please try again.',
-              'error'
-            );
-          }
-        } catch (error) {
-          console.error('Error during login:', error);
-          showNotification('Login failed. Please try again.', 'error');
+        if (error) {
+          showNotification(error.message, 'error');
+        } else {
+          localStorage.setItem('username', username);
+          showNotification('Login successful!', 'success');
+          setTimeout(() => {
+            window.location.href = '/dashboard/';
+          }, 1000);
         }
-      });
+      } catch (err) {
+        console.error('Login failed:', err);
+        showNotification('Login failed for unknown reason. Please try again.', 'error');
+      }
+    });
 
     // Toggle password visibility
     const passwordInput = document.getElementById('login-pass');
@@ -180,18 +192,9 @@
 
     // Offline check
     fetch('https://blue16-team.github.io/blue16-web/values.json')
-      .then((response) => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
-      .then((data) => {
-        if (data.offline === true) {
-          window.location.href = 'offline.html';
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching JSON:', error);
-      });
+      .then(res => res.json())
+      .then(data => { if (data.offline) window.location.href = 'offline.html'; })
+      .catch(console.error);
   </script>
 </body>
 </html>
