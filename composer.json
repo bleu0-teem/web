@@ -1,37 +1,38 @@
 {
-        "name": "blue16-team/blue16-web",
-            "description": "Blue16 web repository.",
-                "minimum-stability": "dev",
-                    "type": "library",
-                        "license": "MIT",
-                            "authors": [
-                                    {
-                                                "name": "noooooobie",
-                                                            "email": "import@blue16.site"
-                                                                    },
-                                    {
-                                                "name": "Maxfm4ikProjects2",
-                                                            "email": "max@blue16.site"
-                                                                    }
-                                                                        ],
-                                                                            "require": {
-                                                                                    "php": ">=7.4",
-                                                                                            "ext-json": "*",
-                                                                                                    "ext-pdo": "*",
-                                                                                                            "ext-redis": "*",
-                                                                                                                    "psr/log": "^1.0 || ^2.0 || ^3.0"
-                                                                                                                        },
-                                                                                                                            "require-dev": {
-                                                                                                                                    "phpunit/phpunit": "^9.5",
-                                                                                                                                            "roave/security-advisories": "dev-master"
-                                                                                                                                                },
-                                                                                                                                                    "autoload": {
-                                                                                                                                                            "psr-4": {
-                                                                                                                                                                        "Workflow\\": [
-                                                                                                                                                                                        "src/",
-                                                                                                                                                                                                        "tests/unit/",
-                                                                                                                                                                                                                        "tests/integration/"
-                                                                                                                                                                                                                                    ]
-                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                }
+  "name": "blue16-team/blue16-web",
+  "description": "Blue16 web repository.",
+  "minimum-stability": "dev",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "noooooobieee",
+      "email": "import@blue16.site"
+    },
+    {
+      "name": "Maxfm4ikProjects2",
+      "email": "max@blue16.site"
+    }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "ext-json": "*",
+    "ext-pdo": "*",
+    "ext-redis": "*",
+    "psr/log": "^1.0 || ^2.0 || ^3.0",
+    "rafaelwendel/phpsupabase": "^0.0.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5",
+    "roave/security-advisories": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "Workflow\\": [
+        "src/",
+        "tests/unit/",
+        "tests/integration/"
+      ]
+    }
+  }
+}
