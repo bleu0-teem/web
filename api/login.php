@@ -9,7 +9,7 @@
 //   • 200 OK   → “Login successful!”
 //   • 400 Bad Request → error message (e.g. missing fields, pwned password)
 //   • 401 Unauthorized → “Invalid username/email or password.”
-– 500 Internal Server Error → generic server error
+// 500 Internal Server Error → generic server error
 // -------------------------------------------------------------------
 
 session_start();
