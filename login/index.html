@@ -162,11 +162,7 @@
             formData.append('username_or_email', username);
             formData.append('password', password);
 
-            const res = await fetch('/api/login.php', {
-                method: 'POST',
-                body: formData,
-                credentials: 'include'
-            });
+            const res = await fetch('/api/login.php', { method: 'POST', body: formData, credentials: 'include' });
 
             const text = await res.text();
             if (res.ok) {
