@@ -87,16 +87,36 @@
 <template id="modal-template">
     <div class="modal-overlay">
         <div class="modal">
-            <h2 class="login__title">Generate Invite Keys</h2>
+            <h2 class="login__title">Generate Invite Key</h2>
             <div class="login__content">
+                <!-- Custom Key -->
                 <div class="login__box">
-                    <i class="ri-hashtag login__icon"></i>
+                    <i class="ri-key-line login__icon"></i>
                     <div class="login__box-input">
-                        <input type="number" min="1" id="key-count" class="login__input" placeholder=" ">
-                        <label for="key-count" class="login__label">How many keys?</label>
+                        <input type="text" id="custom-key" class="login__input" placeholder=" ">
+                        <label for="custom-key" class="login__label">Custom Key (optional)</label>
+                    </div>
+                </div>
+
+                <!-- Max Uses -->
+                <div class="login__box">
+                    <i class="ri-loop-left-line login__icon"></i>
+                    <div class="login__box-input">
+                        <input type="number" id="max-uses" class="login__input" placeholder=" " min="1" value="1">
+                        <label for="max-uses" class="login__label">Usable Count (999 = infinite)</label>
+                    </div>
+                </div>
+
+                <!-- Creator -->
+                <div class="login__box">
+                    <i class="ri-user-line login__icon"></i>
+                    <div class="login__box-input">
+                        <input type="text" id="creator-name" class="login__input" placeholder=" " required>
+                        <label for="creator-name" class="login__label">Creator</label>
                     </div>
                 </div>
             </div>
+
             <button id="generate-btn" class="login__button">Generate</button>
             <button id="close-btn" class="login__button" style="margin-top:1rem; background:#e74c3c; color:#fff;">Close</button>
             <div id="generated-keys" style="margin-top:1.5rem; max-height:200px; overflow:auto;"></div>
@@ -107,17 +127,6 @@
 <div id="notification-container"></div>
 
 <script>
-    /* -----------------------------------------
-       Supabase initialisation (reuse anon key)
-       -----------------------------------------
-       Create a table `invite_keys` with columns:
-       key TEXT PRIMARY KEY,
-       used BOOLEAN DEFAULT FALSE,
-       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-    */
-    const supabaseUrl = 'https://pspjvpipyvpvyixahsku.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzcGp2cGlweXZwdnlpeGFoc2t1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyODU4MTQsImV4cCI6MjA2Mjg2MTgxNH0.K3qGEv9Pz-oSNfocFlVkh8ujQp0YZ85z9VlKGI1WXD8';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     /* -------------- Notifications -------------- */
     function showNotification(msg, type = 'success') {
@@ -152,8 +161,6 @@
     const ADMIN_USER = 'BLUE16_Staff';
     const ADMIN_PASS = "(K4?'8h'Wx39"; // exact credential
 
-myUndefinedFunction();
-
     document.getElementById('admin-login-btn').addEventListener('click', () => {
         const u = document.getElementById('admin-user').value.trim();
         const p = document.getElementById('admin-pass').value;
@@ -167,13 +174,48 @@ myUndefinedFunction();
     });
 
     /* -------------- Key generator modal -------------- */
-    document.getElementById('open-generator').addEventListener('click', openModal);
+overlay.querySelector('#generate-btn').addEventListener('click', async () => {
+    const customKey = overlay.querySelector('#custom-key').value.trim();
+    const creator = overlay.querySelector('#creator-name').value.trim();
+    const maxUses = parseInt(overlay.querySelector('#max-uses').value.trim());
 
-    function openModal() {
-        const tmpl = document.getElementById('modal-template');
-        const node = tmpl.content.cloneNode(true);
-        document.body.appendChild(node);
-        const overlay = document.querySelector('.modal-overlay');
+    if (!creator) {
+        showNotification('Enter creator name.', 'error');
+        return;
+    }
+
+    if (!maxUses || maxUses <= 0 || maxUses > 999) {
+        showNotification('Enter valid uses (1-999).', 'error');
+        return;
+    }
+
+    // One custom key OR auto-generate one
+    const key = customKey !== "" ? customKey : `BLUE16_${crypto.getRandomValues(new Uint32Array(1))[0].toString(36).toUpperCase().slice(0, 8)}`;
+
+    const payload = {
+        key: key,
+        creator: creator,
+        max_uses: maxUses,
+        used: 0,
+        created_at: new Date().toISOString()
+    };
+
+    // Save via your backend (example):
+    const res = await fetch('/api/invite_key.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+        overlay.querySelector('#generated-keys').innerHTML = `<code>${key}</code>`;
+        showNotification('Key saved!', 'success');
+        loadLatestKeys(); // you'll need to reimplement this
+    } else {
+        showNotification('Failed to save key.', 'error');
+    }
+});
+
 
         // Close
         overlay.querySelector('#close-btn').addEventListener('click', () => overlay.remove());
