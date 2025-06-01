@@ -168,33 +168,6 @@
             return;
         }
 
-        async function validateInviteKey(inviteKey) {
-    try {
-        const res = await fetch('/api/check_invite_key.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ invite_key: inviteKey }),
-        });
-        const data = await res.json();
-
-        if (res.ok && data.success) {
-            return true; // Valid key
-        } else {
-            showNotification(data.error || 'Invalid invite key.', 'error');
-            return false;
-        }
-    } catch (err) {
-        showNotification('Failed to validate invite key.', 'error');
-        return false;
-    }
-}
-
-// Usage:
-validateInviteKey(inviteKey).then(isValid => {
-    if (!isValid) return;
-    // proceed with login or registration
-});
-
 
         // 3c) HIBP check
         try {
