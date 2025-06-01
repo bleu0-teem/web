@@ -84,107 +84,131 @@
   <div id="notification-container"></div>
 
   <script>
-import { createClient } from '@supabase/supabase-js'
-    // Initialize Supabase client
-    const supabaseUrl = 'https://pspjvpipyvpvyixahsku.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzcGp2cGlweXZwdnlpeGFoc2t1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyODU4MTQsImV4cCI6MjA2Mjg2MTgxNH0.K3qGEv9Pz-oSNfocFlVkh8ujQp0YZ85z9VlKGI1WXD8';
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
+    // ------------------------------------------------------------
+    // 1) showNotification(message, type) — same as in register
+    // ------------------------------------------------------------
     function showNotification(message, type = 'success') {
-      const container = document.getElementById('notification-container');
-      const notification = document.createElement('div');
-      notification.className = `notification ${type}`;
-      notification.textContent = message;
-      container.appendChild(notification);
-
-      setTimeout(() => notification.classList.add('show'), 10);
-      setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => notification.remove(), 300);
-      }, 3000);
+        const container = document.getElementById('notification-container');
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        container.appendChild(notification);
+        setTimeout(() => notification.classList.add('show'), 10);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 
+    // ------------------------------------------------------------
+    // 2) isPwned(password) — returns the count of breaches (0 if none)
+    // ------------------------------------------------------------
     async function isPwned(password) {
-      const buffer = new TextEncoder().encode(password);
-      const hashBuffer = await crypto.subtle.digest('SHA-1', buffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-      const prefix = hashHex.slice(0, 5);
-      const suffix = hashHex.slice(5);
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
 
-      const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
-      const text = await response.text();
-      const lines = text.split('\r\n');
-      for (const line of lines) {
-        const [hashTail, count] = line.split(':');
-        if (hashTail === suffix) {
-          return parseInt(count, 10);
+        const prefix = hashHex.slice(0, 5);
+        const suffix = hashHex.slice(5);
+
+        const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+        if (!response.ok) {
+            console.warn('HIBP request failed. Proceeding with login by default.');
+            return 0;
         }
-      }
-      return 0;
+        const text = await response.text();
+        const lines = text.split('\r\n');
+        for (const line of lines) {
+            const [hashTail, count] = line.split(':');
+            if (hashTail === suffix) {
+                return parseInt(count, 10);
+            }
+        }
+        return 0;
     }
 
-    document.getElementById('login-button').addEventListener('click', async (event) => {
-      event.preventDefault();
+    // ------------------------------------------------------------
+    // 3) Frontend handler for “Login” button
+    // ------------------------------------------------------------
+    document.getElementById('login-button').addEventListener('click', async (e) => {
+        e.preventDefault();
 
-      const username = document.getElementById('login-username').value.trim();
-      const password = document.getElementById('login-pass').value;
+        const username = document.getElementById('login-username').value.trim();
+        const password = document.getElementById('login-pass').value;
 
-      if (!username || !password) {
-        showNotification('Please fill in both fields.', 'error');
-        return;
-      }
-
-      try {
-        // Check if password is breached
-        const breaches = await isPwned(password);
-        if (breaches > 0) {
-          showNotification(`Your password appeared in ${breaches} breaches. Please consider changing it after logging in.`, 'error');
-          return;
+        // 3a) Basic client‐side validation
+        if (!username || !password) {
+            showNotification('Please fill in both fields.', 'error');
+            return;
         }
 
-        // Supabase authentication
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: username,
-          password: password,
-        });
-
-        if (error) {
-          showNotification(`Login failed: ${error.message}`, 'error');
-        } else {
-          localStorage.setItem('username', username);
-          showNotification('Login successful!', 'success');
-          setTimeout(() => {
-            window.location.href = '/dashboard/';
-          }, 1000);
+        // 3b) HIBP check
+        try {
+            const breaches = await isPwned(password);
+            if (breaches > 0) {
+                showNotification(`Your password appeared in ${breaches} breach(es). Please consider changing it.`, 'error');
+                return;
+            }
+        } catch (err) {
+            // If HIBP fails, allow login but warn in console
+            console.warn('Could not complete HIBP check:', err);
         }
-      } catch (err) {
-        console.error('Login failed:', err);
-        showNotification('An unknown error occurred. Please try again.', 'error');
-      }
+
+        // 3c) All good: send to login.php
+        try {
+            const formData = new FormData();
+            formData.append('username_or_email', username);
+            formData.append('password', password);
+
+            const res = await fetch('login.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include'
+            });
+
+            const text = await res.text();
+            if (res.ok) {
+                showNotification(text || 'Login successful!', 'success');
+                // Redirect to dashboard (adjust path as needed)
+                setTimeout(() => {
+                    window.location.href = '/dashboard/';
+                }, 1000);
+            } else {
+                showNotification(text || 'Login failed.', 'error');
+            }
+        } catch (err) {
+            console.error('Login request failed:', err);
+            showNotification('An unknown error occurred. Please try again.', 'error');
+        }
     });
 
-    // Toggle password visibility
+    // ------------------------------------------------------------
+    // 4) Eye‐toggle for password visibility (same as before)
+    // ------------------------------------------------------------
     const passwordInput = document.getElementById('login-pass');
     const eyeIcon = document.getElementById('login-eye');
     eyeIcon.addEventListener('click', () => {
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        eyeIcon.classList.replace('ri-eye-off-line', 'ri-eye-line');
-      } else {
-        passwordInput.type = 'password';
-        eyeIcon.classList.replace('ri-eye-line', 'ri-eye-off-line');
-      }
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.replace('ri-eye-off-line', 'ri-eye-line');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.replace('ri-eye-line', 'ri-eye-off-line');
+        }
     });
 
-    // Offline check
+    // ------------------------------------------------------------
+    // 5) (Optional) Offline‐mode check, same as before
+    // ------------------------------------------------------------
     fetch('https://blue16-team.github.io/blue16-web/values.json')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.offline) window.location.href = 'offline.html';
-      })
-      .catch((err) => console.error('Failed to fetch offline status:', err));
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+        .then((res) => res.json())
+        .then((data) => {
+            if (data.offline) window.location.href = 'offline.html';
+        })
+        .catch((err) => console.error('Failed to fetch offline status:', err));
+</script>
+
 </body>
 </html>
