@@ -70,10 +70,31 @@ if ($password !== $confirm) {
 }
 
 // 2e) Invite key check (replace 'test' with your real invite key)
-$validInviteKey = 'test';
-if ($inviteKey !== $validInviteKey) {
-    $errors[] = 'Invalid invite key.';
+
+// Check if invite key exists
+$stmt = $pdo->prepare("SELECT * FROM invite_keys WHERE invite_key = ?");
+$stmt->execute([$invite_key]);
+$invite = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$invite) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Invalid invite key.']);
+    exit;
 }
+
+// Check usage
+if ($invite['uses_remaining'] != 999 && $invite['uses_remaining'] <= 0) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Invite key has no remaining uses. what a loser lol :p']);
+    exit;
+}
+
+// Decrement uses if not infinite
+if ($invite['uses_remaining'] != 999) {
+    $stmt = $pdo->prepare("UPDATE invite_keys SET uses_remaining = uses_remaining - 1 WHERE id = ?");
+    $stmt->execute([$invite['id']]);
+}
+
 
 if (!empty($errors)) {
     http_response_code(400);
