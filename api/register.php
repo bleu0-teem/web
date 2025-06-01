@@ -1,15 +1,16 @@
 <?php
 // -------------------------------------------------------------------
-// register.php
-// Handles AJAX POST from /register page. Expects fields:
-//   - username
-//   - password
-//   - confirm_password
-//   - invite_key
+// api/register.php
 //
-// Returns plain text and HTTP status codes:
+// Expects POST fields:
+//   • username
+//   • password
+//   • confirm_password
+//   • invite_key
+//
+// Returns plain text + HTTP status code:
 //   • 200 OK   → “Registration successful!”
-//   • 400 Bad Request → error message (e.g. validation failed)
+//   • 400 Bad Request → validation/breach/duplicate‐username error
 //   • 500 Internal Server Error → generic server error
 // -------------------------------------------------------------------
 
@@ -24,13 +25,11 @@ $dbname = 'defaultdb';
 $user   = 'avnadmin';
 $pass   = 'AVNS_mdnUGTzNDx4Ui4O8dTy';
 
-// DSN with SSL mode required
 $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4;sslmode=REQUIRED";
-
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    // If you have Aiven’s CA certificate (e.g. ca.pem), uncomment and set the path:
+    // If you have Aiven’s CA cert (ca.pem), uncomment & adjust:
     // PDO::MYSQL_ATTR_SSL_CA => '/path/to/ca.pem',
 ];
 
@@ -44,13 +43,13 @@ try {
 // ------------------------------------------------------------
 // 2) FETCH & BASIC VALIDATION OF POST DATA
 // ------------------------------------------------------------
-$username      = trim($_POST['username'] ?? '');
-$password      = $_POST['password'] ?? '';
-$confirm       = $_POST['confirm_password'] ?? '';
-$inviteKey     = trim($_POST['invite_key'] ?? '');
-$errors        = [];
+$username   = trim($_POST['username'] ?? '');
+$password   = $_POST['password'] ?? '';
+$confirm    = $_POST['confirm_password'] ?? '';
+$inviteKey  = trim($_POST['invite_key'] ?? '');
+$errors     = [];
 
-// 2a) Required fields
+// 2a) All fields required
 if ($username === '' || $password === '' || $confirm === '' || $inviteKey === '') {
     $errors[] = 'Please fill in all fields.';
 }
@@ -70,7 +69,7 @@ if ($password !== $confirm) {
     $errors[] = 'Passwords do not match.';
 }
 
-// 2e) Invite key check (replace "test" with your actual key)
+// 2e) Invite key check (replace 'test' with your real invite key)
 $validInviteKey = 'test';
 if ($inviteKey !== $validInviteKey) {
     $errors[] = 'Invalid invite key.';
@@ -82,35 +81,51 @@ if (!empty($errors)) {
 }
 
 // ------------------------------------------------------------
-// 3) SERVER-SIDE “Have I Been Pwned” CHECK
+// 3) SERVER-SIDE “Have I Been Pwned” CHECK (via file_get_contents)
 // ------------------------------------------------------------
 function isPwnedPassword(string $password): bool
 {
-    // Compute uppercase SHA-1 hash of password
+    // Compute uppercase SHA-1 of the plain password
     $sha1 = strtoupper(sha1($password));
     $prefix = substr($sha1, 0, 5);
     $suffix = substr($sha1, 5);
 
+    // Prepare an HTTP context with a User-Agent header
+    $ctx = stream_context_create([
+        'http' => [
+            'method'  => 'GET',
+            'header'  => "User-Agent: HIBP-PHP/1.0\r\n",
+            'timeout' => 10,
+        ]
+    ]);
+
     $url = "https://api.pwnedpasswords.com/range/$prefix";
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'HIBP-PHP/1.0');
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    $body = @file_get_contents($url, false, $ctx);
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-    curl_close($ch);
-
-    if ($response === false || $httpCode !== 200) {
-        // If HIBP is unreachable, log and allow registration
-        error_log("HIBP check failed (HTTP $httpCode). Skipping breach check.");
+    // If request failed or returned empty, skip the breach check
+    if ($body === false) {
+        error_log("HIBP check failed or timed out for prefix $prefix.");
         return false;
     }
 
-    $lines = explode("\r\n", $response);
+    // Inspect HTTP response code from $http_response_header
+    $httpCode = 0;
+    if (isset($http_response_header) && is_array($http_response_header)) {
+        // The first header line is like "HTTP/1.1 200 OK"
+        if (preg_match('#^HTTP/\d+\.\d+\s+(\d{3})#', $http_response_header[0], $m)) {
+            $httpCode = intval($m[1]);
+        }
+    }
+    if ($httpCode !== 200) {
+        // If non-200, skip the breach check
+        error_log("HIBP returned HTTP $httpCode for prefix $prefix. Skipping breach check.");
+        return false;
+    }
+
+    // Now parse each line "HASHTAIL:COUNT"
+    $lines = explode("\r\n", $body);
     foreach ($lines as $line) {
-        if (!str_contains($line, ':')) {
+        if (strpos($line, ':') === false) {
             continue;
         }
         [$hashTail, ] = explode(':', $line, 2);
@@ -121,6 +136,7 @@ function isPwnedPassword(string $password): bool
     return false;
 }
 
+// Perform the HIBP check
 if (isPwnedPassword($password)) {
     http_response_code(400);
     exit('Password has been found in a breach. Please choose a different one.');
@@ -151,8 +167,7 @@ try {
         INSERT INTO users (username, email, password_hash)
         VALUES (:username, :email, :password_hash)
     ");
-    // If you treat "username" as an email, set email = username.
-    // Otherwise, add a separate $_POST['email'] field above.
+    // If you treat username as email, use the same. Otherwise read a separate email field.
     $insert->execute([
         ':username'      => $username,
         ':email'         => $username,
@@ -166,7 +181,6 @@ try {
     http_response_code(200);
     exit('Registration successful!');
 } catch (PDOException $e) {
-    // In rare cases (race condition on username), return a generic error
     http_response_code(500);
     exit('Could not register user.');
 }
