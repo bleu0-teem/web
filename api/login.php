@@ -1,15 +1,16 @@
 <?php
 // -------------------------------------------------------------------
 // api/login.php
-// Handles AJAX POST from /login page. Expects fields:
-//   - username_or_email
-//   - password
 //
-// Returns plain text and HTTP status codes:
+// Expects POST fields:
+//   • username_or_email
+//   • password
+//
+// Returns plain text + HTTP status code:
 //   • 200 OK   → “Login successful!”
-//   • 400 Bad Request → error message (e.g. missing fields, pwned password)
-//   • 401 Unauthorized → “Invalid username/email or password.”
-// 500 Internal Server Error → generic server error
+//   • 400 Bad Request → missing fields or pwned password
+//   • 401 Unauthorized → invalid credentials
+//   • 500 Internal Server Error → generic server error
 // -------------------------------------------------------------------
 
 session_start();
@@ -27,7 +28,7 @@ $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4;sslmode=REQUI
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    // If you have Aiven’s CA certificate (e.g. ca.pem), uncomment and set the path:
+    // If you have Aiven’s CA cert (ca.pem), uncomment & adjust:
     // PDO::MYSQL_ATTR_SSL_CA => '/path/to/ca.pem',
 ];
 
@@ -58,26 +59,36 @@ function isPwnedPassword(string $password): bool
     $prefix = substr($sha1, 0, 5);
     $suffix = substr($sha1, 5);
 
+    $ctx = stream_context_create([
+        'http' => [
+            'method'  => 'GET',
+            'header'  => "User-Agent: HIBP-PHP/1.0\r\n",
+            'timeout' => 10,
+        ]
+    ]);
+
     $url = "https://api.pwnedpasswords.com/range/$prefix";
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'HIBP-PHP/1.0');
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    $body = @file_get_contents($url, false, $ctx);
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-    curl_close($ch);
-
-    if ($response === false || $httpCode !== 200) {
-        // If HIBP is unreachable, log and allow login
-        error_log("HIBP check failed (HTTP $httpCode). Skipping breach check.");
+    if ($body === false) {
+        error_log("HIBP check failed or timed out for prefix $prefix.");
         return false;
     }
 
-    $lines = explode("\r\n", $response);
+    $httpCode = 0;
+    if (isset($http_response_header) && is_array($http_response_header)) {
+        if (preg_match('#^HTTP/\d+\.\d+\s+(\d{3})#', $http_response_header[0], $m)) {
+            $httpCode = intval($m[1]);
+        }
+    }
+    if ($httpCode !== 200) {
+        error_log("HIBP returned HTTP $httpCode for prefix $prefix. Skipping breach check.");
+        return false;
+    }
+
+    $lines = explode("\r\n", $body);
     foreach ($lines as $line) {
-        if (!str_contains($line, ':')) {
+        if (strpos($line, ':') === false) {
             continue;
         }
         [$hashTail, ] = explode(':', $line, 2);
@@ -90,11 +101,11 @@ function isPwnedPassword(string $password): bool
 
 if (isPwnedPassword($password)) {
     http_response_code(400);
-    exit('Your password appeared in a breach. Please change it before logging in. To change, DM @funnziesss. (method will get changed soon)');
+    exit('Your password appeared in a breach. Please change it before logging in.');
 }
 
 // ------------------------------------------------------------
-// 4) FETCH USER & VERIFY PASSWORD
+// 4) FETCH USER FROM DATABASE & VERIFY PASSWORD
 // ------------------------------------------------------------
 try {
     $stmt = $pdo->prepare("
@@ -111,7 +122,6 @@ try {
 }
 
 if (!$userRow || !password_verify($password, $userRow['password_hash'])) {
-    // Either no such user, or password mismatch
     http_response_code(401);
     exit('Invalid username/email or password.');
 }
