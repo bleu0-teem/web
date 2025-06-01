@@ -174,53 +174,51 @@
     });
 
     /* -------------- Key generator modal -------------- */
-overlay.querySelector('#generate-btn').addEventListener('click', async () => {
+document.getElementById('open-generator').addEventListener('click', () => {
+  const template = document.getElementById('modal-template');
+  const overlay = template.content.cloneNode(true).querySelector('.modal-overlay');
+  document.body.appendChild(overlay);
+
+  // Attach listeners here, e.g.:
+  overlay.querySelector('#generate-btn').addEventListener('click', async () => {
     const customKey = overlay.querySelector('#custom-key').value.trim();
     const creator = overlay.querySelector('#creator-name').value.trim();
-    const maxUses = parseInt(overlay.querySelector('#max-uses').value.trim());
+    const maxUses = parseInt(overlay.querySelector('#max-uses').value);
 
     if (!creator) {
-        showNotification('Enter creator name.', 'error');
-        return;
+      showNotification('Enter creator name.', 'error');
+      return;
+    }
+    if (!maxUses || maxUses < 1 || maxUses > 999) {
+      showNotification('Enter valid uses (1-999).', 'error');
+      return;
     }
 
-    if (!maxUses || maxUses <= 0 || maxUses > 999) {
-        showNotification('Enter valid uses (1-999).', 'error');
-        return;
-    }
-
-    // One custom key OR auto-generate one
     const key = customKey !== "" ? customKey : `BLUE16_${crypto.getRandomValues(new Uint32Array(1))[0].toString(36).toUpperCase().slice(0, 8)}`;
 
     const payload = {
-    key: key,
-    creator: creator,
-    uses_remaining: maxUses,
-    used: 0,
-    created_at: new Date().toISOString()
+      invite_key: key,
+      created_by: creator,
+      uses_remaining: maxUses
     };
 
-
-    // Save via your backend (example):
     const res = await fetch('/api/invite_key.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
 
     if (res.ok) {
-        overlay.querySelector('#generated-keys').innerHTML = `<code>${key}</code>`;
-        showNotification('Key saved!', 'success');
-        loadLatestKeys(); // you'll need to reimplement this
+      overlay.querySelector('#generated-keys').innerHTML = `<code>${key}</code>`;
+      showNotification('Key saved!', 'success');
+      loadLatestKeys();
     } else {
-        showNotification('Failed to save key.', 'error');
+      showNotification('Failed to save key.', 'error');
     }
+  });
+
+  overlay.querySelector('#close-btn').addEventListener('click', () => overlay.remove());
 });
-
-
-        // Close
-        overlay.querySelector('#close-btn').addEventListener('click', () => overlay.remove());
-
         // Generate keys
         overlay.querySelector('#generate-btn').addEventListener('click', async () => {
             const count = parseInt(overlay.querySelector('#key-count').value);
