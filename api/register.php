@@ -70,42 +70,17 @@ if ($password !== $confirm) {
 }
 
 // 2e) Invite key check (replace 'test' with your real invite key)
+$validInviteKey = 'test';
+if ($inviteKey !== $validInviteKey) {
+    $errors[] = 'Invalid invite key.';
+}
 
-// Check if invite key exists
-// Allow "test" key to always pass
-if ($invite_key === 'test') {
-    // Optional: You can simulate a fake invite row if needed
-    $invite = [
-        'invite_key' => 'test',
-        'uses_remaining' => 999,
-        'created_by' => 'test_user',
-        'id' => 0, // or null, since it won't be used
-    ];
-} else {
-    // Regular invite key check
-    $stmt = $pdo->prepare("SELECT * FROM invite_keys WHERE invite_key = ?");
-    $stmt->execute([$invite_key]);
-    $invite = $stmt->fetch(PDO::FETCH_ASSOC);
+if (!empty($errors)) {
+    http_response_code(400);
+    exit(implode(' ', $errors));
+}
 
-    if (!$invite) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Invalid invite key.']);
-        exit;
-    }
-
-    // Check usage
-    if ($invite['uses_remaining'] != 999 && $invite['uses_remaining'] <= 0) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Invite key has no remaining uses. what a loser lol :p']);
-        exit;
-    }
-
-    // Decrement uses if not infinite
-    if ($invite['uses_remaining'] != 999) {
-        $stmt = $pdo->prepare("UPDATE invite_keys SET uses_remaining = uses_remaining - 1 WHERE id = ?");
-        $stmt->execute([$invite['id']]);
-    }
-} ------------------------------------------------------------
+// ------------------------------------------------------------
 // 3) SERVER-SIDE “Have I Been Pwned” CHECK (via file_get_contents)
 // ------------------------------------------------------------
 function isPwnedPassword(string $password): bool
