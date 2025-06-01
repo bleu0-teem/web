@@ -193,12 +193,13 @@ overlay.querySelector('#generate-btn').addEventListener('click', async () => {
     const key = customKey !== "" ? customKey : `BLUE16_${crypto.getRandomValues(new Uint32Array(1))[0].toString(36).toUpperCase().slice(0, 8)}`;
 
     const payload = {
-        key: key,
-        creator: creator,
-        max_uses: maxUses,
-        used: 0,
-        created_at: new Date().toISOString()
+    key: key,
+    creator: creator,
+    uses_remaining: maxUses,
+    used: 0,
+    created_at: new Date().toISOString()
     };
+
 
     // Save via your backend (example):
     const res = await fetch('/api/invite_key.php', {
