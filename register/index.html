@@ -104,99 +104,136 @@
     <div id="notification-container"></div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-import { createClient } from '@supabase/supabase-js'
-        // Initialize Supabase client
-        const supabaseUrl = 'https://pspjvpipyvpvyixahsku.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzcGp2cGlweXZwdnlpeGFoc2t1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyODU4MTQsImV4cCI6MjA2Mjg2MTgxNH0.K3qGEv9Pz-oSNfocFlVkh8ujQp0YZ85z9VlKGI1WXD8';
-        const supabase = createClient(supabaseUrl, supabaseKey);
+    <script>
+    // ------------------------------------------------------------
+    // 1) showNotification(message, type) — exactly your existing code
+    // ------------------------------------------------------------
+    function showNotification(message, type = 'success') {
+        const container = document.getElementById('notification-container');
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        container.appendChild(notification);
+        setTimeout(() => notification.classList.add('show'), 10);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
 
-        function showNotification(message, type = 'success') {
-            const container = document.getElementById('notification-container');
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            container.appendChild(notification);
-            setTimeout(() => notification.classList.add('show'), 10);
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
+    // ------------------------------------------------------------
+    // 2) isPasswordPwned(password) → returns true if found in a breach
+    // ------------------------------------------------------------
+    async function isPasswordPwned(password) {
+        // Compute SHA‑1 of the password
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+
+        const prefix = hashHex.slice(0, 5);
+        const suffix = hashHex.slice(5);
+
+        // Query HIBP range API
+        const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+        if (!res.ok) {
+            // If HIBP is down, allow registration but warn in console
+            console.warn('HIBP request failed. Proceeding by default.');
+            return false;
+        }
+        const text = await res.text();
+        // Look for the suffix in the returned list
+        return text.split('\r\n').some(line => line.split(':')[0] === suffix);
+    }
+
+    // ------------------------------------------------------------
+    // 3) Handler for “Register” button
+    // ------------------------------------------------------------
+    document.getElementById('register-button').addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        const username  = document.getElementById('reg-username').value.trim();
+        const password  = document.getElementById('reg-pass').value;
+        const confirm   = document.getElementById('reg-pass-confirm').value;
+        const inviteKey = document.getElementById('reg-invite-key').value.trim();
+
+        // 3a) Basic client‐side validation
+        if (!username || !password || !confirm || !inviteKey) {
+            showNotification('Please fill in all fields.', 'error');
+            return;
+        }
+        if (password !== confirm) {
+            showNotification('Passwords do not match.', 'error');
+            return;
         }
 
-        async function isPasswordPwned(password) {
-            const sha1 = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(password));
-            const hash = Array.from(new Uint8Array(sha1)).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-            const prefix = hash.slice(0, 5);
-            const suffix = hash.slice(5);
+        // 3b) Check invite key (replace 'test' with your real key)
+        const validInviteKey = 'test';
+        if (inviteKey !== validInviteKey) {
+            showNotification('Invalid invite key.', 'error');
+            return;
+        }
 
-            const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+        // 3c) HIBP check
+        try {
+            const pwned = await isPasswordPwned(password);
+            if (pwned) {
+                showNotification('Password has been found in a breach. Please choose a different one.', 'error');
+                return;
+            }
+        } catch (err) {
+            console.warn('Could not complete HIBP check:', err);
+        }
+
+        // 3d) All good: send to register.php
+        try {
+            const formData = new FormData();
+            formData.append('username', username);
+            formData.append('password', password);
+            formData.append('confirm_password', confirm);
+            formData.append('invite_key', inviteKey);
+
+            const res = await fetch('register.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include' // so that PHP session cookies (if any) are set
+            });
+
             const text = await res.text();
-            return text.includes(suffix);
+            if (res.ok) {
+                showNotification(text || 'Registration successful!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            } else {
+                showNotification(text || 'Registration failed.', 'error');
+            }
+        } catch (err) {
+            console.error('Registration request failed:', err);
+            showNotification('Something went wrong. Please try again later.', 'error');
         }
+    });
 
-        document.getElementById('register-button').addEventListener('click', async (e) => {
-            e.preventDefault();
-
-            const email = document.getElementById('reg-username').value.trim();
-            const password = document.getElementById('reg-pass').value;
-            const confirm = document.getElementById('reg-pass-confirm').value;
-            const inviteKey = document.getElementById('reg-invite-key').value.trim();
-
-            if (!email || !password || !confirm || !inviteKey) {
-                showNotification('Please fill in all fields.', 'error');
-                return;
-            }
-
-            if (password !== confirm) {
-                showNotification('Passwords do not match.', 'error');
-                return;
-            }
-
-            const validInviteKey = 'test';
-            if (inviteKey !== validInviteKey) {
-                showNotification('Invalid invite key.', 'error');
-                return;
-            }
-
-            try {
-                const isPwned = await isPasswordPwned(password);
-                if (isPwned) {
-                    showNotification('Password has been found in a breach. Please choose a different one.', 'error');
-                    return;
-                }
-
-                const { error } = await supabase.auth.signUp({ email, password });
-                if (error) {
-                    showNotification(`Registration failed: ${error.message}`, 'error');
-                    return;
-                }
-
-                showNotification('Registration successful! Check your email for confirmation.', 'success');
-                setTimeout(() => window.location.href = 'login.html', 1500);
-
-            } catch (err) {
-                console.error(err);
-                showNotification('Something went wrong. Please try again later.', 'error');
+    // ------------------------------------------------------------
+    // 4) Eye‐toggle for password visibility (same as before)
+    // ------------------------------------------------------------
+    function setupEyeToggle(inputId, eyeId) {
+        const input = document.getElementById(inputId);
+        const eye = document.getElementById(eyeId);
+        eye.addEventListener('click', () => {
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.classList.replace('ri-eye-off-line', 'ri-eye-line');
+            } else {
+                input.type = 'password';
+                eye.classList.replace('ri-eye-line', 'ri-eye-off-line');
             }
         });
+    }
+    setupEyeToggle('reg-pass', 'pass-eye');
+    setupEyeToggle('reg-pass-confirm', 'confirm-eye');
+</script>
 
-        function setupEyeToggle(inputId, eyeId) {
-            const input = document.getElementById(inputId);
-            const eye = document.getElementById(eyeId);
-            eye.addEventListener('click', () => {
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    eye.classList.replace('ri-eye-off-line', 'ri-eye-line');
-                } else {
-                    input.type = 'password';
-                    eye.classList.replace('ri-eye-line', 'ri-eye-off-line');
-                }
-            });
-        }
-
-        setupEyeToggle('reg-pass', 'pass-eye');
-        setupEyeToggle('reg-pass-confirm', 'confirm-eye');
-    </script>
 </body>
 </html>
