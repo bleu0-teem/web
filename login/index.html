@@ -130,7 +130,43 @@
     }
 
     // ------------------------------------------------------------
-    // 3) Frontend handler for “Login” button
+    //      // 3) Check for login cookie and auto-login
+    // ------------------------------------------------------------
+    async function autoLogin() {
+        const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+            const [key, value] = cookie.trim().split('=');
+            acc[key] = value;
+            return acc;
+        }, {});
+
+        if (cookies.token) {
+            try {
+                const res = await fetch('/api/validate_token.php', {
+                    method: 'POST',
+                    body: JSON.stringify({ token: cookies.token }),
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                });
+
+                if (res.ok) {
+                    const text = await res.text();
+                    showNotification(text || 'Auto-login successful!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard/';
+                    }, 1000);
+                } else {
+                    console.warn('Auto-login failed.');
+                }
+            } catch (err) {
+                console.error('Auto-login request failed:', err);
+            }
+        }
+    }
+
+    autoLogin();
+
+    // ------------------------------------------------------------
+    // 4) Frontend handler for “Login” button
     // ------------------------------------------------------------
     document.getElementById('login-button').addEventListener('click', async (e) => {
         e.preventDefault();
@@ -138,13 +174,13 @@
         const username = document.getElementById('login-username').value.trim();
         const password = document.getElementById('login-pass').value;
 
-        // 3a) Basic client‐side validation
+        // 4a) Basic client‐side validation
         if (!username || !password) {
             showNotification('Please fill in both fields.', 'error');
             return;
         }
 
-        // 3b) HIBP check
+        // 4b) HIBP check
         try {
             const breaches = await isPwned(password);
             if (breaches > 0) {
@@ -156,7 +192,7 @@
             console.warn('Could not complete HIBP check:', err);
         }
 
-        // 3c) All good: send to login.php
+        // 4c) All good: send to login.php
         try {
             const formData = new FormData();
             formData.append('username_or_email', username);
@@ -166,6 +202,12 @@
 
             const text = await res.text();
             if (res.ok) {
+                const responseData = await res.json();
+                const token = responseData.token;
+
+                // Set a secure cookie for the token
+                document.cookie = `token=${encodeURIComponent(token)}; path=/; max-age=31536000; Secure; HttpOnly`;
+
                 showNotification(text || 'Login successful!', 'success');
                 // Redirect to dashboard (adjust path as needed)
                 setTimeout(() => {
@@ -181,7 +223,7 @@
     });
 
     // ------------------------------------------------------------
-    // 4) Eye‐toggle for password visibility (same as before)
+    // 5) Eye‐toggle for password visibility (same as before)
     // ------------------------------------------------------------
     const passwordInput = document.getElementById('login-pass');
     const eyeIcon = document.getElementById('login-eye');
@@ -196,7 +238,7 @@
     });
 
     // ------------------------------------------------------------
-    // 5) (Optional) Offline‐mode check, same as before
+    // 6) (Optional) Offline‐mode check, same as before
     // ------------------------------------------------------------
     fetch('https://blue16-team.github.io/blue16-web/values.json')
         .then((res) => res.json())

@@ -1,53 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="https://unpkg.com/akar-icons-fonts"></script>
+</head>
+<body>
 
-<link rel="stylesheet" href="dashboard.scss">
-<script src="https://unpkg.com/akar-icons-fonts"></script>
-<ul>
-        <li>
-            <a href="#">
-                <i class="ai-home"></i>
-                <span>Dashboard</span>
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="ai-download"></i>
-                <span>Download</span>
-            </a>
-        </li>	
-        <li>
-            <a href="#">
-                <i class="ai-file"></i>
-                <span>Files</span>
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="ai-game-controller"></i>
-                <span>Games</span>
-            </a>
-        </li>	
-        <li>
-            <a href="#">
-                <i class="ai-key"></i>
-                <span>Invites</span>
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="ai-bell"></i>
-                <span>Notifications</span>
-            </a>
-        </li>
-        <li>	
-            <a href="#">
-                <i class="ai-gear"></i>
-                <span>Settings</span>
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class="ai-person"></i>
-                <span>Profile</span>
-            </a>
-        </li>
-</ul>
+    <div class="dashboard-layout">
+        <nav class="sidebar-menu">
+            <ul>
+                <li>
+                    <a href="#"  class="menu-link" data-section="dashboard">
+                        <i class="ai-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="ai-download"></i>
+                        <span>Download</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="ai-file"></i>
+                        <span>Files</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="ai-game-controller"></i>
+                        <span>Games</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="ai-key"></i>
+                        <span>Invites</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-link" data-section="notifications">
+                        <i class="ai-bell"></i>
+                        <span>Notifications</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-link" data-section="profile">
+                        <i class="ai-person"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-link" data-section="settings">
+                        <i class="ai-gear"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Right side content -->
+        <div class="right-content">
+            <!-- Dashboard Section -->
+            <div class="content-section" id="dashboard-section">
+                <div class="welcome-message">
+                    <h2>Welcome, <span id="username">kitty</span>!</h2>
+                </div>
+                <div class="dummy-text">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nec nunc at libero tincidunt pretium. Curabitur non lorem in magna volutpat lacinia. Nulla facilisi. Suspendisse potenti. Integer nec ex vehicula, imperdiet justo a, pharetra risus.</p>
+                    <!-- ...existing dummy text... -->
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="content-section" id="profile-section" style="display: none;">
+                <h2>Welcome to Your Profile</h2>
+                <p>Manage your personal information here.</p>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="content-section" id="settings-section" style="display: none;">
+                <h2>Settings</h2>
+                <p>Configure your preferences and account settings.</p>
+            </div>
+
+            <!-- Notifications Section -->
+            <div class="content-section" id="notifications-section" style="display: none;">
+                <h2>Notifications</h2>
+                <p>View your recent notifications here.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for switching content sections
+        document.querySelectorAll('.menu-link').forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                const sectionId = link.getAttribute('data-section') + '-section';
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.style.display = section.id === sectionId ? 'block' : 'none';
+                });
+            });
+        });
+
+        // Fetch username from cookies and display in the welcome message
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        const username = getCookie('username') || 'User';
+        document.getElementById('username').textContent = username;
+    </script>
+</body>
+</html>

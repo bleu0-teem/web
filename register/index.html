@@ -190,12 +190,14 @@
 
             const res = await fetch('/api/register.php', { method: 'POST', body: formData, credentials: 'include' });
 
-
             const text = await res.text();
             if (res.ok) {
+                // Set a cookie for the username
+                document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=31536000`; // 1 year expiration
+
                 showNotification(text || 'Registration successful!', 'success');
                 setTimeout(() => {
-                    window.location.href = 'login.html';
+                    window.location.href = '/dashboard/';
                 }, 1500);
             } else {
                 showNotification(text || 'Registration failed.', 'error');
