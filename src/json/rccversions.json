@@ -1,0 +1,16 @@
+{
+  "versions": [
+    {
+      "version": "2016",
+      "launch_arguments": "-place $placepath -port $port",
+      "vulnerable": false,
+      "public": false,
+      "patchby": "noooooobie",
+      "author": "Roblox",
+      "altname": "Roblox 2016 RCC",
+      "desc": "long ass description :3"
+    }
+  ],
+  "offline": true,
+  "message": "Not done yet"
+}

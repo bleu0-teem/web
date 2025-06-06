@@ -1,0 +1,17 @@
+{
+  "versions": [
+    {
+      "version": "2016",
+      "rcc_version": "2016",
+      "launch_arguments": "-port $port",
+      "vulnerable": false,
+      "public": false,
+      "patchby": "noooooobie",
+      "author": "Roblox",
+      "altname": "Roblox 2016 Client",
+      "desc": "long ass description :3"
+    }
+  ],
+  "offline": true,
+  "message": "Not done yet"
+}

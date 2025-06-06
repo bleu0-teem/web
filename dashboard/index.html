@@ -19,25 +19,25 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="#" class="menu-link" data-section="download">
                         <i class="ai-download"></i>
                         <span>Download</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="#" class="menu-link" data-section="files">
                         <i class="ai-file"></i>
                         <span>Files</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="#"  class="menu-link" data-section="games">
                         <i class="ai-game-controller"></i>
                         <span>Games</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="#" class="menu-link" data-section="invites">
                         <i class="ai-key"></i>
                         <span>Invites</span>
                     </a>
@@ -76,6 +76,30 @@
                 </div>
             </div>
 
+            <!-- Download Section -->
+            <div class="content-section" id="download-section" style="display: none;">
+                <h2>Installing the launcher will be there :3</h2>
+                <p>its just not done yettt!</p>
+            </div>
+
+            <!-- Files Section -->
+            <div class="content-section" id="files-section" style="display: none;">
+                <h2>Files</h2>
+                <p>Your files will be here.</p>
+            </div>
+
+            <!-- Games Section -->
+            <div class="content-section" id="games-section" style="display: none;">
+                <h2>Games</h2>
+                <p>Find and play games in there.</p>
+            </div>
+
+            <!-- Invites Section -->
+            <div class="content-section" id="invites-section" style="display: none;">
+                <h2>Invites</h2>
+                <p>Manage all your invite keys here.</p>
+            </div>
+
             <!-- Profile Section -->
             <div class="content-section" id="profile-section" style="display: none;">
                 <h2>Welcome to Your Profile</h2>
@@ -85,8 +109,36 @@
             <!-- Settings Section -->
             <div class="content-section" id="settings-section" style="display: none;">
                 <h2>Settings</h2>
-                <p>Configure your preferences and account settings.</p>
+
+                <div class="setting-group">
+                    <label for="change-username">Change Username</label>
+                    <input type="text" id="change-username" placeholder="Enter new username">
+                    <button onclick="updateUsername()">Update</button>
+                </div>
+
+                <div class="setting-group">
+                    <label for="dark-mode-toggle">
+                        <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()"> Enable Dark Mode
+                    </label>
+                </div>
+
+                <div class="setting-group">
+                    <label for="email-notifications">
+                        <input type="checkbox" id="email-notifications" checked> Email Notifications
+                    </label>
+                </div>
+
+                <div class="setting-group">
+                    <label for="sms-notifications">
+                        <input type="checkbox" id="sms-notifications"> SMS Notifications
+                    </label>
+                </div>
+
+                <div class="setting-note">
+                    <small>Your preferences will be saved for this session.</small>
+                </div>
             </div>
+
 
             <!-- Notifications Section -->
             <div class="content-section" id="notifications-section" style="display: none;">
