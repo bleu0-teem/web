@@ -202,8 +202,6 @@ autoLogin();
             formData.append('password', password);
 
             const res = await fetch('/api/login.php', { method: 'POST', body: formData, credentials: 'include' });
-
-ror');
 const responseData = await res.json();
 const token = responseData.token;
 

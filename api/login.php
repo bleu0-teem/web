@@ -1,4 +1,5 @@
 <?php
+
 // -------------------------------------------------------------------
 // api/login.php
 //
@@ -36,7 +37,9 @@ try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (PDOException $e) {
     http_response_code(500);
-    exit("Database connection failed.");
+    header('Content-Type: application/json');
+echo json_encode(['error' => 'Database unaccessible, probably subcription failed, report to Discord Server.']);
+exit;
 }
 
 // ------------------------------------------------------------
@@ -47,7 +50,9 @@ $password   = $_POST['password'] ?? '';
 
 if ($identifier === '' || $password === '') {
     http_response_code(400);
-    exit('Please fill in both fields.');
+    header('Content-Type: application/json');
+echo json_encode(['error' => 'Please fill in both fields.']);
+exit;
 }
 
 // ------------------------------------------------------------
@@ -101,7 +106,9 @@ function isPwnedPassword(string $password): bool
 
 if (isPwnedPassword($password)) {
     http_response_code(400);
-    exit('Your password appeared in a breach. Please change it before logging in.');
+    header('Content-Type: application/json');
+echo json_encode(['error' => 'Your password found in some breaches of HIBP. Change the password.']);
+exit;
 }
 
 // ------------------------------------------------------------
@@ -117,12 +124,16 @@ try {$stmt = $pdo->prepare("
     $userRow = $stmt->fetch();
 } catch (PDOException $e) {
     http_response_code(500);
-    exit('Server error.');
+    header('Content-Type: application/json');
+echo json_encode(['error' => 'Server error, report in Discord Support server.']);
+exit;
 }
 
 if (!$userRow || !password_verify($password, $userRow['password_hash'])) {
     http_response_code(401);
-    exit('Invalid username/email or password.');
+    header('Content-Type: application/json');
+echo json_encode(['error' => 'Invalid username/password.']);
+exit;
 }
 
 // ------------------------------------------------------------
@@ -139,3 +150,4 @@ echo json_encode([
     'token'   => $userRow['token'] ?? null,
 ]);
 exit;
+>
