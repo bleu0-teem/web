@@ -107,13 +107,12 @@ if (isPwnedPassword($password)) {
 // ------------------------------------------------------------
 // 4) FETCH USER FROM DATABASE & VERIFY PASSWORD
 // ------------------------------------------------------------
-try {
-    $stmt = $pdo->prepare("
-        SELECT id, username, email, password_hash
-        FROM users
-        WHERE username = :ident OR email = :ident
-        LIMIT 1
-    ");
+try {$stmt = $pdo->prepare("
+    SELECT id, username, email, password_hash, token
+    FROM users
+    WHERE username = :ident OR email = :ident
+    LIMIT 1
+");
     $stmt->execute([':ident' => $identifier]);
     $userRow = $stmt->fetch();
 } catch (PDOException $e) {
@@ -128,12 +127,15 @@ if (!$userRow || !password_verify($password, $userRow['password_hash'])) {
 
 // ------------------------------------------------------------
 // 5) LOGIN SUCCESS: SET SESSION & RETURN
-// ------------------------------------------------------------
-$_SESSION['user_id']  = $userRow['id'];
+// ------------------------------------------------------------$_SESSION['user_id']  = $userRow['id'];
 $_SESSION['username'] = $userRow['username'];
 
-// Regenerate session ID to prevent fixation
 session_regenerate_id(true);
 
+header('Content-Type: application/json');
 http_response_code(200);
-exit('Login successful!');
+echo json_encode([
+    'message' => 'Login successful!',
+    'token'   => $userRow['token'] ?? null,
+]);
+exit;

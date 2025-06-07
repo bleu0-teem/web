@@ -133,37 +133,40 @@
     //      // 3) Check for login cookie and auto-login
     // ------------------------------------------------------------
     async function autoLogin() {
-        const cookies = document.cookie.split(';').reduce((acc, cookie) => {
-            const [key, value] = cookie.trim().split('=');
-            acc[key] = value;
-            return acc;
-        }, {});
+    // Parse cookies into an object
+    const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+        const [key, value] = cookie.trim().split('=');
+        acc[key] = value;
+        return acc;
+    }, {});
 
-        if (cookies.token) {
-            try {
-                const res = await fetch('/api/validate_token.php', {
-                    method: 'POST',
-                    body: JSON.stringify({ token: cookies.token }),
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                });
+    if (!cookies.token) return; // Exit early if no token found
 
-                if (res.ok) {
-                    const text = await res.text();
-                    showNotification(text || 'Auto-login successful!', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/dashboard/';
-                    }, 1000);
-                } else {
-                    console.warn('Auto-login failed.');
-                }
-            } catch (err) {
-                console.error('Auto-login request failed:', err);
-            }
+    try {
+        const response = await fetch('/api/validate_token.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ token: cookies.token }),
+        });
+
+        if (response.ok) {
+            const message = await response.text();
+            showNotification(message || 'Auto-login successful!', 'success');
+
+            setTimeout(() => {
+                window.location.href = '/dashboard/';
+            }, 1000);
+        } else {
+            console.warn('Auto-login failed.');
         }
+    } catch (error) {
+        console.error('Auto-login request failed:', error);
     }
+}
 
-    autoLogin();
+autoLogin();
+
 
     // ------------------------------------------------------------
     // 4) Frontend handler for “Login” button
@@ -200,22 +203,21 @@
 
             const res = await fetch('/api/login.php', { method: 'POST', body: formData, credentials: 'include' });
 
-            const text = await res.text();
-            if (res.ok) {
-                const responseData = await res.json();
-                const token = responseData.token;
+ror');
+const responseData = await res.json();
+const token = responseData.token;
 
-                // Set a secure cookie for the token
-                document.cookie = `token=${encodeURIComponent(token)}; path=/; max-age=31536000; Secure; HttpOnly`;
+if (token) {
+    document.cookie = `token=${encodeURIComponent(token)}; path=/; max-age=31536000; Secure;`;
+}
 
-                showNotification(text || 'Login successful!', 'success');
-                // Redirect to dashboard (adjust path as needed)
-                setTimeout(() => {
-                    window.location.href = '/dashboard/';
-                }, 1000);
-            } else {
-                showNotification(text || 'Login failed.', 'error');
-            }
+showNotification(responseData.message || 'Login successful!', 'success');
+setTimeout(() => {
+    window.location.href = '/dashboard/';
+}, 1000);
+
+
+
         } catch (err) {
             console.error('Login request failed:', err);
             showNotification('An unknown error occurred. Please try again.', 'error');
