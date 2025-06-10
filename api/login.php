@@ -150,4 +150,3 @@ echo json_encode([
     'token'   => $userRow['token'] ?? null,
 ]);
 exit;
->
