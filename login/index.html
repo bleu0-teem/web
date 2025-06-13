@@ -202,20 +202,17 @@ autoLogin();
             formData.append('password', password);
 
             const res = await fetch('/api/login.php', { method: 'POST', body: formData, credentials: 'include' });
-const responseData = await res.json();
-const token = responseData.token;
+            const responseData = await res.json();
 
-if (token) {
-    document.cookie = `token=${encodeURIComponent(token)}; path=/; max-age=31536000; Secure;`;
-}
-
-showNotification(responseData.message || 'Login successful!', 'success');
-setTimeout(() => {
-    window.location.href = '/dashboard/';
-}, 1000);
-
-
-
+            if (responseData.success) {
+                document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=31536000; Secure;`;
+                showNotification(responseData.message || 'Login successful!', 'success');
+                setTimeout(() => {
+                    window.location.href = '/dashboard/';
+                }, 1000);
+            } else {
+                showNotification(responseData.message || 'Login failed. Please try again.', 'error');
+            }
         } catch (err) {
             console.error('Login request failed:', err);
             showNotification('An unknown error occurred. Please try again.', 'error');
