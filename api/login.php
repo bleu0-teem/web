@@ -7,7 +7,7 @@
 //   • username_or_email
 //   • password
 //
-// Returns plain text + HTTP status code:
+// Returns json reason and token (token if success) + HTTP status code:
 //   • 200 OK   → “Login successful!”
 //   • 400 Bad Request → missing fields or pwned password
 //   • 401 Unauthorized → invalid credentials
