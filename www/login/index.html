@@ -67,7 +67,7 @@
           <div class="login__box-input">
             <input type="password" required class="login__input" id="login-pass" placeholder=" " />
             <label for="login-pass" class="login__label">Password</label>
-            <i class="ri-eye-off-line login__eye" id="login-eye"></i>
+            <i class="ri-eye-off-line login__eye" id="login-eye" aria-label="Toggle password visibility"></i>
           </div>
         </div>
       </div>
@@ -130,43 +130,40 @@
     }
 
     // ------------------------------------------------------------
-    //      // 3) Check for login cookie and auto-login
+    // 3) Auto-login using token cookie
     // ------------------------------------------------------------
     async function autoLogin() {
-    // Parse cookies into an object
-    const cookies = document.cookie.split(';').reduce((acc, cookie) => {
-        const [key, value] = cookie.trim().split('=');
-        acc[key] = value;
-        return acc;
-    }, {});
+        const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+            const [key, value] = cookie.trim().split('=');
+            acc[key] = value;
+            return acc;
+        }, {});
 
-    if (!cookies.token) return; // Exit early if no token found
+        if (!cookies.token) return;
 
-    try {
-        const response = await fetch('/api/validate_token.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ token: cookies.token }),
-        });
+        try {
+            const response = await fetch('/api/validate_token.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ token: cookies.token }),
+            });
 
-        if (response.ok) {
-            const message = await response.text();
-            showNotification(message || 'Auto-login successful!', 'success');
-
-            setTimeout(() => {
-                window.location.href = '/dashboard/';
-            }, 1000);
-        } else {
-            console.warn('Auto-login failed.');
+            if (response.ok) {
+                const message = await response.text();
+                showNotification(message || 'Auto-login successful!', 'success');
+                setTimeout(() => {
+                    window.location.href = '/dashboard/';
+                }, 1000);
+            } else {
+                console.warn('Auto-login failed.');
+            }
+        } catch (error) {
+            console.error('Auto-login request failed:', error);
         }
-    } catch (error) {
-        console.error('Auto-login request failed:', error);
     }
-}
 
-autoLogin();
-
+    autoLogin();
 
     // ------------------------------------------------------------
     // 4) Frontend handler for “Login” button
@@ -177,13 +174,11 @@ autoLogin();
         const username = document.getElementById('login-username').value.trim();
         const password = document.getElementById('login-pass').value;
 
-        // 4a) Basic client‐side validation
         if (!username || !password) {
             showNotification('Please fill in both fields.', 'error');
             return;
         }
 
-        // 4b) HIBP check
         try {
             const breaches = await isPwned(password);
             if (breaches > 0) {
@@ -191,11 +186,9 @@ autoLogin();
                 return;
             }
         } catch (err) {
-            // If HIBP fails, allow login but warn in console
             console.warn('Could not complete HIBP check:', err);
         }
 
-        // 4c) All good: send to login.php
         try {
             const formData = new FormData();
             formData.append('username_or_email', username);
@@ -205,7 +198,7 @@ autoLogin();
             const responseData = await res.json();
 
             if (responseData.success) {
-                document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=31536000; Secure;`;
+                document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=31536000; Secure; SameSite=Strict;`;
                 showNotification(responseData.message || 'Login successful!', 'success');
                 setTimeout(() => {
                     window.location.href = '/dashboard/';
@@ -220,7 +213,7 @@ autoLogin();
     });
 
     // ------------------------------------------------------------
-    // 5) Eye‐toggle for password visibility (same as before)
+    // 5) Eye‐toggle for password visibility
     // ------------------------------------------------------------
     const passwordInput = document.getElementById('login-pass');
     const eyeIcon = document.getElementById('login-eye');
@@ -235,7 +228,7 @@ autoLogin();
     });
 
     // ------------------------------------------------------------
-    // 6) (Optional) Offline‐mode check, same as before
+    // 6) Offline‐mode check
     // ------------------------------------------------------------
     fetch('https://blue16-team.github.io/blue16-web/values.json')
         .then((res) => res.json())
@@ -243,7 +236,6 @@ autoLogin();
             if (data.offline) window.location.href = 'offline.html';
         })
         .catch((err) => console.error('Failed to fetch offline status:', err));
-</script>
-
+  </script>
 </body>
 </html>

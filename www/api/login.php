@@ -36,23 +36,24 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (PDOException $e) {
+    error_log("Database connection failed: " . $e->getMessage());
     http_response_code(500);
     header('Content-Type: application/json');
-echo json_encode(['error' => 'Database unaccessible, probably subcription failed, report to Discord Server.']);
-exit;
+    echo json_encode(['error' => 'Database connection failed.']);
+    exit;
 }
 
 // ------------------------------------------------------------
-// 2) FETCH & BASIC VALIDATION OF POST DATA
+// 2) FETCH & VALIDATE POST DATA
 // ------------------------------------------------------------
-$identifier = trim($_POST['username_or_email'] ?? '');
+$identifier = filter_var(trim($_POST['username_or_email'] ?? ''), FILTER_SANITIZE_STRING);
 $password   = $_POST['password'] ?? '';
 
 if ($identifier === '' || $password === '') {
     http_response_code(400);
     header('Content-Type: application/json');
-echo json_encode(['error' => 'Please fill in both fields.']);
-exit;
+    echo json_encode(['error' => 'Please fill in both fields.']);
+    exit;
 }
 
 // ------------------------------------------------------------
@@ -80,17 +81,6 @@ function isPwnedPassword(string $password): bool
         return false;
     }
 
-    $httpCode = 0;
-    if (isset($http_response_header) && is_array($http_response_header)) {
-        if (preg_match('#^HTTP/\d+\.\d+\s+(\d{3})#', $http_response_header[0], $m)) {
-            $httpCode = intval($m[1]);
-        }
-    }
-    if ($httpCode !== 200) {
-        error_log("HIBP returned HTTP $httpCode for prefix $prefix. Skipping breach check.");
-        return false;
-    }
-
     $lines = explode("\r\n", $body);
     foreach ($lines as $line) {
         if (strpos($line, ':') === false) {
@@ -107,41 +97,49 @@ function isPwnedPassword(string $password): bool
 if (isPwnedPassword($password)) {
     http_response_code(400);
     header('Content-Type: application/json');
-echo json_encode(['error' => 'Your password found in some breaches of HIBP. Change the password.']);
-exit;
+    echo json_encode(['error' => 'Your password has been found in breaches. Please change it.']);
+    exit;
 }
 
 // ------------------------------------------------------------
 // 4) FETCH USER FROM DATABASE & VERIFY PASSWORD
 // ------------------------------------------------------------
-try {$stmt = $pdo->prepare("
-    SELECT id, username, email, password_hash, token
-    FROM users
-    WHERE username = :ident OR email = :ident
-    LIMIT 1
-");
+try {
+    $stmt = $pdo->prepare("
+        SELECT id, username, email, password_hash, token
+        FROM users
+        WHERE username = :ident OR email = :ident
+        LIMIT 1
+    ");
     $stmt->execute([':ident' => $identifier]);
     $userRow = $stmt->fetch();
 } catch (PDOException $e) {
+    error_log("Database query failed: " . $e->getMessage());
     http_response_code(500);
     header('Content-Type: application/json');
-echo json_encode(['error' => 'Server error, report in Discord Support server.']);
-exit;
+    echo json_encode(['error' => 'Server error. Please try again later.']);
+    exit;
 }
 
 if (!$userRow || !password_verify($password, $userRow['password_hash'])) {
     http_response_code(401);
     header('Content-Type: application/json');
-echo json_encode(['error' => 'Invalid username/password.']);
-exit;
+    echo json_encode(['error' => 'Invalid username/password.']);
+    exit;
 }
 
 // ------------------------------------------------------------
 // 5) LOGIN SUCCESS: SET SESSION & RETURN
-// ------------------------------------------------------------$_SESSION['user_id']  = $userRow['id'];
+// ------------------------------------------------------------
+$_SESSION['user_id']  = $userRow['id'];
 $_SESSION['username'] = $userRow['username'];
 
 session_regenerate_id(true);
+
+// Set secure session cookie flags
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_samesite', 'Strict');
 
 header('Content-Type: application/json');
 http_response_code(200);
