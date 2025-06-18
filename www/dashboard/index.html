@@ -6,6 +6,7 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
     <script src="https://unpkg.com/akar-icons-fonts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -97,7 +98,12 @@
             <!-- Invites Section -->
             <div class="content-section" id="invites-section" style="display: none;">
                 <h2>Invites</h2>
-                <p>Manage all your invite keys here.</p>
+                <p id="invite-message">Manage all your invite keys here.</p>
+                <div id="invite-list"></div>
+                <div class="analytics-widgets">
+                    <canvas id="inviteUsageChart" width="400" height="200"></canvas>
+                    <canvas id="inviteKeyChart" width="400" height="200"></canvas>
+                </div>
             </div>
 
             <!-- Profile Section -->
@@ -149,7 +155,7 @@
     </div>
 
     <script>
-        // JavaScript for switching content sections
+        // 1. Switch content sections
         document.querySelectorAll('.menu-link').forEach(link => {
             link.addEventListener('click', event => {
                 event.preventDefault();
@@ -160,7 +166,7 @@
             });
         });
 
-        // Fetch username from cookies and display in the welcome message
+        // 2. Fetch username from cookies
         function getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
@@ -169,6 +175,123 @@
 
         const username = getCookie('username') || 'User';
         document.getElementById('username').textContent = username;
+
+        // 3. Update username
+        function updateUsername() {
+            const newUsername = document.getElementById('change-username').value.trim();
+            if (newUsername) {
+                document.cookie = `username=${newUsername}; path=/`;
+                document.getElementById('username').textContent = newUsername;
+                alert('Username updated successfully!');
+            } else {
+                alert('Please enter a valid username.');
+            }
+        }
+
+        // 4. Toggle dark mode
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // 5. Save notification preferences
+        document.querySelectorAll('#email-notifications, #sms-notifications').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const emailPref = document.getElementById('email-notifications').checked;
+                const smsPref = document.getElementById('sms-notifications').checked;
+                console.log(`Email Notifications: ${emailPref}, SMS Notifications: ${smsPref}`);
+                alert('Notification preferences saved for this session.');
+            });
+        });
+
+        // 7. Analytics Widgets for Invites Section
+        const inviteUsageCtx = document.getElementById('inviteUsageChart').getContext('2d');
+        const inviteKeyCtx = document.getElementById('inviteKeyChart').getContext('2d');
+
+        // Fetch username from cookies
+        const usernameForInvites = getCookie('username');
+
+        if (!usernameForInvites) {
+            document.getElementById('invite-message').textContent = "You should log in to view your invite keys.";
+        } else {
+            // Fetch invite keys from the API
+            fetch(`../api/invites.php?username=${usernameForInvites}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.invites && data.invites.length > 0) {
+                        const inviteList = document.getElementById('invite-list');
+                        inviteList.innerHTML = '<ul>' + data.invites.map(invite => `
+                            <li>
+                                Key: ${invite.key}, Uses: ${invite.uses}, Status: ${invite.active ? 'Active' : 'Expired'}
+                            </li>
+                        `).join('') + '</ul>';
+
+                        // Update charts with fetched data
+                        updateInviteCharts(data.invites);
+                    } else {
+                        document.getElementById('invite-message').textContent = "No invite keys found.";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching invite keys:', error);
+                    document.getElementById('invite-message').textContent = "Error fetching invite keys.";
+                });
+        }
+
+        // Update charts with invite data
+        function updateInviteCharts(invites) {
+            const keys = invites.map(invite => invite.key);
+            const uses = invites.map(invite => invite.uses);
+            const activeCount = invites.filter(invite => invite.active).length;
+            const expiredCount = invites.length - activeCount;
+
+            // Invite Usage Chart
+            new Chart(inviteUsageCtx, {
+                type: 'line',
+                data: {
+                    labels: keys,
+                    datasets: [{
+                        label: 'Number of Uses',
+                        data: uses,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true }
+                    }
+                }
+            });
+
+            // Invite Key Chart
+            new Chart(inviteKeyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Active', 'Expired'],
+                    datasets: [{
+                        label: 'Invite Key Status',
+                        data: [activeCount, expiredCount],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(255, 99, 132, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true }
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>
