@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Babylon.js Model Viewer</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      background: #121212;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+
+  <!-- Babylon.js Core -->
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <!-- Babylon.js Loaders (for .glb, .gltf, .obj, etc.) -->
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+</head>
+<body>
+<canvas id="renderCanvas"></canvas>
+
+<script>
+  const canvas = document.getElementById("renderCanvas");
+const engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true, alpha: true });
+
+const scene = new BABYLON.Scene(engine);
+scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+
+
+
+  // Camera
+  const camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2.5, 5, BABYLON.Vector3.Zero(), scene);
+  // camera.attachControl(canvas, false);
+
+  // Lighting
+  const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+  light.intensity = 1.2;
+
+  // Load 3D model (.glb or .obj)
+  BABYLON.SceneLoader.ShowLoadingScreen = false;
+  BABYLON.SceneLoader.Append(
+    "./models/ilovemaxf3mchar/",     // folder path (adjust if needed)
+    "ilovemaxf3m.obj", // filename (can be .glb or .obj)
+    scene,
+    () => {
+      scene.createDefaultCameraOrLight(true, true, true);
+    },
+    null,
+    (scene, msg, exception) => {
+      console.error("Model load error:", msg, exception);
+    }
+  );
+
+  // Mouse follow logic
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener("mousemove", (e) => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  engine.runRenderLoop(() => {
+    if (scene.meshes.length > 1) {
+      const model = scene.meshes[1]; // mesh[0] is often root, real model is [1]
+      model.rotation.y = mouseX * Math.PI;
+      model.rotation.x = mouseY * Math.PI / 2;
+    }
+    scene.render();
+  });
+
+  window.addEventListener("resize", () => {
+    engine.resize();
+  });
+</script>
+</body>
+</html>
