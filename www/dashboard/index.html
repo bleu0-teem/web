@@ -7,8 +7,12 @@
     <link rel="stylesheet" href="dashboard.css">
     <script src="https://unpkg.com/akar-icons-fonts"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/aplayer/dist/APlayer.min.css">
+<script src="https://unpkg.com/aplayer/dist/APlayer.min.js"></script>
 </head>
 <body>
+  <div id="aplayer" class="aplayer"></div>
+
 
     <div class="dashboard-layout">
         <nav class="sidebar-menu">
@@ -293,5 +297,23 @@
             });
         }
     </script>
+    
+    <script>
+  const ap = new APlayer({
+    container: document.getElementById('aplayer'),
+    fixed: true,       // set true to make it always visible on scroll
+    audio: [
+      {
+        name: 'anarchy!!!!',
+        artist: 'Stomach Book',
+        url: 'https://files.catbox.moe/t6oilh.mp3',
+        cover: 'https://files.catbox.moe/oz8u9a.jpeg',
+        lrc: 'https://litter.catbox.moe/9qz0f8zdowrj5nxi.lrc',
+        theme: '#e6d0b2'
+      },
+      // add more tracks here if needed
+    ]
+  });
+</script>
 </body>
 </html>
