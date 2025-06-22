@@ -59,25 +59,35 @@ scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
     }
   );
 
-  // Mouse follow logic
-  let mouseX = 0, mouseY = 0;
-  document.addEventListener("mousemove", (e) => {
-    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-  });
+// Track normalized mouse position (-1 to +1)
+let mouseX = 0, mouseY = 0;
 
-  engine.runRenderLoop(() => {
-    if (scene.meshes.length > 1) {
-      const model = scene.meshes[1]; // mesh[0] is often root, real model is [1]
-      model.rotation.y = mouseX * Math.PI;
-      model.rotation.x = mouseY * Math.PI / 2;
-    }
-    scene.render();
-  });
+document.addEventListener("mousemove", e => {
+  mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+  mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+});
 
-  window.addEventListener("resize", () => {
-    engine.resize();
-  });
+// Quality of damping: lower = smoother/slower
+const smoothFactor = 0.1;
+
+engine.runRenderLoop(() => {
+  const delta = scene.getEngine().getDeltaTime(); // ms since last frame :contentReference[oaicite:1]{index=1}
+
+  if (scene.meshes.length > 1) {
+    const model = scene.meshes[1];
+    const targetY = mouseX * Math.PI;       // full 180° turning
+    const targetX = mouseY * Math.PI / 2;   // half 90° up/down
+
+    // LERP: current + (target – current) × factor
+    // Multiply by (delta / 16) to scale smoothing over time :contentReference[oaicite:2]{index=2}
+    const scale = (delta / 16);
+    model.rotation.y += (targetY - model.rotation.y) * smoothFactor * scale;
+    model.rotation.x += (targetX - model.rotation.x) * smoothFactor * scale;
+  }
+
+  scene.render();
+});
+
 </script>
 </body>
 </html>
