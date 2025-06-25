@@ -194,8 +194,18 @@
             formData.append('username_or_email', username);
             formData.append('password', password);
 
-            const res = await fetch('/api/login.php', { method: 'POST', body: formData, credentials: 'include' });
-            const responseData = await res.json();
+            const res = await fetch('/api/login.php', { ... });
+
+              let responseData;
+              try {
+                responseData = await res.json();
+              } catch (e) {
+                const text = await res.text();
+                console.error('Non-JSON response:', text);
+                showNotification('Server error — received invalid response.', 'error');
+                return;
+              }
+
 
             if (responseData.success) {
                 document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=31536000; Secure; SameSite=Strict;`;
