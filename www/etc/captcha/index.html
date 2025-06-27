@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CAPTCHA</title>
+  <style>
+    body {
+      margin: 0; padding: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .captcha {
+      display: flex; align-items: center;
+      cursor: pointer; margin-bottom: 20px;
+      user-select: none;
+    }
+    .checkbox-box {
+      width: 20px; height: 20px;
+      border: 1px solid #9e9e9e;
+      margin-right: 8px; position: relative;
+    }
+    .checkbox-box.checked::after {
+      content: "✓";
+      position: absolute; top: -2px; left: 2px;
+      color: green; font-size: 18px;
+    }
+    #wheelCanvas {
+      border: 4px solid #333;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+    }
+    #spinAgain {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 6px 12px;
+      background: #ffffffcc;
+      border: 2px solid #333;
+      border-radius: 5px;
+      cursor: pointer;
+      display: none;
+    }
+    /* Stage 3 Limbo Keys styles */
+    #limboKeysStage {
+      display: none;
+      position: relative;
+      width: 400px; height: 400px;
+      margin: 0 auto;
+    }
+    .limbo-orbiter {
+      position: absolute;
+      width: 100%; height: 100%;
+      top: 0; left: 0;
+      pointer-events: none;
+    }
+    .limbo-key {
+      position: absolute;
+      width: 60px; height: 60px;
+      margin: -30px 0 0 -30px;
+      top: 50%; left: 50%;
+      display: flex; justify-content: center; align-items: center;
+      font-size: 40px; background: #333; color: #fff;
+      border-radius: 8px;
+      user-select: none;
+      cursor: pointer;
+      transition: box-shadow 0.3s, transform 0.5s cubic-bezier(.3,1.5,.5,1);
+      pointer-events: auto;
+    }
+    .limbo-glow { box-shadow: 0 0 20px 8px #0f0; }
+  </style>
+</head>
+<body>
+  <!-- Add this where you like, e.g. at the top of <body> -->
+<button id="speedrunToggleBtn" style="position:fixed;top:18px;right:18px;z-index:1000;font-size:18px;padding:6px 18px;border-radius:8px;cursor:pointer;">Speedrun: OFF</button>
+<div id="speedrunTimer" style="display:none;position:fixed;top:16px;left:16px;padding:7px 18px;background:#222;color:#fff;border-radius:9px;font-size:19px;z-index:2000;box-shadow:0 2px 10px #0003;">⏱️ <span id="speedrunTimeValue">0.00</span> s</div>
+
+  <div class="captcha" id="captcha">
+    <div class="checkbox-box" id="cbox"></div>
+    <span>I'm not a robot</span>
+  </div>
+
+  <div style="position: relative;">
+    <canvas id="wheelCanvas" width="400" height="400"></canvas>
+    <button id="spinAgain">Spin</button>
+  </div>
+  
+  <div id="mathStage" style="display:none;">
+    <canvas id="mathCanvas"></canvas>
+<button id="revealHint">Get Hint</button>
+<p id="hintFeedback"></p>
+<input id="userAnswer" autocomplete="off">
+<button id="submitAnswer">Submit</button>
+<p id="answerFeedback"></p>
+</div>
+<div id="limboKeysStage"></div>
+
+<div class="end" id="end" style="display:none;">
+  <h4>
+  hi! you made it :'3<br>
+  entire page was made using chatgpt and github copilot!!!<br>
+  inspired by "you dont wanna see me infuriated"<br>
+  maybe... its time to check smtthhh else :p<br>
+  </h4><br>
+  <details>
+    <summary>my links</summary>
+    <p>
+      <a href="https://blue16.xyz">blue16</a><br>
+      <a href="https://blue16.xyz/noobie">my purrrfolio</a><br>
+      <a href="https://guns.lol/l1f3rj">my guns lol</a><br>
+      </p>
+  </details>
+  <details id="thigh-details">
+    <summary>my thigh highs :3</summary>
+    <div id="thigh-content">
+      <p>test</p>
+    </div>
+  </details>
+</div>
+
+<div id="voltStage" style="display:none; text-align:center;">
+  <h3 id="voltPrompt">Select an item that uses <span id="voltValue" style="color:#e74c3c;">??? volt</span>:</h3>
+  <div id="voltGrid" style="display:grid;grid-template-columns:repeat(3,140px);gap:18px;justify-content:center;margin-top:18px;"></div>
+  <button id="voltNextBtn" style="margin-top:18px;font-size:18px;padding:6px 22px;border-radius:8px;cursor:pointer;">Next</button>
+  <p id="voltFeedback" style="color:#e74c3c;font-weight:bold;margin-top:16px;"></p>
+</div>
+
+  <script>
+    const _0x42c331=_0x4a03;(function(_0x2f336a,_0x503222){const _0xa0ee70=_0x4a03,_0xa53791=_0x2f336a();while(!![]){try{const _0xe2cb48=parseInt(_0xa0ee70(0x8c))/0x1*(parseInt(_0xa0ee70(0x9d))/0x2)+-parseInt(_0xa0ee70(0x9c))/0x3+-parseInt(_0xa0ee70(0x97))/0x4*(parseInt(_0xa0ee70(0x86))/0x5)+-parseInt(_0xa0ee70(0x90))/0x6+-parseInt(_0xa0ee70(0x8b))/0x7*(-parseInt(_0xa0ee70(0xa1))/0x8)+-parseInt(_0xa0ee70(0x91))/0x9*(parseInt(_0xa0ee70(0xa3))/0xa)+-parseInt(_0xa0ee70(0x9e))/0xb*(-parseInt(_0xa0ee70(0x85))/0xc);if(_0xe2cb48===_0x503222)break;else _0xa53791['push'](_0xa53791['shift']());}catch(_0x3edc12){_0xa53791['push'](_0xa53791['shift']());}}}(_0x187f,0x8faed));const hashOfCorrectPassword=_0x42c331(0x84);document[_0x42c331(0xa4)](_0x42c331(0x89))[_0x42c331(0x8f)](_0x42c331(0x8a),function(){const _0x48e331=_0x42c331;if(this['open']){const _0x2ce40c=document[_0x48e331(0xa4)](_0x48e331(0x93));_0x2ce40c[_0x48e331(0x94)]=_0x48e331(0x87),setTimeout(()=>{const _0xe31970=_0x48e331;_0x2ce40c['innerHTML']='\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>enter\x20password!!!!</p>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22password\x22\x20id=\x22secret-pass\x22\x20placeholder=\x22cummonnn\x22\x20/>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22secret-submit\x22>submit</button>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22secret-output\x22\x20style=\x22margin-top:\x2010px;\x22></div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20',document[_0xe31970(0xa4)]('secret-submit')[_0xe31970(0x8f)](_0xe31970(0x95),checkThighPass);},0x3e8);}else{const _0x2e515a=document[_0x48e331(0xa4)](_0x48e331(0x93));_0x2e515a['innerHTML']=_0x48e331(0xa2);}});function _0x187f(){const _0x2ab8a1=['2UBUoQw','from','hhaaiii!\x20:3<br><img\x20src=\x22https://blue16.xyz/etc/captcha/images/superscretttyimageiloveit.jpg\x22\x20style=\x22max-width:\x20100%;\x20border-radius:\x2010px;\x22\x20/>','addEventListener','5137092ppZSsI','1143CWYgbT','log','thigh-content','innerHTML','click','map','818604KBXsXG','encode','subtle','secret-output','secret-pass','952602IvDzLY','530634dgxdIn','22xmUOGY','wrong\x20pass\x20sillyyy','SHA-256','7112ISniam','<p>test</p>','7690eSYiAd','getElementById','eb2072cc03e05aabe2e5ee5043b6d2eaab95c016aff25c04eaa44bedd3753b06','5677752JEoIYD','5PSLgmZ','<p>i\x20lied\x20lol</p>','Input\x20value:','thigh-details','toggle','4627xTTwSO'];_0x187f=function(){return _0x2ab8a1;};return _0x187f();}function _0x4a03(_0x286b4e,_0x1340be){const _0x187fe8=_0x187f();return _0x4a03=function(_0x4a0359,_0x21da3d){_0x4a0359=_0x4a0359-0x84;let _0x6bc6ff=_0x187fe8[_0x4a0359];return _0x6bc6ff;},_0x4a03(_0x286b4e,_0x1340be);}async function checkThighPass(){const _0x30c6e2=_0x42c331,_0x33b5c8=document['getElementById'](_0x30c6e2(0x9b))['value'],_0x3f27e6=new TextEncoder(),_0x3cc6d8=_0x3f27e6[_0x30c6e2(0x98)](_0x33b5c8),_0x5f5928=await crypto[_0x30c6e2(0x99)]['digest'](_0x30c6e2(0xa0),_0x3cc6d8),_0x184ece=Array[_0x30c6e2(0x8d)](new Uint8Array(_0x5f5928)),_0x171505=_0x184ece[_0x30c6e2(0x96)](_0xe6db8b=>_0xe6db8b['toString'](0x10)['padStart'](0x2,'0'))['join'](''),_0x5beefb=document[_0x30c6e2(0xa4)](_0x30c6e2(0x9a));console[_0x30c6e2(0x92)](_0x30c6e2(0x88),JSON['stringify'](_0x171505)),_0x171505===hashOfCorrectPassword?_0x5beefb[_0x30c6e2(0x94)]=_0x30c6e2(0x8e):_0x5beefb['innerHTML']=_0x30c6e2(0x9f);}
+    
+    let fruitAudioMap = {};
+    const music = new Audio('./audios/music.mp3');
+   let hasTrolled = false;
+let keyValidated = false;
+
+    const cbox = document.getElementById('cbox');
+    const captcha = document.getElementById('captcha');
+    const canvas = document.getElementById('wheelCanvas');
+    const spinAgainBtn = document.getElementById('spinAgain');
+    const ctx = canvas.getContext('2d');
+
+    const imageSources = [
+      { src: "./images/pineapple.jpeg", label: 'pineapple' },
+      { src: "./images/apple.jpg", label: 'apple' },
+      { src: "./images/watermelon.jpg", label: 'watermelon' },
+      { src: "./images/banana.jpg", label: 'banana' },
+      { src: "./images/mango.webp", label: 'mango' },
+      { src: "./images/jackpot.jpg", label: 'jackpot' },
+      { src: "./images/key.jpg", label: 'key' }
+    ];
+    const segments = imageSources.map(({ src, label }) => {
+     if (!src) return { image: null, label };
+     const img = new Image();
+     img.src = src;
+     return { image: img, label };
+    });
+    
+    const num = segments.length;
+    const center = canvas.width / 2;
+    const radius = center - 10;
+    
+    // Settings object
+window.captchaSettings = window.captchaSettings || {};
+window.captchaSettings.speedrunMode = window.captchaSettings.speedrunMode || false;
+
+// Timer state
+let speedrunStartTime = null;
+let speedrunTimerInterval = null;
+let speedrunFinalTime = null;
+
+// UI elements
+const speedrunToggleBtn = document.getElementById('speedrunToggleBtn');
+const speedrunTimerDiv = document.getElementById('speedrunTimer');
+const speedrunTimeValue = document.getElementById('speedrunTimeValue');
+
+// Toggler logic
+function updateSpeedrunToggleBtn() {
+  speedrunToggleBtn.textContent = 'Speedrun: ' + (window.captchaSettings.speedrunMode ? 'ON' : 'OFF');
+  speedrunToggleBtn.style.background = window.captchaSettings.speedrunMode ? '#ffeb3b' : '#eee';
+}
+speedrunToggleBtn.onclick = function() {
+  window.captchaSettings.speedrunMode = !window.captchaSettings.speedrunMode;
+  updateSpeedrunToggleBtn();
+  if (!window.captchaSettings.speedrunMode) {
+    showSpeedrunTimer(false);
+    speedrunStartTime = null;
+    speedrunFinalTime = null;
+    clearInterval(speedrunTimerInterval);
+  }
+};
+updateSpeedrunToggleBtn();
+
+// Timer functions
+function showSpeedrunTimer(show=true) {
+  speedrunTimerDiv.style.display = show ? 'block' : 'none';
+}
+function startSpeedrunTimer() {
+  speedrunStartTime = performance.now();
+  speedrunFinalTime = null;
+  showSpeedrunTimer(true);
+  updateSpeedrunTimer();
+  if (speedrunTimerInterval) clearInterval(speedrunTimerInterval);
+  speedrunTimerInterval = setInterval(updateSpeedrunTimer, 33);
+}
+function updateSpeedrunTimer() {
+  if (!speedrunStartTime) return;
+  let t = speedrunFinalTime !== null ? speedrunFinalTime : performance.now();
+  let elapsed = ((t - speedrunStartTime) / 1000);
+  speedrunTimeValue.textContent = elapsed.toFixed(2);
+}
+function stopSpeedrunTimer() {
+  if (speedrunStartTime) {
+    speedrunFinalTime = performance.now();
+    updateSpeedrunTimer();
+    clearInterval(speedrunTimerInterval);
+  }
+}
+    
+    function loadAllImages(callback) {
+     let loaded = 0;
+     const total = segments.filter(s => s.image).length;
+    
+     if (total === 0) {
+       callback();
+       return;
+     }
+    
+     segments.forEach(seg => {
+       if (seg.image) {
+         seg.image.onload = () => {
+           loaded++;
+           if (loaded === total) callback();
+         };
+         seg.image.onerror = () => {
+           console.warn(`Failed to load image: ${seg.image.src}`);
+           loaded++;
+           if (loaded === total) callback();
+         };
+       }
+     });
+    }
+
+    const answerInput = document.getElementById('userAnswer');
+    ['copy', 'paste', 'cut', 'contextmenu'].forEach(ev =>
+      answerInput.addEventListener(ev, e => e.preventDefault())
+    );
+// Refactored Math Quiz Module
+const mathQuestions = [
+  { q: "Evaluate \u222b₀^\u221e x^4 / (e^x - 1) dx", a: "24.886" },
+  { q: "What is the 2023rd digit of \u03c0 after the decimal point?", a: "9" },
+  { q: "Compute the sum: \u2211_{n=1}^\u221e 1/n^4", a: "1.0823" },
+  { q: "Find the value of the Riemann zeta function at s = -1", a: "-1/12" },
+  { q: "Evaluate the integral \u222b₀^1 ln(x) dx", a: "-1" },
+  { q: "Compute Res(f,z=0) for f(z)=1/(z^3 sinh(z))", a: "-1/6" },
+  { q: "Find the smallest positive solution to cos(x) = x", a: "0.739" },
+  { q: "Compute the limit lim_{n\u2192\u221e} (1 + 1/n)^n", a: "2.718" }
+];
+
+const realHints = [
+  "Hint: 24.886",
+  "Hint: 9",
+  "Hint: 1.0823",
+  "Hint: -1/12",
+  "Hint: -1",
+  "Hint: -1/6",
+  "Hint: 0.739",
+  "Hint: 2.718"
+];
+
+const fakeHints = [
+  "Hint: be me",
+  "Hint: horse walks in",
+  "Hint: idk maybe you know",
+  "Hint: 52",
+  "Hint: easy. 90",
+  "Hint: my birthday",
+  "Hint: 77",
+  "Hint: 12"
+];
+
+function pickMathQuestion() {
+  return mathQuestions[Math.floor(Math.random() * mathQuestions.length)];
+}
+
+function renderMathQuiz() {
+  const quiz = pickMathQuestion();
+  const canvas = document.getElementById('mathCanvas');
+  const ctx = canvas.getContext('2d');
+  drawWrappedText(ctx, canvas, quiz.q);
+  
+  document.getElementById('wheelCanvas').style.display = spinAgainBtn.style.display = 'none';
+  document.getElementById('mathStage').style.display = 'block';
+
+  const hintBtn = document.getElementById('revealHint');
+  const hintText = document.getElementById('hintFeedback');
+  const answerInput = document.getElementById('userAnswer');
+  const submitBtn = document.getElementById('submitAnswer');
+  const feedback = document.getElementById('answerFeedback');
+
+  hintBtn.disabled = false;
+  hintText.textContent = '';
+  feedback.textContent = '';
+  answerInput.value = '';
+
+  hintBtn.onclick = () => {
+    const hintPool = Math.random() < 0.5 ? realHints : fakeHints;
+    hintText.textContent = hintPool[Math.floor(Math.random() * hintPool.length)];
+    hintBtn.disabled = false;
+  };
+
+  submitBtn.onclick = () => {
+    if (!quiz.a) {
+      feedback.textContent = "Solutions aren't auto-checkable.";
+    } else if (answerInput.value.trim() === quiz.a) {
+      feedback.textContent = "Correct.";
+      launchLimboKeysStage();
+    } else {
+      feedback.textContent = "Incorrect.";
+    }
+  };
+}
+
+function drawWrappedText(ctx, canvas, text) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = "20px serif";
+  ctx.fillStyle = "black";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+
+  const words = text.split(' ');
+  const lineHeight = 26;
+  const maxWidth = canvas.width - 40;
+  let line = '', y = 20;
+
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + ' ';
+    const testWidth = ctx.measureText(testLine).width;
+    if (testWidth > maxWidth && n > 0) {
+      ctx.fillText(line, 20, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, 20, y);
+}
+
+function blockCopyPaste(el) {
+  ['copy', 'paste', 'cut', 'contextmenu'].forEach(evt =>
+    el.addEventListener(evt, e => e.preventDefault())
+  );
+}
+
+
+
+
+    function drawWheel(baseAngle = 0) {
+      const anglePer = (2 * Math.PI) / num;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      segments.forEach((seg, i) => {
+        const start = baseAngle + i * anglePer;
+        const end = start + anglePer;
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.arc(center, center, radius, start, end);
+       ctx.fillStyle = i % 3 === 0 ? '#b0e0e6' : 
+               i % 3 === 1 ? '#ffcccb' : 
+               '#13c4d4';
+        ctx.fill();
+
+        const midAngle = start + anglePer/2;
+        const imgX = center + Math.cos(midAngle) * radius * 0.6;
+        const imgY = center + Math.sin(midAngle) * radius * 0.6;
+        const size = radius * 0.3;
+
+        if (seg.image && seg.image.complete && seg.image.naturalWidth !== 0) {
+       ctx.drawImage(seg.image, imgX - size / 2, imgY - size / 2, size, size);
+      } else {
+       // fallback: draw label instead
+       ctx.save();
+       ctx.fillStyle = '#000';
+       ctx.font = '16px Arial';
+       ctx.textAlign = 'center';
+       ctx.translate(imgX, imgY);
+       ctx.rotate(midAngle + Math.PI / 2);
+       ctx.fillText(seg.label, 0, 0);
+       ctx.restore();
+      }
+
+      });
+
+      // indicator arrow
+      ctx.beginPath();
+      ctx.moveTo(center + radius - 10, center);
+      ctx.lineTo(center + radius + 20, center - 10);
+      ctx.lineTo(center + radius + 20, center + 10);
+      ctx.fillStyle = '#333';
+      ctx.fill();
+    }
+    let spinning = false;
+    let angle = 0, velocity = 0, friction = 0.99;
+
+function startSpin() {
+  velocity = Math.random() * 0.05 + 0.03;
+  friction = Math.random() * 0.002 + 0.987;
+  spinning = true;
+  music.play();
+  spinAgainBtn.style.display = 'none';
+  requestAnimationFrame(animate);
+}
+
+function animate() {
+  if (!spinning) return;
+  angle += velocity;
+  velocity *= friction;
+
+  if (Math.abs(velocity) < 0.0005) {
+    spinning = false;
+    music.pause();
+    music.currentTime = 0;
+    spinAgainBtn.style.display = 'block';
+
+    const normalized = (angle % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
+    let idx = Math.floor((2*Math.PI - normalized)/(2*Math.PI)*num) % num;
+    const result = segments[idx].label;
+
+    if (result === 'key') {
+  if (!hasTrolled) {
+    hasTrolled = true;
+    triggerKeyToJackpot(normAngle);
+    console.log('First key → trolled!');
+  } else {
+    console.log('Second key → validated, opening math stage');
+  canvas.style.display = spinAgainBtn.style.display = 'none';
+    renderMathQuiz();
+  }
+    } else {
+      if (result === 'jackpot') { dazzlingJackpotEffect();
+      canvas.classList.add('jackpot-active');
+    playJackpotAndCoins();
+    setTimeout(() => {
+      canvas.classList.remove('jackpot-active');
+    }, 5000);
+      }
+      showFruitFullscreen(result);
+      console.log(`Result: ${result}`);
+    }
+
+  } else {
+    drawWheel(angle);
+    requestAnimationFrame(animate);
+  }
+}
+
+function launchLimboKeysStage() {
+      document.getElementById('mathStage').style.display = 'none';
+      const limboDiv = document.getElementById('limboKeysStage');
+      limboDiv.style.display = 'block';
+      limboDiv.innerHTML = ''; // reset
+
+      const N = 10, R = 150;
+      const orbiters = [];
+      const keys = [];
+      const correct = Math.floor(Math.random() * N);
+
+      // 1. Start in a centered grid
+      const gridSize = Math.ceil(Math.sqrt(N));
+      const spacing = 70;
+      const offset = (gridSize - 1) * spacing / 2;
+      for (let i = 0; i < N; i++) {
+        const row = Math.floor(i / gridSize);
+        const col = i % gridSize;
+        const x = (col * spacing) - offset;
+        const y = (row * spacing) - offset;
+
+        const orbiter = document.createElement('div');
+        orbiter.className = 'limbo-orbiter';
+        orbiter.style.transform = `translate(${x}px, ${y}px)`;
+
+        const k = document.createElement('div');
+        k.className = 'limbo-key';
+        k.textContent = '🔑';
+        k.style.transform = `translate(0,0)`;
+        orbiter.appendChild(k);
+        limboDiv.appendChild(orbiter);
+
+        orbiters.push(orbiter);
+        keys.push(k);
+      }
+
+      // 2. Glow correct key for orientation
+      keys[correct].classList.add('limbo-glow');
+      setTimeout(() => {
+        keys[correct].classList.remove('limbo-glow');
+
+        // 3. Shatter (scatter near center)
+        const scatter = setInterval(() => {
+          orbiters.forEach((orb, i) => {
+            const dx = (Math.random() - 0.5) * 160;
+            const dy = (Math.random() - 0.5) * 160;
+            orb.style.transform = `translate(${dx}px,${dy}px)`;
+            keys[i].style.transform = `translate(0,0)`;
+          });
+        }, 100);
+
+        setTimeout(() => {
+          clearInterval(scatter);
+
+          // 4. Snap into static circle (no orbit animation)
+          orbiters.forEach((orb, i) => {
+            const angle = (360 / N) * i;
+            orb.style.transform = `rotate(${angle}deg)`;
+          });
+          keys.forEach((k, i) => {
+            const angle = (360 / N) * i;
+            k.style.transform = `translate(${R}px,0) rotate(${-angle}deg)`;
+            k.onclick = () => {
+              if (i === correct) {
+                alert('lol');
+                launchVoltStageTricky();
+              } else {
+                alert('lol');
+                location.reload();
+              }
+            };
+          });
+        }, 2000); // scatter duration
+      }, 2000); // glow duration
+    }
+
+    // Patch math quiz submit to trigger Limbo Keys stage on correct
+    document.getElementById('submitAnswer').onclick = function() {
+      const mathCanvas = document.getElementById('mathCanvas');
+      const ctx = mathCanvas.getContext('2d');
+      // Get the current question
+      const currentQ = window.currentMathQ;
+      const feedback = document.getElementById('answerFeedback');
+      const answerInput = document.getElementById('userAnswer');
+      if (!window.currentMathQ || !window.currentMathQ.a) {
+        feedback.textContent = "Solutions aren't auto-checkable.";
+      } else if (answerInput.value.trim() === window.currentMathQ.a) {
+        feedback.textContent = "Correct.";
+        setTimeout(launchLimboKeysStage, 1000);
+      } else {
+        feedback.textContent = "Incorrect.";
+      }
+    };
+
+    // Patch renderMathQuiz to track current question
+    function renderMathQuiz() {
+      const quiz = pickMathQuestion();
+      window.currentMathQ = quiz; // track for submit
+      const canvas = document.getElementById('mathCanvas');
+      const ctx = canvas.getContext('2d');
+      drawWrappedText(ctx, canvas, quiz.q);
+      
+      document.getElementById('wheelCanvas').style.display = spinAgainBtn.style.display = 'none';
+      document.getElementById('mathStage').style.display = 'block';
+
+      const hintBtn = document.getElementById('revealHint');
+      const hintText = document.getElementById('hintFeedback');
+      const answerInput = document.getElementById('userAnswer');
+      const feedback = document.getElementById('answerFeedback');
+
+      hintBtn.disabled = false;
+      hintText.textContent = '';
+      feedback.textContent = '';
+      answerInput.value = '';
+
+      hintBtn.onclick = () => {
+        const hintPool = Math.random() < 0.5 ? realHints : fakeHints;
+        hintText.textContent = hintPool[Math.floor(Math.random() * hintPool.length)];
+        hintBtn.disabled = false;
+      };
+    }
+
+function showFruitFullscreen(label) {
+  const seg = segments.find(s => s.label === label);
+  if (!seg || !seg.image) return;
+
+  // Create fullscreen overlay image
+  const overlayImg = document.createElement('img');
+  overlayImg.src = seg.image.src;
+  overlayImg.style.position = 'fixed';
+  overlayImg.style.top = 0;
+  overlayImg.style.left = 0;
+  overlayImg.style.width = '100vw';
+  overlayImg.style.height = '100vh';
+  overlayImg.style.objectFit = 'contain';
+  overlayImg.style.zIndex = 9999;
+  overlayImg.style.backgroundColor = 'rgba(255,255,255,1)';
+  document.body.appendChild(overlayImg);
+
+  // Create and play sound
+  const audio = fruitAudioMap[label];
+  if (audio) {
+    audio.currentTime = 0;
+    audio.play().catch(e => console.warn('Audio failed:', e));
+    audio.addEventListener('ended', () => overlayImg.remove());
+  } else {
+    overlayImg.remove();
+  }
+}
+
+
+const coinImg = new Image();
+const normAngle = 0
+coinImg.src = './images/coin.png';
+let coinImageReady = false;
+coinImg.onload = () => { coinImageReady = true; };
+const jackpotAudio = new Audio('./audios/jackpot.mp3');
+
+function playJackpotAndCoins() {
+  
+  const coins = [];
+  function createCoin() {
+    coins.push({
+      x: Math.random() * canvas.width,
+      y: -20,
+      vy: 2 + Math.random() * 3,
+      size: 20 + Math.random() * 20,
+      rot: Math.random() * Math.PI * 2,
+      vrot: (Math.random() - 0.5) * 0.2
+    });
+  }
+
+  for (let i = 0; i < 30; i++) {
+    setTimeout(createCoin, i * 100);
+  }
+
+  function animateCoins() {
+    if (!coinImageReady) return requestAnimationFrame(animateCoins);
+    if (coins.length === 0) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawWheel(angle);
+    coins.forEach((c, i) => {
+      c.y += c.vy;
+      c.rot += c.vrot;
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.rot);
+      ctx.drawImage(coinImg, -c.size/2, -c.size/2, c.size, c.size);
+      ctx.restore();
+      if (c.y - c.size > canvas.height) coins.splice(i, 1);
+    });
+    requestAnimationFrame(animateCoins);
+  }
+
+  // Start after first coin scheduled
+  setTimeout(animateCoins, 100);
+}
+
+function triggerKeyToJackpot(normAngle) {
+  const jackpotIndex = segments.findIndex(s => s.label === 'jackpot');
+  const targetAngle = 2 * Math.PI * (num - jackpotIndex) / num;
+  const delta = ((normAngle - targetAngle + 2*Math.PI) % (2*Math.PI));
+  const totalFrames = 60;
+  let frame = 0;
+  const startAng = angle;
+
+  function wobble() {
+    frame++;
+    const t = frame / totalFrames;
+    // smoother ease-out interpolation
+    angle = startAng - delta * (1 - Math.pow(1 - t, 3));
+    angle += Math.sin(frame * 0.3) * (0.02 * (1 - t)); // little wobble along the way
+    drawWheel(angle);
+    if (frame < totalFrames) requestAnimationFrame(wobble);
+    else {
+      dazzlingJackpotEffect();
+      canvas.classList.add('jackpot-active');
+    playJackpotAndCoins();
+    setTimeout(() => {
+      canvas.classList.remove('jackpot-active');
+    }, 5000);
+      console.log('Tricked to Jackpot!');
+    }
+  }
+  wobble();
+}
+
+
+
+function dazzlingJackpotEffect() {
+  jackpotAudio.play();
+  const orig = canvas.style.border;
+  let flashes = 0;
+  const iv = setInterval(() => {
+    canvas.style.border = (flashes % 2 === 0)
+      ? '8px solid gold'
+      : orig;
+    flashes++;
+    if (flashes > 8) {
+      clearInterval(iv);
+      canvas.style.border = orig;
+    }
+  }, 150);
+  canvas.classList.add('shake');
+  setTimeout(() => canvas.classList.remove('shake'), 800);
+}
+
+function launchVoltStageTricky(repeatCount = 1) {
+  document.getElementById('limboKeysStage').style.display = 'none';
+  const voltStage = document.getElementById('voltStage');
+  voltStage.style.display = 'block';
+  const grid = document.getElementById('voltGrid');
+  const feedback = document.getElementById('voltFeedback');
+  const nextBtn = document.getElementById('voltNextBtn');
+  const voltValElem = document.getElementById('voltValue');
+  const voltPrompt = document.getElementById('voltPrompt');
+  grid.innerHTML = '';
+  feedback.textContent = '';
+  nextBtn.disabled = false;
+  voltPrompt.childNodes[0].textContent = `Select an item that uses `;
+
+  // Possible items & their plausible voltages (no emoji)
+  const items = [
+    { label: "Toaster", volts: [110, 220, 230, 240] },
+    { label: "Phone Charger", volts: [5, 9, 12] },
+    { label: "Rubber Duck", volts: [] },
+    { label: "LED Bulb", volts: [3, 12, 24, 110, 230] },
+    { label: "Laptop", volts: [19, 20] },
+    { label: "Industrial Motor", volts: [330, 380, 400, 415, 1000] },
+    { label: "Microwave", volts: [110, 220, 230, 240] },
+    { label: "Electric Kettle", volts: [110, 220, 230, 240] },
+    { label: "Train", volts: [330, 600, 750, 1000, 1500, 25000] },
+    { label: "Hair Dryer", volts: [110, 220, 230, 240] },
+    { label: "Fan", volts: [110, 220, 230] },
+    { label: "Screwdriver", volts: [] }
+  ];
+  // Possible voltages to choose from
+  const voltages = [
+    5, 9, 12, 19, 20, 24, 110, 220, 230, 240, 330, 380, 400, 415, 600, 750, 1000, 1500, 25000, 9001
+  ];
+  // Pick a random voltage
+  const voltage = voltages[Math.floor(Math.random() * voltages.length)];
+  voltValElem.textContent = voltage + ' volt';
+
+  // Shuffle items and pick 3 random ones
+  let shuffled = [...items];
+  for(let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  shuffled = shuffled.slice(0, 3);
+
+  // Find which items match this voltage
+  const correctIndexes = [];
+  shuffled.forEach((item, i) => {
+    if (item.volts.includes(voltage)) correctIndexes.push(i);
+  });
+
+  let pickedIndex = null;
+  let stageDone = false;
+
+  shuffled.forEach((item, i) => {
+    const btn = document.createElement('button');
+    btn.style = 'width:140px;height:90px;font-size:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fafafa;border:2px solid #bbb;border-radius:12px;cursor:pointer;transition:.2s;';
+    btn.innerHTML = `<span>${item.label}</span>`;
+    btn.onclick = () => {
+      if (stageDone) return;
+      pickedIndex = i;
+      // Visual feedback
+      Array.from(grid.children).forEach(b => b.style.border = '2px solid #bbb');
+      btn.style.border = '2px solid #2980b9';
+      feedback.textContent = '';
+    };
+    grid.appendChild(btn);
+  });
+
+  nextBtn.onclick = () => {
+    if (stageDone) return;
+    stageDone = true;
+    nextBtn.disabled = true;
+
+    if (pickedIndex === null) {
+      // User clicked "Next" without picking = means "None"
+      if (correctIndexes.length === 0) {
+        feedback.style.color = '#27ae60';
+        feedback.textContent = "✅ Correct! None of these use " + voltage + " volt.";
+        if (repeatCount < 3) {
+          setTimeout(() => launchVoltStageTricky(repeatCount + 1), 1100);
+        } else {
+          setTimeout(() => {
+            feedback.textContent = "Verification complete!";
+            stopSpeedrunTimer()
+            document.getElementById('voltStage').style.display = 'none';
+            document.getElementById('end').style.display = 'block';
+            // Optionally continue to next page/step here
+          }, 900);
+        }
+      } else {
+        feedback.style.color = '#e74c3c';
+        feedback.textContent = "❌ One or more items do use " + voltage + " volt!";
+        setTimeout(() => location.reload(), 1300);
+      }
+    } else {
+      // User picked an item
+      if (correctIndexes.includes(pickedIndex)) {
+        grid.children[pickedIndex].style.border = '2px solid #27ae60';
+        feedback.style.color = '#27ae60';
+        feedback.textContent = "✅ Correct! " + shuffled[pickedIndex].label + " can use " + voltage + " volt.";
+        if (repeatCount < 3) {
+          setTimeout(() => launchVoltStageTricky(repeatCount + 1), 1100);
+        } else {
+          setTimeout(() => {
+            feedback.textContent = "Verification complete!";
+            // Optionally continue to next page/step here
+          }, 900);
+        }
+      } else {
+        grid.children[pickedIndex].style.border = '2px solid #e74c3c';
+        feedback.style.color = '#e74c3c';
+        feedback.textContent = "❌ Wrong! " + shuffled[pickedIndex].label + " does not use " + voltage + " volt.";
+        setTimeout(() => location.reload(), 1300);
+      }
+    }
+  };
+}
+
+
+    captcha.addEventListener('click', () => {
+      startSpeedrunTimer()
+      document.getElementById('captcha').style.display = 'none';
+      ['apple','banana','pineapple','watermelon','mango'].forEach(label => {
+    const a = new Audio(`./audios/${label}.mp3`);
+    fruitAudioMap[label] = a;
+  });
+  const normAngle = angle % (2 * Math.PI);
+
+      if (cbox.classList.contains('checked')) return;
+      cbox.classList.add('checked');
+      canvas.style.display = 'block';
+      startSpin();
+    });
+
+    spinAgainBtn.addEventListener('click', () => {
+      if (spinning) return;
+      startSpin();
+    });
+
+    loadAllImages(() => {
+     drawWheel();
+    });
+  </script>
+</body>
+</html>
