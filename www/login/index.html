@@ -214,7 +214,7 @@ try {
 
               
 
-
+// stylesheet
             if (responseData.success) {
                 document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=31536000; Secure; SameSite=Strict;`;
                 showNotification(responseData.message || 'Login successful!', 'success');
