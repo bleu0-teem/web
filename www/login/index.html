@@ -200,16 +200,19 @@
   credentials: 'include',
 });
 
+let responseData;
+let responseText;
 
-              let responseData;
-              try {
-                responseData = await res.json();
-              } catch (e) {
-                const text = await res.text();
-                console.error('Non-JSON response:', text);
-                showNotification('Server error — received invalid response.', 'error');
-                return;
-              }
+try {
+  responseText = await res.text(); // ✅ Read it once
+  responseData = JSON.parse(responseText); // Try parsing it
+} catch (e) {
+  console.error('Non-JSON response:', responseText);
+  showNotification('Server error — received invalid response.', 'error');
+  return;
+}
+
+              
 
 
             if (responseData.success) {
