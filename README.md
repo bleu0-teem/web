@@ -14,11 +14,9 @@ Clean design. Powerful features. Built for scalability.
 
 ---
 
-## 🛠️ Planning to use
-
-- **Frontend:** [React](https://reactjs.org/) / [Next.js](https://nextjs.org/)
-- **Backend:** [Node.js](https://nodejs.org/) / [Express](https://expressjs.com/)  
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/) / [Styled Components](https://styled-components.com/)
+- **Frontend:** [PHP](https://www.php.net/)
+- **Backend:** ... Just Static, i guess.
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 - **Database:** [MongoDB](https://www.mongodb.com/) / [PostgreSQL](https://www.postgresql.org/)
 - **Other:** Docker, CI/CD, Testing (Jest/RTL)
 

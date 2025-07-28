@@ -188,7 +188,7 @@
             formData.append('confirm_password', confirm);
             formData.append('invite_key', inviteKey);
 
-            const res = await fetch('/api/register.php', { method: 'POST', body: formData, credentials: 'include' });
+            const res = await fetch('../api/register.php', { method: 'POST', body: formData, credentials: 'include' });
 
             const text = await res.text();
             if (res.ok) {

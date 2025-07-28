@@ -142,7 +142,7 @@
         if (!cookies.token) return;
 
         try {
-            const response = await fetch('/api/validate_token.php', {
+            const response = await fetch('../api/validate_token.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -194,11 +194,11 @@
             formData.append('username_or_email', username);
             formData.append('password', password);
 
-            const res = await fetch('/api/login.php', {
-  method: 'POST',
-  body: formData,
-  credentials: 'include',
-});
+            const res = await fetch('../api/login.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include',
+            });
 
 let responseData;
 let responseText;
