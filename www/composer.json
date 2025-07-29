@@ -12,9 +12,9 @@
   ],
   "require": {
     "php": ">=7.4",
+    "cultuurnet/monolog-socketio": "dev-master",
     "ext-json": "*",
     "ext-pdo": "*",
-    "ext-redis": "*",
     "psr/log": "^1.0 || ^2.0 || ^3.0",
     "rafaelwendel/phpsupabase": "^0.0.1",
     "vlucas/phpdotenv": "^5.4"
