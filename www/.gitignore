@@ -1,0 +1,8 @@
+# Environment variables
+.env
+
+# Composer
+/vendor/
+composer.lock
+
+# Logs
