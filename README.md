@@ -55,10 +55,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more info.
 
 MIT License © [BLUE16 TEAM](https://github.com/blue16-team)
 
-                                          ---
+---
 
-                                          <p align="center">
-                                            <img src="https://img.shields.io/github/stars/blue16-team/blue16-web?style=social" alt="GitHub Stars" />
-                                              &nbsp;
-                                                <img src="https://img.shields.io/github/forks/blue16-team/blue16-web?style=social" alt="GitHub Forks" />
-                                                </p>
+<p align="center">
+<img src="https://img.shields.io/github/stars/blue16-team/blue16-web?style=social" alt="GitHub Stars"/>
+&nbsp;
+<img src="https://img.shields.io/github/forks/blue16-team/blue16-web?style=social" alt="GitHub Forks"/>
+</p>
