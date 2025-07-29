@@ -9,7 +9,7 @@
 //   • invite_key
 //
 // Returns plain text + HTTP status code:
-//   • 200 OK   → “Registration successful!”
+//   • 200 OK   → "Registration successful!"
 //   • 400 Bad Request → validation/breach/duplicate‐username error
 //   • 500 Internal Server Error → generic server error
 // -------------------------------------------------------------------
@@ -17,16 +17,9 @@
 session_start();
 
 // ------------------------------------------------------------
-// 1) DATABASE CONNECTION (PDO + SSL to Aiven MySQL)
+// 1) DATABASE CONNECTION (PDO + SSL using environment variables)
 // ------------------------------------------------------------
-require_once 'db_connection.php'; // Move sensitive credentials to a separate config file
-
-try {
-    $pdo = new PDO(DB_DSN, DB_USER, DB_PASS, DB_OPTIONS);
-} catch (PDOException $e) {
-    http_response_code(500);
-    exit("Database connection failed.");
-}
+require_once 'db_connection.php';
 
 // ------------------------------------------------------------
 // 2) FETCH & VALIDATE POST DATA
@@ -70,7 +63,7 @@ if ($errors) {
 // ------------------------------------------------------------
 // 3) CHECK PASSWORD BREACH (HIBP API)
 // ------------------------------------------------------------
-require_once 'hibp.php'; // Move HIBP logic to a reusable function
+require_once 'hibp.php';
 
 if (isPwnedPassword($password)) {
     http_response_code(400);
