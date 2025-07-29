@@ -1,2 +1,16 @@
 # Vercel
 .vercel
+
+# Environment variables
+.env
+
+# Composer
+/vendor/
+composer.lock
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
