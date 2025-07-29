@@ -16,22 +16,10 @@ if (!isset($input['invite_key'])) {
 
 $invite_key = strtoupper(trim($input['invite_key']));
 
-// Setup DB connection (reuse your existing connection code)
-$host   = 'blue16data-blue16-ad24.b.aivencloud.com';
-$port   = '19008';
-$dbname = 'defaultdb';
-$user   = 'avnadmin';
-$pass   = 'AVNS_mdnUGTzNDx4Ui4O8dTy';
-
-$dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4;sslmode=REQUIRED";
-$options = [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-];
+// Setup DB connection using environment variables
+require_once 'db_connection.php';
 
 try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-
     $stmt = $pdo->prepare("SELECT uses_remaining FROM invite_keys WHERE invite_key = ?");
     $stmt->execute([$invite_key]);
     $row = $stmt->fetch();
