@@ -4,14 +4,8 @@
 // -------------------------------------------------------------------
 // Secure database connection using environment variables
 
-// Load environment variables
-require_once __DIR__ . '/../vendor/autoload.php';
-
-use Dotenv\Dotenv;
-
-// Load .env file from the www directory
-$dotenv = Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
+// Load bootstrap (includes autoloader and environment variables)
+require_once __DIR__ . '/../bootstrap.php';
 
 // Database configuration from environment variables
 $host   = $_ENV['DB_HOST'] ?? 'localhost';
