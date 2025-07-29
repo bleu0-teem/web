@@ -1,4 +1,3 @@
-
 <?php
 
 header('Content-Type: application/json');
@@ -6,7 +5,7 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
-require_once 'db_connection.php'; // Include database connection
+require_once 'db_connection.php';
 
 // Get the raw POST data
 $input = json_decode(file_get_contents('php://input'), true);
@@ -19,20 +18,20 @@ if (!isset($input['token'])) {
 
 $token = $input['token'];
 
-// Validate the token
-$stmt = $db->prepare('SELECT username FROM users WHERE token = ?');
-$stmt->bind_param('s', $token);
-$stmt->execute();
-$result = $stmt->get_result();
+// Validate the token using PDO
+try {
+    $stmt = $pdo->prepare('SELECT username FROM users WHERE token = ?');
+    $stmt->execute([$token]);
+    $user = $stmt->fetch();
 
-if ($result->num_rows > 0) {
-    $user = $result->fetch_assoc();
-    echo json_encode(['success' => true, 'message' => 'Token is valid', 'username' => $user['username']]);
-} else {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Invalid token']);
+    if ($user) {
+        echo json_encode(['success' => true, 'message' => 'Token is valid', 'username' => $user['username']]);
+    } else {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Invalid token']);
+    }
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Database error']);
 }
-
-$stmt->close();
-$db->close();
 ?>
