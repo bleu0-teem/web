@@ -8,7 +8,7 @@
 //   • password
 //
 // Returns json reason and token (token if success) + HTTP status code:
-//   • 200 OK   → “Login successful!”
+//   • 200 OK   → "Login successful!"
 //   • 400 Bad Request → missing fields or pwned password
 //   • 401 Unauthorized → invalid credentials
 //   • 500 Internal Server Error → generic server error
@@ -17,31 +17,9 @@
 session_start();
 
 // ------------------------------------------------------------
-// 1) DATABASE CONNECTION (PDO + SSL to Aiven MySQL)
+// 1) DATABASE CONNECTION (PDO + SSL using environment variables)
 // ------------------------------------------------------------
-$host   = 'blue16data-blue16-ad24.b.aivencloud.com';
-$port   = '19008';
-$dbname = 'defaultdb';
-$user   = 'avnadmin';
-$pass   = 'AVNS_mdnUGTzNDx4Ui4O8dTy';
-
-$dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4;sslmode=REQUIRED";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    // If you have Aiven’s CA cert (ca.pem), uncomment & adjust:
-    // PDO::MYSQL_ATTR_SSL_CA => '/path/to/ca.pem',
-];
-
-try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (PDOException $e) {
-    error_log("Database connection failed: " . $e->getMessage());
-    http_response_code(500);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Database connection failed.']);
-    exit;
-}
+require_once 'db_connection.php';
 
 // ------------------------------------------------------------
 // 2) FETCH & VALIDATE POST DATA
@@ -57,42 +35,9 @@ if ($identifier === '' || $password === '') {
 }
 
 // ------------------------------------------------------------
-// 3) SERVER-SIDE “Have I Been Pwned” CHECK
+// 3) SERVER-SIDE "Have I Been Pwned" CHECK
 // ------------------------------------------------------------
-function isPwnedPassword(string $password): bool
-{
-    $sha1 = strtoupper(sha1($password));
-    $prefix = substr($sha1, 0, 5);
-    $suffix = substr($sha1, 5);
-
-    $ctx = stream_context_create([
-        'http' => [
-            'method'  => 'GET',
-            'header'  => "User-Agent: HIBP-PHP/1.0\r\n",
-            'timeout' => 10,
-        ]
-    ]);
-
-    $url = "https://api.pwnedpasswords.com/range/$prefix";
-    $body = @file_get_contents($url, false, $ctx);
-
-    if ($body === false) {
-        error_log("HIBP check failed or timed out for prefix $prefix.");
-        return false;
-    }
-
-    $lines = explode("\r\n", $body);
-    foreach ($lines as $line) {
-        if (strpos($line, ':') === false) {
-            continue;
-        }
-        [$hashTail, ] = explode(':', $line, 2);
-        if ($hashTail === $suffix) {
-            return true;
-        }
-    }
-    return false;
-}
+require_once 'hibp.php';
 
 if (isPwnedPassword($password)) {
     http_response_code(400);

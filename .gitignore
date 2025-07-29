@@ -3,14 +3,13 @@
 
 # Environment variables
 .env
+www/.env
 
 # Composer
-/vendor/
-composer.lock
+www/vendor/
+www/composer.lock
 
 # Logs
 *.log
 
 # Temporary files
-*.tmp
-*.temp

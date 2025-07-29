@@ -5,7 +5,7 @@
 //
 // Expects POST fields:
 //   • invite_key       (optional; if omitted, a random key is generated)
-//   • uses_remaining   (integer ≥ 1; use 999 for “infinite”)
+//   • uses_remaining   (integer ≥ 1; use 999 for "infinite")
 //   • created_by       (integer user ID of the creator)
 //
 // Returns JSON + HTTP status code:
@@ -24,29 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // ------------------------------------------------------------
-// 1) DATABASE CONNECTION (inline PDO + SSL to Aiven MySQL)
+// 1) DATABASE CONNECTION (using environment variables)
 // ------------------------------------------------------------
-$host   = 'blue16data-blue16-ad24.b.aivencloud.com';
-$port   = '19008';
-$dbname = 'defaultdb';
-$user   = 'avnadmin';
-$pass   = 'AVNS_mdnUGTzNDx4Ui4O8dTy';
-
-$dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4;sslmode=REQUIRED";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    // If Aiven provided a CA certificate (ca.pem), you can uncomment:
-    // PDO::MYSQL_ATTR_SSL_CA => '/path/to/ca.pem',
-];
-
-try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Database connection failed']);
-    exit;
-}
+require_once 'db_connection.php';
 
 // ------------------------------------------------------------
 // 2) FETCH & VALIDATE POST DATA
