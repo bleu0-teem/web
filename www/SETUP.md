@@ -57,8 +57,8 @@ This update moves all credentials from hardcoded values in PHP files to environm
 
 **Before:**
 ```php
-$host = 'blue16data-blue16-ad24.b.aivencloud.com';
-$pass = 'AVNS_mdnUGTzNDx4Ui4O8dTy';
+$host = 'your-database-host.com';
+$pass = 'your-database-password';
 ```
 
 **After:**
