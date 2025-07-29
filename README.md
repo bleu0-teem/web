@@ -17,8 +17,6 @@ Clean design. Powerful features. Built for scalability.
 - **Frontend:** [PHP](https://www.php.net/)
 - **Backend:** ... Just Static, i guess.
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **Database:** [MongoDB](https://www.mongodb.com/) / [PostgreSQL](https://www.postgresql.org/)
-- **Other:** Docker, CI/CD, Testing (Jest/RTL)
 
 ---
 
@@ -26,37 +24,36 @@ Clean design. Powerful features. Built for scalability.
 
 1. **Clone the repository**
    ```bash
-      git clone https://github.com/blue16-team/blue16-web.git
-         cd blue16-web
-            ```
+   git clone https://github.com/blue16-team/blue16-web.git
+   cd blue16-web
+   ```
 
-            2. **Install dependencies**
-               ```bash
-                  yarn install
-                     # or
-                        npm install
-                           ```
+2. **Install dependencies**
+   ```bash
+   yarn install
+   # or
+   npm install
+   ```
 
-                           3. **Run the development server**
-                              ```bash
-                                 yarn dev
-                                    # or
-                                       npm run dev
-                                
-        ```
+3. **Run the development server**
+   ```bash
+   yarn dev
+   # or
+   npm run dev                          
+   ```
 
-                                          ---
+   ---
 
-                                          ## 🤝 Contributing
+## 🤝 Contributing
 
-                                          Contributions are welcome!  
-                                          See [CONTRIBUTING.md](CONTRIBUTING.md) for more info.
+Contributions are welcome!  
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more info.
 
-                                          ---
+---
 
-                                          ## 📄 License
+## 📄 License
 
-                                          MIT License © [BLUE16 TEAM](https://github.com/blue16-team)
+MIT License © [BLUE16 TEAM](https://github.com/blue16-team)
 
                                           ---
 
