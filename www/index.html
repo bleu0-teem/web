@@ -6,6 +6,22 @@
     <title>BLUE16</title>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        html, body {
+            min-height: 100vh;
+            height: auto;
+            overflow-y: auto;
+        }
+        body {
+            min-height: 100vh;
+            height: auto;
+            overflow-y: auto;
+        }
+        section {
+            min-height: 100vh;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
     <section>
@@ -15,11 +31,65 @@
             <span></span>
         </div>
         <div class="content">
-            <h1>BLUE16</h1>
-            <div class="buttons">
-                <button class="btn" onclick="location.href='login/index.html'">Login</button>
-                <button class="btn" onclick="location.href='register/index.html'">Register</button>
+            <img src="https://see.fontimg.com/api/rf5/nRoyY/YzA4MzM4MDJkMDY5NDQ4NDhmMjkxOTliNTQwMTAxZjMudHRm/Ymx1ZTE2/boblox-04-regular.png?r=fs&h=81&w=1250&fg=FFFFFF&bg=FFFFFF&tb=1&s=65" style="padding:305px 0 30px 0; font-size: 100px;" alt="Roblox fonts">
+            <div class="description" style="max-width:600px;margin:20px auto 30px auto;font-size:1.15em;color:#ffffff;text-align:center;display:flex;flex-direction:column;align-items:center;">
+                <span><strong>BLUE16</strong> is a free, community-driven platform for hosting and playing classic Roblox games and experiences. Our mission is to preserve the legacy of old Roblox clients and make them accessible to everyone. With BLUE16, you can:</span>
+                <ul style="margin:10px 0 10px 0;padding-left:20px;text-align:left;max-width:500px;">
+                  <li>Connect and play solo or with friends on every Roblox client that exists</li>
+                  <li>Host your own servers or join public ones, as well official ones by BLUE16</li>
+                  <li>Have no limits to anything</li>
+                  <li>Enjoy a secure-friendly experience</li>
+                  <li>Contribute to an open-source project and help shape its future</li>
+                </ul>
+                <br><br>
+                <hr>
+                <div style="display: flex; align-items: center; gap: 12px; color: #fff; font-size: 1em;">
+                    <img src="src/img/cat.png" alt="Client Screenshot" style="width: 50px;" />
+                    <span>
+                        BLUE16 is built by fans, for fans. Whether you're here to relive nostalgia, learn about Roblox history, or just have fun, you're welcome in our community. Join us in keeping the spirit of classic Roblox alive!
+                    </span>
+                </div>
             </div>
+            <div class="screenshots" style="max-width:800px;margin:40px auto 0 auto;text-align:center;">
+            <h2 style="color:#fff;font-size:1.4em;margin-bottom:18px;">Screenshots</h2>
+            <div style="display:flex;flex-direction:column;gap:32px;align-items:center;">
+                <!-- Feature 1 -->
+                <div style="display:flex;align-items:center;justify-content:center;gap:32px;max-width:700px;width:100%;">
+                    <div style="flex:1;text-align:left;color:#fff;font-size:1.08em;">
+                        <strong>Simple Client GUI</strong><br>
+                        A clean, simple Client GUI. Enter your username and password, then click "Login" to start playing. Or, just play without account.
+                    </div>
+                    <img src="src/img/clientss.png" alt="Client Screenshot" style="width:320px;border-radius:8px;box-shadow:0 2px 8px #0002;object-fit:cover;background:#222;" />
+                </div>
+                <!-- Feature 2 -->
+                <div style="display:flex;align-items:center;justify-content:center;gap:32px;max-width:700px;width:100%;">
+                    <img src="src/img/placeholder.png" alt="Server Screenshot" style="width:320px;border-radius:8px;box-shadow:0 2px 8px #0002;object-fit:cover;background:#222;" />
+                    <div style="flex:1;text-align:left;color:#fff;font-size:1.08em;">
+                        <strong>Host or Join Servers</strong><br>
+                        Easily create your own server or join public games with friends.
+                    </div>
+                </div>
+                <!-- Feature 3 -->
+                <div style="display:flex;align-items:center;justify-content:center;gap:32px;max-width:700px;width:100%;">
+                    <div style="flex:1;text-align:left;color:#fff;font-size:1.08em;">
+                        <strong>Places Library</strong><br>
+                        Browse and download any Roblox places to play them in your own server.
+                    </div>
+                    <img src="src/img/placeholder.png" alt="Library Screenshot" style="width:320px;border-radius:8px;box-shadow:0 2px 8px #0002;object-fit:cover;background:#222;" />
+                </div>
+            </div>
+        </div>
+        <div class="buttons">
+        <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:10px;">
+            <h2 style="padding-top: 20px;color:#ffffff;font-size:2em;margin-bottom:8px;letter-spacing:1px;">Are you ready?</h2>
+            <h3 style="color:#ffffff;font-size:2em;margin-bottom:8px;letter-spacing:1px;font-size: 10px;">Even tho... youre not required to create an account to play in solo,<br> but required to create an account to play in multiplayer. We need to know who is using our resourses and app :/</h3>
+            <div style="padding-bottom:20px ;display:flex;align-items:center;justify-content:center;">
+                <button class="btn" onclick="location.href='login/index.html'" style="margin:10px 12px 10px 0;padding:12px 32px;font-size:1.08em;">Login</button>
+                <span style="color:#fff;font-size:1.15em;margin:0 8px;">or</span>
+                <button class="btn" onclick="location.href='register/index.html'" style="margin:10px 0 10px 12px;padding:12px 32px;font-size:1.08em;">Register</button>
+            </div>
+        </div>
+        </div>
         </div>
     </section>
     <script>

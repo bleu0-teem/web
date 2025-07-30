@@ -28,7 +28,7 @@ composer install
    - `DB_NAME`: Your database name
    - `DB_USER`: Your database username
    - `DB_PASS`: Your database password
-   - `VALID_INVITE_KEY`: Your application's invite key
+   - `VALID_INVITE_KEY`: Your application's invite key, that is valid infinitely.
 
 ### 3. Verify Configuration
 
