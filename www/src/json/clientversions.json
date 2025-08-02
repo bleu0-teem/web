@@ -2,7 +2,7 @@
   "versions": [
     {
       "version": "InteractivePhysics",
-      "download_url": "https://files.catbox.moe/xoujzf.zip",
+      "download_url": "https://github.com/blue16-team/blue16-web/raw/refs/heads/main/www/src/files/clients/InteractivePhysics.zip",
       "rcc_version": null,
       "launch_arguments": null,
       "vulnerable": false,
