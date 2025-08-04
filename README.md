@@ -31,19 +31,49 @@ Clean design. Powerful features. Built for scalability.
 
 2. **Install dependencies**
    ```bash
-   yarn install
-   # or
-   npm install
+   cd www
+   composer install
    ```
 
-3. **Run the development server**
+3. **Configure your environment**
    ```bash
-   yarn dev
-   # or
-   npm run dev                          
+   cp .env.sample .env
+   # Edit .env with your database credentials
    ```
 
-   ---
+4. **Set up your database**
+   ```bash
+   php config-check.php  # Verify configuration
+   php migrate.php       # Create database tables
+   ```
+
+5. **Choose your database**
+   - **MySQL**: Set `DB_TYPE=mysql` and configure MySQL credentials
+   - **Supabase**: Set `DB_TYPE=supabase` and configure Supabase credentials
+   
+   See [DATABASE.md](www/DATABASE.md) for detailed configuration guide.
+
+---
+
+## 🗄️ Database Support
+
+Blue16 Web supports both traditional MySQL and modern Supabase databases:
+
+### MySQL
+- Full control over your database server
+- Traditional SQL operations
+- Wide hosting support
+
+### Supabase (Recommended)
+- Zero server maintenance
+- Built-in real-time features
+- Automatic REST/GraphQL APIs
+- Built-in authentication
+- Web-based dashboard
+
+Switch between databases by simply changing the `DB_TYPE` environment variable. No code changes required!
+
+---
 
 ## 🤝 Contributing
 
