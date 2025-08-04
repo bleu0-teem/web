@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
-    <script src="https://unpkg.com/akar-icons-fonts"></script>
+    <link rel="stylesheet" href="animations.css">
+    <script src="https://code.iconify.design/2/2.1.2/iconify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/aplayer/dist/APlayer.min.css">
 <script src="https://unpkg.com/aplayer/dist/APlayer.min.js"></script>
@@ -19,49 +20,49 @@
             <ul>
                 <li>
                     <a href="#"  class="menu-link" data-section="dashboard">
-                        <i class="ai-home"></i>
+                        <span style="font-size: 25px;" class="iconify" data-icon="mdi:home-outline" data-inline="false"></span>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li>
                     <a href="#" class="menu-link" data-section="download">
-                        <i class="ai-download"></i>
+                        <span style="font-size: 25px;" class="iconify" data-icon="mdi:download" data-inline="false"></span>
                         <span>Download</span>
                     </a>
                 </li>
                 <li>
                     <a href="#" class="menu-link" data-section="files">
-                        <i class="ai-file"></i>
+                        <span style="font-size: 25px;" class="iconify" data-icon="mdi:folder" data-inline="false"></span>
                         <span>Files</span>
                     </a>
                 </li>
                 <li>
                     <a href="#"  class="menu-link" data-section="games">
-                        <i class="ai-game-controller"></i>
+                        <span style="font-size: 25px;" class="iconify" data-icon="mdi:file" data-inline="false"></span>
                         <span>Games</span>
                     </a>
                 </li>
                 <li>
                     <a href="#" class="menu-link" data-section="invites">
-                        <i class="ai-key"></i>
+                        <span style="font-size: 25px;" class="iconify" data-icon="mdi:key" data-inline="false"></span>
                         <span>Invites</span>
                     </a>
                 </li>
                 <li>
                     <a href="#" class="menu-link" data-section="notifications">
-                        <i class="ai-bell"></i>
+                        <span style="font-size: 25px;" class="iconify" data-icon="mdi:bell" data-inline="false"></span>
                         <span>Notifications</span>
                     </a>
                 </li>
                 <li>
                     <a href="#" class="menu-link" data-section="profile">
-                        <i class="ai-person"></i>
+                        <span style="font-size: 25px;" class="iconify" data-icon="mdi:person" data-inline="false"></span>
                         <span>Profile</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="menu-link" data-section="settings">
-                        <i class="ai-gear"></i>
+                    <a href="#" class="menu-link" data -section="settings">
+                        <span style="font-size: 25px;" class="iconify" data-icon="mdi:gear" data-inline="false"></span>
                         <span>Settings</span>
                     </a>
                 </li>
@@ -75,45 +76,294 @@
                 <div class="welcome-message">
                     <h2>Welcome, <span id="username">kitty</span>!</h2>
                 </div>
-                <div class="dummy-text">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nec nunc at libero tincidunt pretium. Curabitur non lorem in magna volutpat lacinia. Nulla facilisi. Suspendisse potenti. Integer nec ex vehicula, imperdiet justo a, pharetra risus.</p>
-                    <!-- ...existing dummy text... -->
+                
+                <!-- Quick Stats -->
+                <div class="stats-overview">
+                    <h3>Quick Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Games Played</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Servers Hosted</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">24</div>
+                            <div class="stat-label">Friends Online</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Achievements</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="activity-feed">
+                    <h3>Recent Activity</h3>
+                    <ul class="activity-list">
+                        <li class="activity-item">
+                            <div style="padding-left: 10px; padding-bottom: 5px;" class="activity-icon">🎮</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Played "Classic Obby"</div>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div style="padding-left: 10px; padding-bottom: 5px;" class="activity-icon">🏠</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Hosted "Friends Server"</div>
+                                <div class="activity-time">Yesterday</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div style="padding-left: 10px; padding-bottom: 5px;" class="activity-icon">📥</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Downloaded "Retro Racing"</div>
+                                <div class="activity-time">2 days ago</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Quick Links removed -->
+                
+                <!-- News/Announcements -->
+                <div class="news-section">
+                    <h3>Latest News</h3>
+                    <div class="news-item">
+                        <div class="news-date">June 15, 2023</div>
+                        <h4>New Client Versions Available</h4>
+                        <p>We've added support for more classic Roblox clients. Check out the updated versions in the Download section!</p>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-date">June 10, 2023</div>
+                        <h4>Community Server Hosting</h4>
+                        <p>Users can now host their own community servers. Visit the Servers section to get started!</p>
+                    </div>
                 </div>
             </div>
 
             <!-- Download Section -->
             <div class="content-section" id="download-section" style="display: none;">
-                <h2>Installing the launcher will be there :3</h2>
-                <p>its just not done yettt!</p>
+                <h2>Download Launcher</h2>
+                <p>Get started with BLUE16 by downloading our launcher. The launcher will allow you to easily access all the classic Roblox clients and games.</p>
+                
+                <div class="download-options">
+                    <div class="download-card">
+                        <h3>Windows</h3>
+                        <p>Compatible with Windows 7 and above</p>
+                        <button class="download-button" onclick="downloadLauncher('windows')"><span class="iconify" data-icon="mdi:download" data-inline="false"></span> Download for Windows</button>
+                    </div>
+                    
+                    <div class="download-card">
+                        <h3>MacOS</h3>
+                        <p>Compatible with MacOS 10.12 and above</p>
+                        <button class="download-button" onclick="downloadLauncher('mac')"><span class="iconify" data-icon="mdi:download" data-inline="false"></span> Download for MacOS</button>
+                    </div>
+                    
+                    <div class="download-card">
+                        <h3>Linux</h3>
+                        <p>Compatible with most Linux distributions</p>
+                        <button class="download-button" onclick="downloadLauncher('linux')"><span class="iconify" data-icon="mdi:download" data-inline="false"></span> Download for Linux</button>
+                    </div>
+                </div>
+                
+                <div class="download-notes">
+                    <h3>Installation Notes</h3>
+                    <ul>
+                        <li>Make sure to check your antivirus software if the launcher is flagged</li>
+                        <li>Our launcher is completely safe and open-source</li>
+                        <li>For any issues, please visit our support page or contact us</li>
+                    </ul>
+                </div>
             </div>
 
             <!-- Files Section -->
             <div class="content-section" id="files-section" style="display: none;">
-                <h2>Files</h2>
-                <p>Your files will be here.</p>
+                <h2>Manage Your Files</h2>
+                <p>Upload, download, and manage your game files and resources.</p>
+                
+                <div class="file-upload-section">
+                    <h3>Upload a File</h3>
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <input type="file" id="fileInput" name="file" class="file-input" />
+                        <button type="submit" class="upload-button"><span class="iconify" data-icon="mdi:upload" data-inline="false"></span> Upload File</button>
+                    </form>
+                </div>
+
+                <div class="file-list">
+                    <h3>Your Uploaded Files</h3>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">my_awesome_game.rbxl</span>
+                        <span class="file-size">2.4 MB</span>
+                        <button class="file-action download-btn"><span class="iconify" data-icon="mdi:download" data-inline="false"></span> Download</button>
+                        <button class="file-action delete-btn"><span class="iconify" data-icon="mdi:trash" data-inline="false"></span> Delete</button>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📁</span>
+                        <span class="file-name">cool_sky_fixed_final</span>
+                        <span class="file-size">1.1 MB</span>
+                        <button class="file-action download-btn"><span class="iconify" data-icon="mdi:download" data-inline="false"></span> Download</button>
+                        <button class="file-action delete-btn"><span class="iconify" data-icon="mdi:trash" data-inline="false"></span> Delete</button>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">🎵</span>
+                        <span class="file-name">retro_music.mp3</span>
+                        <span class="file-size">3.2 MB</span>
+                        <button class="file-action download-btn"><span class="iconify" data-icon="mdi:download" data-inline="false"></span> Download</button>
+                        <button class="file-action delete-btn"><span class="iconify" data-icon="mdi:trash" data-inline="false"></span> Delete</button>
+                    </div>
+                </div>
             </div>
 
             <!-- Games Section -->
             <div class="content-section" id="games-section" style="display: none;">
-                <h2>Games</h2>
-                <p>Find and play games in there.</p>
+                <h2>Your Game Files</h2>
+                <p>Manage and play your uploaded game files.</p>
+                
+                <div class="games-description">
+                    <p>Find and play your uploaded .rbxl or .rbxlx files.</p>
+                </div>
+                
+                <div class="games-search-container" style="margin: 20px 0; display: flex; gap: 10px;">
+                    <input type="text" id="gameSearch" placeholder="Search your games..." class="search-input" style="flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                    <button class="refresh-button" onclick="refreshGameList()" style="padding: 10px 15px; border-radius: 5px; border: none; background: #1565c0; color: white; cursor: pointer;"><span class="iconify" data-icon="mdi:refresh" data-inline="false"></span> Refresh</button>
+                </div>
+                
+                <div class="file-list">
+                    <h3>Recently Uploaded Games</h3>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">MyAwesomeGame.rbxl</span>
+                        <span class="file-size">2.4 MB</span>
+                        <button class="file-action play-btn"><span class="iconify" data-icon="mdi:play" data-inline="false"></span> Play</button>
+                        <button class="file-action download-btn"><span class="iconify" data-icon="mdi:download" data-inline="false"></span> Download</button>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">RetroObby.rbxl</span>
+                        <span class="file-size">1.8 MB</span>
+                        <button class="file-action play-btn"><span class="iconify" data-icon="mdi:play" data-inline="false"></span> Play</button>
+                        <button class="file-action download-btn"><span class="iconify" data-icon="mdi:download" data-inline="false"></span> Download</button>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">SkyWars.rbxl</span>
+                        <span class="file-size">3.1 MB</span>
+                        <button class="file-action play-btn"><span class="iconify" data-icon="mdi:play" data-inline="false"></span> Play</button>
+                        <button class="file-action download-btn"><span class="iconify" data-icon="mdi:download" data-inline="false"></span> Download</button>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">BuilderParadise.rbxl</span>
+                        <span class="file-size">4.2 MB</span>
+                        <button class="file-action play-btn"><span class="iconify" data-icon="mdi:play" data-inline="false"></span> Play</button>
+                        <button class="file-action download-btn"><span class="iconify" data-icon="mdi:download" data-inline="false"></span> Download</button>
+                    </div>
+                </div>
             </div>
 
             <!-- Invites Section -->
             <div class="content-section" id="invites-section" style="display: none;">
                 <h2>Invites</h2>
                 <p id="invite-message">Manage all your invite keys here.</p>
+                
+                <div class="invite-actions" style="margin: 20px 0;">
+                    <button class="btn-primary" onclick="generateInviteKey()" style="padding: 10px 20px; background: #1565c0; color: white; border: none; border-radius: 5px; cursor: pointer;"><span class="iconify" data-icon="mdi:plus" data-inline="false"></span> Generate New Invite Key</button>
+                    <button class="btn-secondary" onclick="refreshInviteList()" style="padding: 10px 20px; background: #f5f5f5; color: #333; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; margin-left: 10px;"><span class="iconify" data-icon="mdi:refresh" data-inline="false"></span> Refresh</button>
+                </div>
+                
                 <div id="invite-list"></div>
                 <div class="analytics-widgets">
                     <canvas id="inviteUsageChart" width="400" height="200"></canvas>
                     <canvas id="inviteKeyChart" width="400" height="200"></canvas>
                 </div>
+                
+                <div class="invite-instructions" style="margin-top: 30px;">
+                    <h3>How to Use Invite Keys</h3>
+                    <ol>
+                        <li>Generate a new invite key using the button above</li>
+                        <li>Share the key with friends you want to invite</li>
+                        <li>They can use the key to register on BLUE16</li>
+                        <li>Each key can only be used once</li>
+                    </ol>
+                </div>
             </div>
 
             <!-- Profile Section -->
             <div class="content-section" id="profile-section" style="display: none;">
-                <h2>Welcome to Your Profile</h2>
-                <p>Manage your personal information here.</p>
+                <h2>User Profile</h2>
+                
+                <div class="forum-profile">
+                    <div class="profile-header" style="display: flex; gap: 20px; align-items: flex-start;">
+                        <div class="profile-avatar">
+                            <img src="../src/img/cat.png" alt="Profile Picture" style="width: 120px; height: 120px; border-radius: 10px; object-fit: cover;">
+                        </div>
+                        <div class="profile-main-info" style="padding-top: 10px;">
+                            <h3 class="username" style="margin: 0 0 5px 0;">kitty</h3>
+                            <p class="user-title" style="margin: 0 0 10px 0; color: #666;">Community Member</p>
+                            <div class="user-stats" style="display: flex; gap: 15px;">
+                                <span class="stat">Posts: 42</span>
+                                <span class="stat">Joined: June 1, 2023</span>
+                                <span class="stat">Last Seen: Today</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-content">
+                        <div class="profile-section">
+                            <h4>About Me</h4>
+                            <p>Classic Roblox enthusiast and community member. I love playing retro games and hosting servers for friends.</p>
+                        </div>
+                        
+                        <div class="profile-section">
+                            <h4>User Information</h4>
+                            <table class="profile-table">
+                                <tr>
+                                    <td class="label">Username:</td>
+                                    <td>kitty</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Email:</td>
+                                    <td>kitty@example.com</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Member Since:</td>
+                                    <td>June 1, 2023</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Games Played:</td>
+                                    <td>12</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Servers Hosted:</td>
+                                    <td>3</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="profile-section">
+                            <h4>Recent Activity</h4>
+                            <ul class="activity-list">
+                                <li>Posted in "Classic Obby Discussion" - 2 hours ago</li>
+                                <li>Uploaded "RetroObby.rbxl" - 1 day ago</li>
+                                <li>Commented on "Server Hosting Tips" - 3 days ago</li>
+                                <li>Joined "Nostalgia Club" group - 1 week ago</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="profile-section">
+                            <h4>Signature</h4>
+                            <div class="signature">
+                                "Keeping the spirit of classic Roblox alive!"
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Settings Section -->
@@ -123,7 +373,7 @@
                 <div class="setting-group">
                     <label for="change-username">Change Username</label>
                     <input type="text" id="change-username" placeholder="Enter new username">
-                    <button onclick="updateUsername()">Update</button>
+                    <button onclick="updateUsername()"><span class="iconify" data-icon="mdi:save" data-inline="false"></span> Update</button>
                 </div>
 
                 <div class="setting-group">
@@ -153,7 +403,74 @@
             <!-- Notifications Section -->
             <div class="content-section" id="notifications-section" style="display: none;">
                 <h2>Notifications</h2>
-                <p>View your recent notifications here.</p>
+                <p>View your recent notifications and updates.</p>
+                
+                <div class="notifications-list">
+                    <div class="notification-item" style="display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: #f9f9f9;">
+                        <div class="notification-icon" style="font-size: 1.5rem; margin-right: 15px;">🎉</div>
+                        <div class="notification-content" style="flex: 1;">
+                            <h4 style="margin: 0 0 5px 0;">New Friend Request</h4>
+                            <p style="margin: 0; color: #666;"><strong>RobloxRetroFan</strong> wants to be your friend</p>
+                        </div>
+                        <div class="notification-actions" style="display: flex; gap: 10px; margin-left: 15px;">
+                            <span class="iconify accept-icon" data-icon="mdi:check" style="color: #4caf50; font-size: 1.5rem; cursor: pointer;"></span>
+                            <span class="iconify decline-icon" data-icon="mdi:x" style="color: #f44336; font-size: 1.5rem; cursor: pointer;"></span>
+                        </div>
+                        <div class="notification-time" style="color: #999; margin-left: 15px;">2 minutes ago</div>
+                    </div>
+                    
+                    <div class="notification-item" style="display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #eee;">
+                        <div class="notification-icon" style="font-size: 1.5rem; margin-right: 15px;">🎮</div>
+                        <div class="notification-content" style="flex: 1;">
+                            <h4 style="margin: 0 0 5px 0;">Game Update Available</h4>
+                            <p style="margin: 0; color: #666;">A new version of "Classic Obby" is available for download</p>
+                        </div>
+                        <div class="notification-actions" style="display: flex; gap: 10px; margin-left: 15px;">
+                            <span class="iconify accept-icon" data-icon="mdi:check" style="color: #4caf50; font-size: 1.5rem; cursor: pointer;"></span>
+                            <span class="iconify decline-icon" data-icon="mdi:x" style="color: #f44336; font-size: 1.5rem; cursor: pointer;"></span>
+                        </div>
+                        <div class="notification-time" style="color: #999; margin-left: 15px;">1 hour ago</div>
+                    </div>
+                    
+                    <div class="notification-item" style="display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #eee; background: #f9f9f9;">
+                        <div class="notification-icon" style="font-size: 1.5rem; margin-right: 15px;">📢</div>
+                        <div class="notification-content" style="flex: 1;">
+                            <h4 style="margin: 0 0 5px 0;">Community Event</h4>
+                            <p style="margin: 0; color: #666;">Join our weekly "Retro Game Night" this Friday at 8 PM EST</p>
+                        </div>
+                        <div class="notification-actions" style="display: flex; gap: 10px; margin-left: 15px;">
+                            <span class="iconify accept-icon" data-icon="mdi:check" style="color: #4caf50; font-size: 1.5rem; cursor: pointer;"></span>
+                            <span class="iconify decline-icon" data-icon="mdi:x" style="color: #f44336; font-size: 1.5rem; cursor: pointer;"></span>
+                        </div>
+                        <div class="notification-time" style="color: #999; margin-left: 15px;">3 hours ago</div>
+                    </div>
+                    
+                    <div class="notification-item" style="display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #eee;">
+                        <div class="notification-icon" style="font-size: 1.5rem; margin-right: 15px;">🏆</div>
+                        <div class="notification-content" style="flex: 1;">
+                            <h4 style="margin: 0 0 5px 0;">Achievement Unlocked</h4>
+                            <p style="margin: 0; color: #666;">You've earned the "Nostalgia Hunter" achievement</p>
+                        </div>
+                        <div class="notification-actions" style="display: flex; gap: 10px; margin-left: 15px;">
+                            <span class="iconify accept-icon" data-icon="mdi:check" style="color: #4caf50; font-size: 1.5rem; cursor: pointer;"></span>
+                            <span class="iconify decline-icon" data-icon="mdi:x" style="color: #f44336; font-size: 1.5rem; cursor: pointer;"></span>
+                        </div>
+                        <div class="notification-time" style="color: #999; margin-left: 15px;">1 day ago</div>
+                    </div>
+                    
+                    <div class="notification-item" style="display: flex; align-items: center; padding: 15px; background: #f9f9f9;">
+                        <div class="notification-icon" style="font-size: 1.5rem; margin-right: 15px;">👤</div>
+                        <div class="notification-content" style="flex: 1;">
+                            <h4 style="margin: 0 0 5px 0;">New Follower</h4>
+                            <p style="margin: 0; color: #666;"><strong>BuilderPro2008</strong> is now following you</p>
+                        </div>
+                        <div class="notification-actions" style="display: flex; gap: 10px; margin-left: 15px;">
+                            <span class="iconify accept-icon" data-icon="mdi:check" style="color: #4caf50; font-size: 1.5rem; cursor: pointer;"></span>
+                            <span class="iconify decline-icon" data-icon="mdi:x" style="color: #f44336; font-size: 1.5rem; cursor: pointer;"></span>
+                        </div>
+                        <div class="notification-time" style="color: #999; margin-left: 15px;">2 days ago</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -179,6 +496,19 @@
 
         const username = getCookie('username') || 'User';
         document.getElementById('username').textContent = username;
+        
+        // Check for saved dark mode preference
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedDarkMode = localStorage.getItem('darkMode');
+            if (savedDarkMode === 'true') {
+                document.body.classList.add('dark-mode');
+                // Update the checkbox state
+                const darkModeToggle = document.getElementById('dark-mode-toggle');
+                if (darkModeToggle) {
+                    darkModeToggle.checked = true;
+                }
+            }
+        });
 
         // 3. Update username
         function updateUsername() {
@@ -195,6 +525,9 @@
         // 4. Toggle dark mode
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
+            // Save preference to localStorage
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
         }
 
         // 5. Save notification preferences
@@ -299,21 +632,90 @@
     </script>
     
     <script>
-  const ap = new APlayer({
-    container: document.getElementById('aplayer'),
-    fixed: true,       // set true to make it always visible on scroll
-    audio: [
-      {
-        name: 'anarchy!!!!',
-        artist: 'Stomach Book',
-        url: 'https://files.catbox.moe/t6oilh.mp3',
-        cover: 'https://files.catbox.moe/oz8u9a.jpeg',
-        lrc: 'https://litter.catbox.moe/9qz0f8zdowrj5nxi.lrc',
-        theme: '#e6d0b2'
-      },
-      // add more tracks here if needed
-    ]
-  });
-</script>
+        // Function to refresh game list
+        function refreshGameList() {
+            alert('Game list refreshed!');
+            // In a real implementation, this would fetch updated game data from the server
+        }
+        
+        // Function to play a game
+        function playGame(gameName) {
+            alert(`Starting game: ${gameName}`);
+            // In a real implementation, this would start the game server with the specified file
+        }
+        
+        // Function to save profile changes
+        function saveProfile() {
+            alert('Profile changes saved!');
+            // In a real implementation, this would send the profile data to the server
+        }
+        
+        // Function to change password
+        function changePassword() {
+            const newPassword = prompt('Enter your new password:');
+            if (newPassword) {
+                alert('Password changed successfully!');
+                // In a real implementation, this would send the new password to the server
+            }
+        }
+        
+        // Function to mark all notifications as read
+        function markAllAsRead() {
+            alert('All notifications marked as read!');
+            // In a real implementation, this would update the notification status on the server
+        }
+        
+        // Function to generate a new invite key
+        function generateInviteKey() {
+            alert('New invite key generated!');
+            // In a real implementation, this would request a new key from the server
+        }
+        
+        // Function to refresh the invite list
+        function refreshInviteList() {
+            alert('Invite list refreshed!');
+            // In a real implementation, this would fetch updated invite data from the server
+        }
+        
+        // Add event listeners for notification actions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for accept icons
+            document.querySelectorAll('.accept-icon').forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const notificationItem = this.closest('.notification-item');
+                    alert('Notification accepted!');
+                    // In a real implementation, this would update the notification status on the server
+                    // and potentially perform the associated action
+                });
+            });
+            
+            // Add event listeners for decline icons
+            document.querySelectorAll('.decline-icon').forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const notificationItem = this.closest('.notification-item');
+                    notificationItem.style.opacity = '0.5';
+                    // In a real implementation, this would update the notification status on the server
+                });
+            });
+        });
+    </script>
+    
+    <script>
+        const ap = new APlayer({
+            container: document.getElementById('aplayer'),
+            fixed: true,       // set true to make it always visible on scroll
+            audio: [
+            {
+                name: 'anarchy!!!!',
+                artist: 'Stomach Book',
+                url: 'https://files.catbox.moe/t6oilh.mp3',
+                cover: 'https://files.catbox.moe/oz8u9a.jpeg',
+                lrc: 'https://litter.catbox.moe/9qz0f8zdowrj5nxi.lrc',
+                theme: '#e6d0b2'
+            },
+            // add more tracks here if needed
+            ]
+        });
+    </script>
 </body>
 </html>

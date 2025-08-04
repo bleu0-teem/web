@@ -1,4 +1,7 @@
 {
     "offline": false,
-    "message": "Unaccessible"
+    "message": "No issues detected.",
+    "progress": 100,
+    "statusMessage": "Everything works smoothly.",
+    "estimatedTime": "-"
 }

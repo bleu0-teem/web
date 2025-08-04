@@ -8,6 +8,14 @@
     {
       "name": "noooooobieee",
       "email": "import@blue16.site"
+    },
+    {
+      "name": "techplayz32",
+      "email": "volumetech@getgoogleoff.com"
+    },
+    {
+      "name": "Maxfm4ik",
+      "email": "max@maxfm4ik.site"
     }
   ],
   "require": {
@@ -17,7 +25,7 @@
     "ext-pdo": "*",
     "psr/log": "^1.0 || ^2.0 || ^3.0",
     "rafaelwendel/phpsupabase": "^0.0.1",
-    "vlucas/phpdotenv": "^5.4"
+    "vlucas/phpdotenv": "^5.6@dev"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",

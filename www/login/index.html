@@ -214,14 +214,15 @@ try {
 
               
 
-            if (responseData.success) {
+            if (responseData.token) {
+                document.cookie = `token=${responseData.token}; path=/; max-age=31536000; Secure; SameSite=Strict;`;
                 document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=31536000; Secure; SameSite=Strict;`;
                 showNotification(responseData.message || 'Login successful!', 'success');
                 setTimeout(() => {
                     window.location.href = '/dashboard/';
                 }, 1000);
             } else {
-                showNotification(responseData.message || 'Login failed. Please try again.', 'error');
+                showNotification(responseData.error || 'Login failed. Please try again.', 'error');
             }
         } catch (err) {
             console.error('Login request failed:', err);

@@ -1,0 +1,206 @@
+/* Icon animation keyframes */
+@keyframes iconPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes iconHover {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Base icon styles */
+.iconify {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+.iconify:hover {
+  animation: iconHover 0.3s ease forwards;
+  color: #1565c0;
+}
+
+/* Sidebar menu icon animations */
+.sidebar-menu .iconify {
+  font-size: 25px;
+  transition: all 0.3s ease;
+}
+
+.sidebar-menu .iconify:hover {
+  transform: scale(1.1);
+  color: #ffffff;
+}
+
+/* Content section icon animations */
+.right-content .iconify {
+  transition: all 0.3s ease;
+}
+
+.right-content .iconify:hover {
+  transform: scale(1.1);
+  color: #1565c0;
+}
+
+/* Button icon animations */
+.download-button .iconify,
+.upload-button .iconify,
+.file-action .iconify {
+  transition: all 0.3s ease;
+}
+
+.download-button:hover .iconify,
+.upload-button:hover .iconify,
+.file-action:hover .iconify {
+  transform: scale(1.1);
+  color: #1565c0;
+}
+
+/* Notification icon animations */
+.notification-actions .iconify {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.notification-actions .iconify:hover {
+  transform: scale(1.2);
+}
+
+.accept-icon:hover {
+  color: #4caf50 !important;
+}
+
+.decline-icon:hover {
+  color: #f44336 !important;
+}
+
+/* Pulse animation for icons on load */
+.iconify:hover {
+  animation: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .iconify {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .iconify {
+    font-size: 18px;
+  }
+}
+
+/* Dark mode icon styles */
+body.dark-mode .iconify {
+  color: #ffffff;
+}
+
+body.dark-mode .iconify:hover {
+  color: #4fc3f7;
+}
+
+/* Focus styles for accessibility */
+.iconify:focus {
+  outline: 2px solid #1565c0;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+.menu-link .iconify,
+.menu-link span {
+  transition: all 0.3s ease;
+}
+
+.menu-link:hover .iconify,
+.menu-link:hover span {
+  transform: translateX(5px);
+  color: #ffffff;
+}
+
+/* Enhanced hover effects for sidebar */
+.sidebar-menu a:hover .iconify {
+  transform: scale(1.1) rotate(5deg);
+  color: #ffffff;
+}
+
+/* Enhanced button hover effects */
+.download-button:hover,
+.upload-button:hover,
+.file-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.download-button:hover .iconify,
+.upload-button:hover .iconify,
+.file-action:hover .iconify {
+  transform: scale(1.1);
+  animation: iconPulse 0.5s ease-in-out;
+}
+
+/* Loading animation for icons */
+.iconify.loading {
+  animation: iconPulse 1.5s ease-in-out infinite;
+}
+
+/* Custom animation for specific icons */
+.refresh-button .iconify {
+  animation: spin 2s linear infinite;
+}
+
+.refresh-button:hover .iconify {
+  animation-duration: 1s;
+}
+
+/* Notification pulse animation */
+.notification-item .iconify {
+  animation: iconPulse 3s ease-in-out infinite;
+}
+
+.notification-item:hover .iconify {
+  animation: none;
+}
+
+/* Profile section enhancements */
+.profile-section .iconify {
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.profile-section .iconify:hover {
+  transform: scale(1.1);
+  color: #1565c0;
+}
+
+/* Settings section icon styles */
+.setting-group .iconify {
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.setting-group .iconify:hover {
+  transform: scale(1.1);
+  color: #1565c0;
+}
+
+/* Enhanced focus states */
+.iconify:focus-visible {
+  outline: 2px solid #1565c0;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Print styles */
+@media print {
+  .iconify {
+    color: #000 !important;
+  }
+}

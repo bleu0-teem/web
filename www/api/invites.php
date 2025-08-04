@@ -13,7 +13,7 @@ $username = $_GET['username'];
 
 try {
     // Prepare and execute the query
-    $stmt = $pdo->prepare("SELECT `key`, `uses`, `active` FROM invitekeys WHERE username = :username");
+    $stmt = $pdo->prepare("SELECT `key`, `uses`, `active` FROM invite_keys WHERE username = :username");
     $stmt->execute(['username' => $username]);
 
     // Fetch all results
