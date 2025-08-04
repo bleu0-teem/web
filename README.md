@@ -11,6 +11,7 @@ Clean design. Powerful features. Built for scalability.
 - 🎨 **Modern UI**: Sleek and aesthetic user interface.
 - 🔒 **Secure**: Security best-practices baked in.
 - ♻️ **Easy to Maintain**: Modular and well-documented codebase.
+- 🗄️ **Flexible Database**: Support for both MySQL and Supabase databases.
 
 ---
 
