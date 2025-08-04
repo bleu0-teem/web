@@ -53,7 +53,6 @@ if (isPwnedPassword($password)) {
 try {
     $userRow = DatabaseUtils::getUserByIdentifier($identifier);
 } catch (PDOException $e) {
-    error_log("Database query failed: " . $e->getMessage());
     http_response_code(500);
     header('Content-Type: application/json');
     echo json_encode(['error' => 'Server error. Please try again later.']);
