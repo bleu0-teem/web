@@ -20,6 +20,7 @@ session_start();
 // 1) DATABASE CONNECTION (PDO + SSL using environment variables)
 // ------------------------------------------------------------
 require_once 'db_connection.php';
+require_once 'database_utils.php';
 
 // ------------------------------------------------------------
 // 2) FETCH & VALIDATE POST DATA
