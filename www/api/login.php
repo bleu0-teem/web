@@ -51,14 +51,7 @@ if (isPwnedPassword($password)) {
 // 4) FETCH USER FROM DATABASE & VERIFY PASSWORD
 // ------------------------------------------------------------
 try {
-    $stmt = $pdo->prepare("
-        SELECT id, username, email, password_hash, token
-        FROM users
-        WHERE username = :ident OR email = :ident
-        LIMIT 1
-    ");
-    $stmt->execute([':ident' => $identifier]);
-    $userRow = $stmt->fetch();
+    $userRow = DatabaseUtils::getUserByIdentifier($identifier);
 } catch (PDOException $e) {
     error_log("Database query failed: " . $e->getMessage());
     http_response_code(500);
