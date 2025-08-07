@@ -3,230 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
+    <title>Register - BLUE16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="register_styles.css">
-
-    <style>
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 15px 20px;
-            background-color: #333;
-            color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        .notification.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .notification.error {
-            background-color: #e74c3c;
-        }
-
-        .notification.success {
-            background-color: #2ecc71;
-        }
-    </style>
-
-    <title>BLUE16 - Register</title>
+    <script src="https://unpkg.com/akar-icons-fonts"></script>
 </head>
 <body>
-    <section>
-        <div class="wave">
-            <span></span>
-            <span></span>
-            <span></span>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="https://see.fontimg.com/api/rf5/nRoyY/YzA4MzM4MDJkMDY5NDQ4NDhmMjkxOTliNTQwMTAxZjMudHRm/Ymx1ZTE2/boblox-04-regular.png?r=fs&h=81&w=1250&fg=FFFFFF&bg=FFFFFF&tb=1&s=65" alt="BLUE16" class="logo-small">
+            </div>
+            <div class="nav-links">
+                <a href="../" class="nav-link btn-nav">Home</a>
+                <a href="../login/" class="nav-link btn-nav btn-primary">Login</a>
+            </div>
         </div>
+    </nav>
 
-        <div class="container">
-            <h1 class="login__title">Register</h1>
-
-            <div class="login__content">
-                <!-- Username -->
-                <div class="login__box">
-                    <i class="ri-user-3-line login__icon"></i>
-                    <div class="login__box-input">
-                        <input type="text" required class="login__input" id="reg-username" placeholder=" ">
-                        <label for="reg-username" class="login__label">Username</label>
-                    </div>
+    <!-- Register Section -->
+    <section class="register-section">
+        <div class="register-background">
+            <div class="register-particles"></div>
+        </div>
+        
+        <div class="register-container">
+            <div class="register-card">
+                <div class="register-header">
+                    <h1 class="register-title">Create Account</h1>
+                    <p class="register-subtitle">Join BLUE16 and get access</p>
                 </div>
 
-                <!-- Password -->
-                <div class="login__box">
-                    <i class="ri-lock-2-line login__icon"></i>
-                    <div class="login__box-input">
-                        <input type="password" required class="login__input" id="reg-pass" placeholder=" ">
-                        <label for="reg-pass" class="login__label">Password</label>
-                        <i class="ri-eye-off-line login__eye" id="pass-eye"></i>
-                    </div>
-                </div>
+                <!-- Notification Container -->
+                <div id="notification-container" class="notification-container"></div>
 
-                <!-- Confirm Password -->
-                <div class="login__box">
-                    <i class="ri-lock-2-line login__icon"></i>
-                    <div class="login__box-input">
-                        <input type="password" required class="login__input" id="reg-pass-confirm" placeholder=" ">
-                        <label for="reg-pass-confirm" class="login__label">Confirm Password</label>
-                        <i class="ri-eye-off-line login__eye" id="confirm-eye"></i>
-                    </div>
-                </div>
+                <form id="registerForm" class="register-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="username" class="form-label">
+                                <i class="ai-person"></i>
+                                Username
+                            </label>
+                            <input type="text" id="username" name="username" class="form-input" required>
+                            <div class="form-hint">3-20 characters, letters, numbers, and underscores only</div>
+                        </div>
 
-                <!-- Invite Key -->
-                <div class="login__box">
-                    <i class="ri-key-line login__icon"></i>
-                    <div class="login__box-input">
-                        <input type="text" required class="login__input" id="reg-invite-key" placeholder=" ">
-                        <label for="reg-invite-key" class="login__label">Invite Key</label>
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <i class="ai-envelope"></i>
+                                Email
+                            </label>
+                            <input type="email" id="email" name="email" class="form-input" required>
+                        </div>
                     </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="password" class="form-label">
+                                <i class="ai-lock-on"></i>
+                                Password
+                            </label>
+                            <div class="password-input">
+                                <input type="password" id="password" name="password" class="form-input" required>
+                                <button type="button" class="password-toggle" onclick="togglePassword()">
+                                    <i class="ai-eye-closed" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength">
+                                <div class="strength-bar">
+                                    <div class="strength-fill" id="strengthFill"></div>
+                                </div>
+                                <span class="strength-text" id="strengthText">Password strength</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirm_password" class="form-label">
+                                <i class="ai-lock-on"></i>
+                                Confirm Password
+                            </label>
+                            <div class="password-input">
+                                <input type="password" id="confirm_password" name="confirm_password" class="form-input" required>
+                                <button type="button" class="password-toggle" onclick="togglePassword2()">
+                                    <i class="ai-eye-closed" id="eyeIcon2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="invite_key" class="form-label">
+                            <i class="ai-key"></i>
+                            Invite Key
+                        </label>
+                        <input type="text" id="invite_key" name="invite_key" class="form-input" required>
+                        <div class="form-hint">Enter your invite key to create an account</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="csrf_token" class="form-label">
+                            <i class="ai-key"></i>
+                            CSRF Token
+                        </label>
+                        <input type="text" id="csrf_token" name="csrf_token" class="form-input" required>
+                        <div class="form-hint">This is TEMPORARY, we are testing the registration.</div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <span class="checkmark"></span>
+                            I agree to the <a href="#" class="link-primary">Terms of Service</a> and <a href="#" class="link-primary">Privacy Policy</a>
+                        </label>
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="newsletter" name="newsletter">
+                            <span class="checkmark"></span>
+                            Subscribe to our newsletter for updates
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="ai-person-add"></i>
+                        Create Account
+                    </button>
+                </form>
+
+                <div class="register-footer">
+                    <p>Already have an account? <a href="../login/index.html" class="link-primary">Sign in</a></p>
                 </div>
             </div>
 
-            <button id="register-button" class="login__button">Register</button>
-
-            <p class="login__register">
-                Already have an account? <a href="/login/">Login</a>
-            </p>
+            <div class="register-info">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="ai-shield"></i>
+                    </div>
+                    <h3>Secure & Private</h3>
+                    <p>Your data is encrypted and protected with industry-standard security measures.</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="ai-people-group"></i>
+                    </div>
+                    <h3>Join the Community</h3>
+                    <p>Connect with thousands of retro gaming enthusiasts from around the world.</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="ai-game-controller"></i>
+                    </div>
+                    <h3>Unlimited Access</h3>
+                    <p>Get access to thousands of classic Roblox games and exclusive content.</p>
+                </div>
+            </div>
         </div>
     </section>
 
-    <div id="notification-container"></div>
-
-
     <script>
-    // ------------------------------------------------------------
-    // 1) showNotification(message, type) — exactly your existing code
-    // ------------------------------------------------------------
-    function showNotification(message, type = 'success') {
-        const container = document.getElementById('notification-container');
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        container.appendChild(notification);
-        setTimeout(() => notification.classList.add('show'), 10);
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
-
-    // ------------------------------------------------------------
-    // 2) isPasswordPwned(password) → returns true if found in a breach
-    // ------------------------------------------------------------
-    async function isPasswordPwned(password) {
-        // Compute SHA‑1 of the password
-        const encoder = new TextEncoder();
-        const data = encoder.encode(password);
-        const hashBuffer = await crypto.subtle.digest('SHA-1', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-
-        const prefix = hashHex.slice(0, 5);
-        const suffix = hashHex.slice(5);
-
-        // Query HIBP range API
-        const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
-        if (!res.ok) {
-            // If HIBP is down, allow registration but warn in console
-            console.warn('HIBP request failed. Proceeding by default.');
-            return false;
-        }
-        const text = await res.text();
-        // Look for the suffix in the returned list
-        return text.split('\r\n').some(line => line.split(':')[0] === suffix);
-    }
-
-    // ------------------------------------------------------------
-    // 3) Handler for “Register” button
-    // ------------------------------------------------------------
-    document.getElementById('register-button').addEventListener('click', async (e) => {
-        e.preventDefault();
-
-        const username  = document.getElementById('reg-username').value.trim();
-        const password  = document.getElementById('reg-pass').value;
-        const confirm   = document.getElementById('reg-pass-confirm').value;
-        const inviteKey = document.getElementById('reg-invite-key').value.trim();
-
-        // 3a) Basic client‐side validation
-        if (!username || !password || !confirm || !inviteKey) {
-            showNotification('Please fill in all fields.', 'error');
-            return;
-        }
-        if (password !== confirm) {
-            showNotification('Passwords do not match.', 'error');
-            return;
-        }
-
-
-        // 3c) HIBP check
-        try {
-            const pwned = await isPasswordPwned(password);
-            if (pwned) {
-                showNotification('Password has been found in a breach. Please choose a different one.', 'error');
-                return;
-            }
-        } catch (err) {
-            console.warn('Could not complete HIBP check:', err);
-        }
-
-        // 3d) All good: send to register.php
-        try {
-            const formData = new FormData();
-            formData.append('username', username);
-            formData.append('password', password);
-            formData.append('confirm_password', confirm);
-            formData.append('invite_key', inviteKey);
-
-            const res = await fetch('../api/register.php', { method: 'POST', body: formData, credentials: 'include' });
-
-            const text = await res.text();
-            if (res.ok) {
-                // Set a cookie for the username
-                document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=31536000`; // 1 year expiration
-
-                showNotification(text || 'Registration successful!', 'success');
-                setTimeout(() => {
-                    window.location.href = '/dashboard/';
-                }, 1500);
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.className = 'ai-eye-open';
             } else {
-                showNotification(text || 'Registration failed.', 'error');
+                passwordInput.type = 'password';
+                eyeIcon.className = 'ai-eye-closed';
             }
-        } catch (err) {
-            console.error('Registration request failed:', err);
-            showNotification('Something went wrong. Please try again later.', 'error');
         }
-    });
 
-    // ------------------------------------------------------------
-    // 4) Eye‐toggle for password visibility (same as before)
-    // ------------------------------------------------------------
-    function setupEyeToggle(inputId, eyeId) {
-        const input = document.getElementById(inputId);
-        const eye = document.getElementById(eyeId);
-        eye.addEventListener('click', () => {
-            if (input.type === 'password') {
-                input.type = 'text';
-                eye.classList.replace('ri-eye-off-line', 'ri-eye-line');
+        function togglePassword2() {
+            const passwordInput = document.getElementById('confirm_password');
+            const eyeIcon = document.getElementById('eyeIcon2');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.className = 'ai-eye-open';
             } else {
-                input.type = 'password';
-                eye.classList.replace('ri-eye-line', 'ri-eye-off-line');
+                passwordInput.type = 'password';
+                eyeIcon.className = 'ai-eye-closed';
+            }
+        }
+
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            let feedback = '';
+
+            if (password.length >= 8) strength += 25;
+            if (/[a-z]/.test(password)) strength += 25;
+            if (/[A-Z]/.test(password)) strength += 25;
+            if (/\d/.test(password)) strength += 25;
+
+            if (strength < 25) feedback = 'Very Weak';
+            else if (strength < 50) feedback = 'Weak';
+            else if (strength < 75) feedback = 'Fair';
+            else if (strength < 100) feedback = 'Good';
+            else feedback = 'Strong';
+
+            return { strength, feedback };
+        }
+
+        // Update password strength indicator
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const { strength, feedback } = checkPasswordStrength(password);
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+
+            strengthFill.style.width = strength + '%';
+            strengthText.textContent = feedback;
+
+            // Update color based on strength
+            if (strength < 25) {
+                strengthFill.style.background = '#f44336';
+            } else if (strength < 50) {
+                strengthFill.style.background = '#ff9800';
+            } else if (strength < 75) {
+                strengthFill.style.background = '#ffc107';
+            } else {
+                strengthFill.style.background = '#4caf50';
             }
         });
-    }
-    setupEyeToggle('reg-pass', 'pass-eye');
-    setupEyeToggle('reg-pass-confirm', 'confirm-eye');
-</script>
 
+        // Show notification
+        function showNotification(message, type = 'error') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="ai-${type === 'error' ? 'warning' : 'check'}"></i>
+                    <span>${message}</span>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="ai-cross"></i>
+                </button>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Form submission
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            // Validate passwords match
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirm_password');
+            
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match!');
+                return;
+            }
+
+            // Show loading state
+            submitBtn.innerHTML = '<i class="ai-spinner"></i> Creating Account...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('../api/register.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 200) {
+                    showNotification('Account created successfully! Redirecting to login...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '../login/index.html';
+                    }, 2000);
+                } else {
+                    showNotification(data.error || 'Registration failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showNotification('Network error. Please check your connection and try again.');
+            } finally {
+                // Reset button state
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+
+        // Focus effects
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('focused');
+            });
+        });
+    </script>
 </body>
 </html>

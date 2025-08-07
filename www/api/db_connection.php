@@ -35,9 +35,8 @@ if ($db_type === 'supabase') {
     define('SUPABASE_ANON_KEY', $supabase_key);
     
     try {
-        // Initialize Supabase client
-        use RafaelWendel\PhpSupabase\SupabaseClient;
-        $supabase = new SupabaseClient($supabase_url, $supabase_key);
+        // Initialize Supabase client 
+        $supabase = new PHPSupabase\Service($supabase_url, $supabase_key);
         
         // Create a PDO-like wrapper for Supabase to maintain compatibility
         $pdo = new SupabasePDOWrapper($supabase);

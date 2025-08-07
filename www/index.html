@@ -4,372 +4,313 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BLUE16 - Revive Classic Roblox</title>
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/akar-icons-fonts"></script>
-    <style>
-        html, body {
-            min-height: 100vh;
-            height: auto;
-            overflow-x: hidden;
-            margin: 0;
-            padding: 0;
-            font-family: 'Ubuntu', sans-serif;
-            color: #fff;
-        }
-        
-        body {
-            min-height: 100vh;
-            height: auto;
-            overflow-y: auto;
-        }
-        
-        section {
-            position: relative;
-            width: 100%;
-            min-height: 100vh;
-            overflow: visible;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        section .wave {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #4973ff;
-            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
-            transition: 0.5s;
-        }
-        
-        section .wave span {
-            content: "";
-            position: absolute;
-            width: 325vh;
-            height: 325vh;
-            top: 0;
-            left: 50%;
-            transform: translate(-50%, -75%);
-            background: #000;
-        }
-        
-        section .wave span:nth-child(1) {
-            border-radius: 45%;
-            background: rgba(20, 20, 20, 1);
-            animation: animate 5s linear infinite;
-        }
-        
-        section .wave span:nth-child(2) {
-            border-radius: 40%;
-            background: rgba(20, 20, 20, 0.5);
-            animation: animate 10s linear infinite;
-        }
-        
-        section .wave span:nth-child(3) {
-            border-radius: 42.5%;
-            background: rgba(20, 20, 20, 0.5);
-            animation: animate 15s linear infinite;
-        }
-        
-        @keyframes animate {
-            0% {
-                transform: translate(-50%, -75%) rotate(0deg);
-            }
-            100% {
-                transform: translate(-50%, -75%) rotate(360deg);
-            }
-        }
-        
-        .content {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            max-width: 1200px;
-            padding: 20px;
-            margin: 0 auto;
-        }
-        
-        .logo {
-            max-width: 600px;
-            width: 100%;
-            margin: 20px auto;
-            display: block;
-        }
-        
-        .tagline {
-            font-size: 1.4rem;
-            max-width: 800px;
-            margin: 20px auto;
-            text-align: center;
-            line-height: 1.6;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 10px;
-        }
-        
-        .features {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            margin: 40px 0;
-        }
-        
-        .feature-card {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 25px;
-            width: 300px;
-            text-align: center;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            background: rgba(0, 0, 0, 0.5);
-        }
-        
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-        
-        .ai-game-controller, .ai-home, .ai-folder {
-            display: inline-block;
-            width: 1em;
-            height: 1em;
-        }
-        
-        .feature-title {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            color: #4fc3f7;
-        }
-        
-        .feature-description {
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-        
-        .screenshots {
-            max-width: 1000px;
-            margin: 50px auto;
-            text-align: center;
-        }
-        
-        .screenshots h2 {
-            font-size: 2rem;
-            margin-bottom: 30px;
-            color: #4fc3f7;
-        }
-        
-        .screenshot-gallery {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 30px;
-        }
-        
-        .screenshot-item {
-            width: 300px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .screenshot-img {
-            width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            margin-bottom: 15px;
-        }
-        
-        .screenshot-caption {
-            font-size: 1.1rem;
-            text-align: center;
-        }
-        
-        .cta-section {
-            text-align: center;
-            padding: 50px 0;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            margin: 50px 0;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .cta-title {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: #4fc3f7;
-        }
-        
-        .cta-subtitle {
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto 30px;
-            line-height: 1.6;
-        }
-        
-        .btn {
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s ease;
-            font-family: 'Ubuntu', sans-serif;
-        }
-        
-        .btn:hover {
-            background: rgba(0, 0, 0, 0.9);
-            transform: scale(1.05);
-        }
-        
-        .btn-secondary {
-            background: transparent;
-            border: 2px solid #ffffff;
-            color: #ffffff;
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(79, 195, 247, 0.1);
-        }
-        
-        .community-section {
-            max-width: 800px;
-            margin: 50px auto;
-            text-align: center;
-            padding: 30px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .community-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 30px 0;
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        @media (max-width: 768px) {
-            .features {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .feature-card {
-                width: 90%;
-                max-width: 350px;
-            }
-            
-            .screenshot-gallery {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .tagline {
-                font-size: 1.1rem;
-            }
-        }
-    </style>
 </head>
 <body>
-    <section>
-        <div class="wave">
-            <span></span>
-            <span></span>
-            <span></span>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="https://see.fontimg.com/api/rf5/nRoyY/YzA4MzM4MDJkMDY5NDQ4NDhmMjkxOTliNTQwMTAxZjMudHRm/Ymx1ZTE2/boblox-04-regular.png?r=fs&h=81&w=1250&fg=FFFFFF&bg=FFFFFF&tb=1&s=65" alt="BLUE16" class="logo-small">
+            </div>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#screenshots" class="nav-link">Screenshots</a>
+                <a href="login/" class="nav-link btn-nav">Login</a>
+                <a href="register/" class="nav-link btn-nav btn-primary">Register</a>
+            </div>
         </div>
-        <div class="content">
-            <img src="https://see.fontimg.com/api/rf5/nRoyY/YzA4MzM4MDJkMDY5NDQ4NDhmMjkxOTliNTQwMTAxZjMudHRm/Ymx1ZTE2/boblox-04-regular.png?r=fs&h=81&w=1250&fg=FFFFFF&bg=FFFFFF&tb=1&s=65" alt="BLUE16" class="logo">
-            <p class="tagline"><strong>BLUE16</strong> is a free, community-driven platform for hosting and playing classic Roblox games and experiences. Our mission is to preserve the legacy of old Roblox clients and make them accessible to everyone.</p>
-            
-            <div class="features">
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="ai-game-controller"></i></div>
-                    <h3 class="feature-title">Play Classic Games</h3>
-                    <p class="feature-description">Experience the nostalgia of early Roblox with access to classic clients and games from 2006-2024.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="ai-home"></i></div>
-                    <h3 class="feature-title">Host Your Own Server</h3>
-                    <p class="feature-description">Create your own private server or join public ones to play with friends.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon"><i class="ai-folder"></i></div>
-                    <h3 class="feature-title">Places Library</h3>
-                    <p class="feature-description">Browse and download thousands of classic Roblox places to play in your own server.</p>
-                </div>
-            </div>
-            
-            <div class="screenshots">
-                <h2>Screenshots</h2>
-                <div class="screenshot-gallery">
-                    <div class="screenshot-item">
-                        <img src="src/img/clientss.png" alt="Client GUI" class="screenshot-img">
-                        <p class="screenshot-caption">Simple Client GUI - Easy to use interface for playing games</p>
-                    </div>
-                    
-                    <div class="screenshot-item">
-                        <img src="src/img/placeholder.png" alt="Server Hosting" class="screenshot-img">
-                        <p class="screenshot-caption">Server Hosting - Create and manage your own servers</p>
-                    </div>
-                    
-                    <div class="screenshot-item">
-                        <img src="src/img/placeholder.png" alt="Places Library" class="screenshot-img">
-                        <p class="screenshot-caption">Places Library - Browse thousands of classic games</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="cta-section">
-                <h2 class="cta-title">Ready to Play?</h2>
-                <p class="cta-subtitle">Join our community of classic Roblox enthusiasts and start playing today!</p>
-                <p class="cta-subtitle" style="font-size: 1rem; color: #ffe5be;">
-                    Note: You can play solo without an account, but an account is required for multiplayer features.
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background">
+            <div class="hero-particles"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="gradient-text">Revive</span> Classic Roblox
+                </h1>
+                <p class="hero-subtitle">
+                    Experience the nostalgia of early Roblox with our community-driven platform. 
+                    Host servers, play classic games, and preserve gaming history.
                 </p>
-                <div>
-                    <button class="btn" onclick="location.href='login/index.html'">Login</button>
-                    <button class="btn btn-secondary" onclick="location.href='register/index.html'">Register</button>
+                <div class="hero-cta">
+                    <a href="register/index.html" class="btn btn-primary btn-large">
+                        <i class="ai-game-controller"></i>
+                        Start Playing
+                    </a>
+                    <a href="#features" class="btn btn-secondary btn-large">
+                        Learn More
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">10K+</span>
+                        <span class="stat-label">Active Players</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Classic Games</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Server Uptime</span>
+                    </div>
                 </div>
             </div>
-            
-            <div class="community-section">
-                <div class="community-icon"><img src="src/img/cat.png" alt="kiti" style="width: 80px; margin-top: 20px;"></div>
-                <h3>Community Driven</h3>
-                <p>BLUE16 is built by fans, for fans. Whether you're here to relive nostalgia, learn about Roblox history, or just have fun, you're welcome in our community.</p>
+            <div class="hero-visual">
+                <div class="game-preview">
+                    <div class="game-window">
+                        <div class="game-header">
+                            <div class="window-controls">
+                                <span class="control red"></span>
+                                <span class="control yellow"></span>
+                                <span class="control green"></span>
+                            </div>
+                        </div>
+                        <div class="game-content">
+                            <div class="game-scene"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <footer>
-                <p>BLUE16 - Preserving Roblox History | Open Source Project</p>
-            </footer>
         </div>
     </section>
-    
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Why Choose BLUE16?</h2>
+                <p class="section-subtitle">Everything you need to relive the golden age of Roblox</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ai-game-controller"></i>
+                    </div>
+                    <h3 class="feature-title">Classic Game Library</h3>
+                    <p class="feature-description">
+                        Access thousands of classic Roblox games from 2006-2024. 
+                        From nostalgic favorites to forgotten gems.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Authentic gameplay experience</li>
+                        <li>No modern restrictions</li>
+                        <li>Community-curated selection</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ai-home"></i>
+                    </div>
+                    <h3 class="feature-title">Server Hosting</h3>
+                    <p class="feature-description">
+                        Create your own private servers or join public ones. 
+                        Full control over your gaming experience.
+                    </p>
+                    <ul class="feature-list">
+                        <li>One-click server creation</li>
+                        <li>Custom game settings</li>
+                        <li>Real-time player management</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ai-folder"></i>
+                    </div>
+                    <h3 class="feature-title">Places Library</h3>
+                    <p class="feature-description">
+                        Browse and download thousands of classic Roblox places. 
+                        Build your own collection of favorites.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Extensive place database</li>
+                        <li>Easy download system</li>
+                        <li>Community ratings</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section id="screenshots" class="screenshots-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">See BLUE16 in Action</h2>
+                <p class="section-subtitle">Take a look at our platform's key features</p>
+            </div>
+            
+            <div class="screenshots-grid">
+                <div class="screenshot-card">
+                    <div class="screenshot-image">
+                        <img src="src/img/clientss.png" alt="Client GUI" class="screenshot-img">
+                        <div class="screenshot-overlay">
+                            <span class="screenshot-tag">Client Interface</span>
+                        </div>
+                    </div>
+                    <div class="screenshot-content">
+                        <h3 class="screenshot-title">Modern Client GUI</h3>
+                        <p class="screenshot-description">
+                            Clean, intuitive interface for seamless gaming experience
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="screenshot-card">
+                    <div class="screenshot-image">
+                        <img src="src/img/placeholder.png" alt="Server Hosting" class="screenshot-img">
+                        <div class="screenshot-overlay">
+                            <span class="screenshot-tag">Server Management</span>
+                        </div>
+                    </div>
+                    <div class="screenshot-content">
+                        <h3 class="screenshot-title">Server Hosting Dashboard</h3>
+                        <p class="screenshot-description">
+                            Easy-to-use tools for creating and managing your servers
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="screenshot-card">
+                    <div class="screenshot-image">
+                        <img src="src/img/placeholder.png" alt="Places Library" class="screenshot-img">
+                        <div class="screenshot-overlay">
+                            <span class="screenshot-tag">Game Library</span>
+                        </div>
+                    </div>
+                    <div class="screenshot-content">
+                        <h3 class="screenshot-title">Places Library</h3>
+                        <p class="screenshot-description">
+                            Browse and discover thousands of classic games
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to Start Your Journey?</h2>
+                <p class="cta-subtitle">
+                    Join thousands of players already experiencing classic Roblox nostalgia. 
+                    Create your account and start playing today!
+                </p>
+                <div class="cta-buttons">
+                    <a href="register/index.html" class="btn btn-primary btn-large">
+                        <i class="ai-user-plus"></i>
+                        Create Account
+                    </a>
+                    <a href="login/index.html" class="btn btn-secondary btn-large">
+                        <i class="ai-login"></i>
+                        Sign In
+                    </a>
+                </div>
+                <p class="cta-note">
+                    <i class="ai-info-circle"></i>
+                    You can play solo without an account, but registration is required for multiplayer features.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Section -->
+    <section class="community-section">
+        <div class="container">
+            <div class="community-content">
+                <div class="community-icon">
+                    <img src="src/img/cat.png" alt="Community" class="community-image">
+                </div>
+                <h3 class="community-title">Built by Fans, for Fans</h3>
+                <p class="community-description">
+                    BLUE16 is more than just a platform—it's a community of passionate Roblox enthusiasts. 
+                    Whether you're here to relive nostalgia, learn about Roblox history, or just have fun, 
+                    you're welcome in our growing family.
+                </p>
+                <div class="community-stats">
+                    <div class="community-stat">
+                        <span class="stat-number">5K+</span>
+                        <span class="stat-label">Community Members</span>
+                    </div>
+                    <div class="community-stat">
+                        <span class="stat-number">100+</span>
+                        <span class="stat-label">Contributors</span>
+                    </div>
+                    <div class="community-stat">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="https://see.fontimg.com/api/rf5/nRoyY/YzA4MzM4MDJkMDY5NDQ4NDhmMjkxOTliNTQwMTAxZjMudHRm/Ymx1ZTE2/boblox-04-regular.png?r=fs&h=81&w=1250&fg=FFFFFF&bg=FFFFFF&tb=1&s=65" alt="BLUE16" class="logo-footer">
+                    </div>
+                    <p class="footer-description">
+                        Preserving Roblox history and bringing classic gaming experiences to modern players.
+                    </p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 class="footer-title">Platform</h4>
+                    <ul class="footer-links">
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#screenshots">Screenshots</a></li>
+                        <li><a href="login/index.html">Login</a></li>
+                        <li><a href="register/index.html">Register</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 class="footer-title">Community</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Discord</a></li>
+                        <li><a href="#">GitHub</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 class="footer-title">Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">DMCA</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="footer-copyright">
+                    © 2024 BLUE16. All rights reserved. | Open Source Project
+                </p>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        fetch('https://blue16-team.github.io/blue16-web/values.json')
+        // Use relative path instead of hardcoded external URL
+        fetch('values.json')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -383,7 +324,32 @@
             })
             .catch(error => {
                 console.error('Error fetching JSON:', error);
+                // Don't redirect on error, just log it
             });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
+            }
+        });
     </script>
 </body>
 </html>

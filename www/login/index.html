@@ -1,259 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!--=============== REMIXICONS ===============-->
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
-
-  <!--=============== CSS ===============-->
-  <link rel="stylesheet" href="login_design.css" />
-
-  <style>
-    .notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-      padding: 15px 20px;
-      background-color: #333;
-      color: #fff;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      opacity: 0;
-      transform: translateY(-20px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    .notification.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .notification.error {
-      background-color: #e74c3c;
-    }
-
-    .notification.success {
-      background-color: #2ecc71;
-    }
-  </style>
-
-  <title>Login - BLUE16</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BLUE16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="login_design.css">
+    <script src="https://unpkg.com/akar-icons-fonts"></script>
 </head>
 <body>
-  <section>
-    <div class="wave">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-
-    <div class="container">
-      <h1 class="login__title">Login</h1>
-
-      <div class="login__content">
-        <div class="login__box">
-          <i class="ri-user-3-line login__icon"></i>
-          <div class="login__box-input">
-            <input type="text" required class="login__input" id="login-username" placeholder=" " />
-            <label for="login-username" class="login__label">Username</label>
-          </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="https://see.fontimg.com/api/rf5/nRoyY/YzA4MzM4MDJkMDY5NDQ4NDhmMjkxOTliNTQwMTAxZjMudHRm/Ymx1ZTE2/boblox-04-regular.png?r=fs&h=81&w=1250&fg=FFFFFF&bg=FFFFFF&tb=1&s=65" alt="BLUE16" class="logo-small">
+            </div>
+            <div class="nav-links">
+                <a href="." class="nav-link btn-nav">Home</a>
+                <a href="../register/" class="nav-link btn-nav btn-primary">Login</a>
+            </div>
         </div>
+    </nav>
 
-        <div class="login__box">
-          <i class="ri-lock-2-line login__icon"></i>
-          <div class="login__box-input">
-            <input type="password" required class="login__input" id="login-pass" placeholder=" " />
-            <label for="login-pass" class="login__label">Password</label>
-            <i class="ri-eye-off-line login__eye" id="login-eye" aria-label="Toggle password visibility"></i>
-          </div>
+    <!-- Login Section -->
+    <section class="login-section">
+        <div class="login-background">
+            <div class="login-particles"></div>
         </div>
-      </div>
+        
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1 class="login-title">Welcome Back</h1>
+                    <p class="login-subtitle">Sign in to continue your BLUE16 journey</p>
+                </div>
 
-      <button id="login-button" class="login__button">Login</button>
+                <!-- Notification Container -->
+                <div id="notification-container" class="notification-container"></div>
 
-      <p class="login__register">
-        Don't have an account?
-        <a href="/register/">Register</a>
-      </p>
-    </div>
-  </section>
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="username" class="form-label">
+                            <i class="ai-person"></i>
+                            Username
+                        </label>
+                        <input type="text" id="username" name="username" class="form-input" required>
+                    </div>
 
-  <div id="notification-container"></div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <i class="ai-lock-on"></i>
+                            Password
+                        </label>
+                        <div class="password-input">
+                            <input type="password" id="password" name="password" class="form-input" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
+                                <i class="ai-eye-closed" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
 
-  <script>
-    // ------------------------------------------------------------
-    // 1) showNotification(message, type) — same as in register
-    // ------------------------------------------------------------
-    function showNotification(message, type = 'success') {
-        const container = document.getElementById('notification-container');
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        container.appendChild(notification);
-        setTimeout(() => notification.classList.add('show'), 10);
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
+                    <div class="form-options">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="remember" name="remember">
+                            <span class="checkmark"></span>
+                            Remember me
+                        </label>
+                        <a href="#" class="forgot-link">Forgot password?</a>
+                    </div>
 
-    // ------------------------------------------------------------
-    // 2) isPwned(password) — returns the count of breaches (0 if none)
-    // ------------------------------------------------------------
-    async function isPwned(password) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(password);
-        const hashBuffer = await crypto.subtle.digest('SHA-1', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="ai-arrow-left"></i>
+                        Sign In
+                    </button>
+                </form>
 
-        const prefix = hashHex.slice(0, 5);
-        const suffix = hashHex.slice(5);
+                <div class="login-footer">
+                    <p>Don't have an account? <a href="../register/index.html" class="link-primary">Create one</a></p>
+                </div>
+            </div>
 
-        const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
-        if (!response.ok) {
-            console.warn('HIBP request failed. Proceeding with login by default.');
-            return 0;
-        }
-        const text = await response.text();
-        const lines = text.split('\r\n');
-        for (const line of lines) {
-            const [hashTail, count] = line.split(':');
-            if (hashTail === suffix) {
-                return parseInt(count, 10);
-            }
-        }
-        return 0;
-    }
+            <div class="login-info">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="ai-game-controller"></i>
+                    </div>
+                    <h3>Classic Gaming</h3>
+                    <p>Access thousands of classic Roblox games and relive the golden era of online gaming.</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="ai-people-group"></i>
+                    </div>
+                    <h3>Community</h3>
+                    <p>Join a vibrant community of retro gaming enthusiasts and make new friends.</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="ai-shield"></i>
+                    </div>
+                    <h3>Secure & Safe</h3>
+                    <p>Your account is protected with industry-standard security measures.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    // ------------------------------------------------------------
-    // 3) Auto-login using token cookie
-    // ------------------------------------------------------------
-    async function autoLogin() {
-        const cookies = document.cookie.split(';').reduce((acc, cookie) => {
-            const [key, value] = cookie.trim().split('=');
-            acc[key] = value;
-            return acc;
-        }, {});
-
-        if (!cookies.token) return;
-
-        try {
-            const response = await fetch('../api/validate_token.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ token: cookies.token }),
-            });
-
-            if (response.ok) {
-                const message = await response.text();
-                showNotification(message || 'Auto-login successful!', 'success');
-                setTimeout(() => {
-                    window.location.href = '/dashboard/';
-                }, 1000);
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.className = 'ai-eye-open';
             } else {
-                console.warn('Auto-login failed.');
+                passwordInput.type = 'password';
+                eyeIcon.className = 'ai-eye-closed';
             }
-        } catch (error) {
-            console.error('Auto-login request failed:', error);
-        }
-    }
-
-    autoLogin();
-
-    // ------------------------------------------------------------
-    // 4) Frontend handler for “Login” button
-    // ------------------------------------------------------------
-    document.getElementById('login-button').addEventListener('click', async (e) => {
-        e.preventDefault();
-
-        const username = document.getElementById('login-username').value.trim();
-        const password = document.getElementById('login-pass').value;
-
-        if (!username || !password) {
-            showNotification('Please fill in both fields.', 'error');
-            return;
         }
 
-        try {
-            const breaches = await isPwned(password);
-            if (breaches > 0) {
-                showNotification(`Your password appeared in ${breaches} breach(es). Please consider changing it.`, 'error');
-                return;
+        // Show notification
+        function showNotification(message, type = 'error') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="ai-${type === 'error' ? 'warning' : 'check'}"></i>
+                    <span>${message}</span>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="ai-cross"></i>
+                </button>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // Show loading state
+            submitBtn.innerHTML = '<i class="ai-spinner"></i> Signing In...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('../api/login.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 200) {
+                    showNotification('Login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '../dashboard/index.html';
+                    }, 1500);
+                } else {
+                    showNotification(data.error || 'Login failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('Network error. Please check your connection and try again.');
+            } finally {
+                // Reset button state
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
             }
-        } catch (err) {
-            console.warn('Could not complete HIBP check:', err);
-        }
+        });
 
-        try {
-            const formData = new FormData();
-            formData.append('username_or_email', username);
-            formData.append('password', password);
-
-            const res = await fetch('../api/login.php', {
-                method: 'POST',
-                body: formData,
-                credentials: 'include',
+        // Focus effects
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
             });
-
-let responseData;
-let responseText;
-
-try {
-  responseText = await res.text(); // ✅ Read it once
-  responseData = JSON.parse(responseText); // Try parsing it
-} catch (e) {
-  console.error('Non-JSON response:', responseText);
-  showNotification('Server error — received invalid response.', 'error');
-  return;
-}
-
-              
-
-            if (responseData.token) {
-                document.cookie = `token=${responseData.token}; path=/; max-age=31536000; Secure; SameSite=Strict;`;
-                document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=31536000; Secure; SameSite=Strict;`;
-                showNotification(responseData.message || 'Login successful!', 'success');
-                setTimeout(() => {
-                    window.location.href = '/dashboard/';
-                }, 1000);
-            } else {
-                showNotification(responseData.error || 'Login failed. Please try again.', 'error');
-            }
-        } catch (err) {
-            console.error('Login request failed:', err);
-            showNotification('An unknown error occurred. Please try again.', 'error');
-        }
-    });
-
-    // ------------------------------------------------------------
-    // 5) Eye‐toggle for password visibility
-    // ------------------------------------------------------------
-    const passwordInput = document.getElementById('login-pass');
-    const eyeIcon = document.getElementById('login-eye');
-    eyeIcon.addEventListener('click', () => {
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            eyeIcon.classList.replace('ri-eye-off-line', 'ri-eye-line');
-        } else {
-            passwordInput.type = 'password';
-            eyeIcon.classList.replace('ri-eye-line', 'ri-eye-off-line');
-        }
-    });
-
-    // ------------------------------------------------------------
-    // 6) Offline‐mode check
-    // ------------------------------------------------------------
-    fetch('https://blue16-team.github.io/blue16-web/values.json')
-        .then((res) => res.json())
-        .then((data) => {
-            if (data.offline) window.location.href = 'offline.html';
-        })
-        .catch((err) => console.error('Failed to fetch offline status:', err));
-  </script>
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('focused');
+            });
+        });
+    </script>
 </body>
 </html>

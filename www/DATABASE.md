@@ -1,6 +1,6 @@
 # Database Configuration Guide
 
-Blue16 Web now supports both MySQL and Supabase databases with seamless switching between them using environment variables.
+Blue16 now supports both MySQL and Supabase databases with seamless switching between them using environment variables.
 
 ## Quick Start
 

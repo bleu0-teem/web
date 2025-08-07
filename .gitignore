@@ -13,3 +13,5 @@ www/composer.lock
 *.log
 
 # Temporary files
+.php_tmp
+*.tmp
