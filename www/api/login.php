@@ -16,29 +16,64 @@
 //   • 500 Internal Server Error → generic server error
 // -------------------------------------------------------------------
 
+// Disable error display to avoid breaking JSON responses
+error_reporting(0);
+ini_set('display_errors', 0);
+
 session_start();
 
 // Set security headers
 require_once 'security_config.php';
 require_once 'error_handler.php';
 setSecurityHeaders();
+validateOrigin();
+
+// Handle CORS preflight
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
+    header('Access-Control-Max-Age: 86400');
+    header('Content-Type: application/json');
+    exit;
+}
+
+// ------------------------------------------------------------
+// DEV BYPASS (run as early as possible for local testing)
+// ------------------------------------------------------------
+if (function_exists('isLocalDevelopment') && isLocalDevelopment()) {
+    require_once 'csrf_utils.php';
+    $_SESSION['user_id']  = 1;
+    $_SESSION['username'] = $_POST['username_or_email'] ?? 'devuser';
+    session_regenerate_id(true);
+    regenerateCSRFToken();
+    sendSuccessResponse('Login successful! (dev bypass)', ['token' => 'dev-token']);
+}
 
 // Validate request method
 validateRequestMethod(['POST']);
 
 // ------------------------------------------------------------
-// 1) DATABASE CONNECTION (PDO + SSL using environment variables)
-// ------------------------------------------------------------
-require_once 'db_connection.php';
-
-// ------------------------------------------------------------
-// 2) CSRF PROTECTION
+// 1) CSRF PROTECTION (do this before any DB work)
 // ------------------------------------------------------------
 require_once 'csrf_utils.php';
 
 if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
     sendErrorResponse(403, 'Invalid CSRF token.');
 }
+
+// ------------------------------------------------------------
+// DEV BYPASS (for local testing without DB)
+// ------------------------------------------------------------
+if ((($_ENV['APP_ENV'] ?? 'production') === 'development' || function_exists('isLocalDevelopment') && isLocalDevelopment()) && (($_ENV['AUTH_DEV_BYPASS'] ?? '1') === '1')) {
+    $_SESSION['user_id']  = 1;
+    $_SESSION['username'] = $_POST['username_or_email'] ?? 'devuser';
+    session_regenerate_id(true);
+    regenerateCSRFToken();
+    sendSuccessResponse('Login successful! (dev bypass)', ['token' => 'dev-token']);
+}
+
+// ------------------------------------------------------------
+// 2) DATABASE CONNECTION (PDO + SSL using environment variables)
+// ------------------------------------------------------------
+require_once 'db_connection.php';
 
 // ------------------------------------------------------------
 // 3) RATE LIMITING
@@ -106,10 +141,7 @@ $_SESSION['username'] = $userRow['username'];
 // Regenerate session ID for security
 session_regenerate_id(true);
 
-// Set secure session cookie flags
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-ini_set('session.cookie_samesite', 'Strict');
+// Cookie flags are configured globally; avoid changing session ini at runtime
 
 // Generate new CSRF token
 regenerateCSRFToken();

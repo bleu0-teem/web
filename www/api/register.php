@@ -30,6 +30,14 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'security_config.php';
 require_once 'error_handler.php';
 setSecurityHeaders();
+validateOrigin();
+
+// Handle CORS preflight
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
+    header('Access-Control-Max-Age: 86400');
+    header('Content-Type: application/json');
+    exit;
+}
 
 // Validate request method - allow POST only
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -37,12 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // ------------------------------------------------------------
-// 1) DATABASE CONNECTION (PDO + SSL using environment variables)
-// ------------------------------------------------------------
-require_once 'db_connection.php';
-
-// ------------------------------------------------------------
-// 2) CSRF PROTECTION
+// 1) CSRF PROTECTION (do this before any DB work)
 // ------------------------------------------------------------
 require_once 'csrf_utils.php';
 
@@ -51,6 +54,22 @@ $csrf_token = $_POST['csrf_token'] ?? '';
 if (!validateCSRFToken($csrf_token)) {
     sendErrorResponse(403, 'Invalid CSRF token. Please refresh the page and try again.');
 }
+// ------------------------------------------------------------
+// DEV BYPASS (for local testing without DB)
+// ------------------------------------------------------------
+if (function_exists('isLocalDevelopment') && isLocalDevelopment()) {
+    // Simulate success without DB interaction
+    $_SESSION['user_id']  = 1;
+    $_SESSION['username'] = $_POST['username'] ?? 'devuser';
+    session_regenerate_id(true);
+    regenerateCSRFToken();
+    sendSuccessResponse('Registration successful! (dev bypass)', ['token' => 'dev-token']);
+}
+
+// ------------------------------------------------------------
+// 2) DATABASE CONNECTION (PDO + SSL using environment variables)
+// ------------------------------------------------------------
+require_once 'db_connection.php';
 
 // ------------------------------------------------------------
 // 3) RATE LIMITING

@@ -17,7 +17,7 @@
         <nav class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <img src="https://see.fontimg.com/api/rf5/nRoyY/YzA4MzM4MDJkMDY5NDQ4NDhmMjkxOTliNTQwMTAxZjMudHRm/Ymx1ZTE2/boblox-04-regular.png?r=fs&h=81&w=1250&fg=FFFFFF&bg=FFFFFF&tb=1&s=65" alt="BLUE16" class="logo-sidebar">
+                    <img src="https://see.fontimg.com/api/rf5/nRoyY/YzA4MzM4MDJkMDY5NDQ4NDhmMjkxOTliNTQwMTAxZjMudHRm/Ymx1ZTE2/boblox-04-regular.png?r=fs&h=80&w=100&fg=FFFFFF&bg=FFFFFF&tb=1&s=65" alt="BLUE16" class="logo-sidebar">
                 </div>
                 <div class="sidebar-user">
                     <div class="user-avatar">
@@ -655,11 +655,55 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- Profile Section -->
+                <section class="content-section" id="profile-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Profile</h2>
+                        <p class="section-subtitle">View and edit your profile information.</p>
+                    </div>
+                    <div class="profile-content">
+                        <div class="profile-avatar">
+                            <span class="iconify" data-icon="mdi:account-circle" style="font-size: 64px;"></span>
+                        </div>
+                        <div class="profile-info">
+                            <h3 id="profile-username">kitty</h3>
+                            <p>Email: <span id="profile-email">user@example.com</span></p>
+                            <button class="btn btn-secondary">Edit Profile</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section class="content-section" id="settings-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Settings</h2>
+                        <p class="section-subtitle">Manage your account and preferences.</p>
+                    </div>
+                    <div class="settings-content">
+                        <form id="settings-form">
+                            <div class="form-group">
+                                <label for="setting-theme">Theme</label>
+                                <select id="setting-theme" name="theme">
+                                    <option value="light">Light</option>
+                                    <option value="dark">Dark</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="setting-email">Email Notifications</label>
+                                <input type="checkbox" id="setting-email" name="email_notifications" checked>
+                            </div>
+                            <input type="hidden" name="csrf_token" id="csrf_token_settings">
+                            <button type="submit" class="btn btn-primary">Save Settings</button>
+                        </form>
+                    </div>
+                </section>
             </div>
         </main>
     </div>
 
     <script>
+        const API_BASE = (window.location.port === '5500') ? 'http://127.0.0.1:8000' : window.location.origin;
         // Navigation functionality
         document.querySelectorAll('.menu-link').forEach(link => {
             link.addEventListener('click', function(e) {
@@ -717,6 +761,16 @@
                 this.style.display = 'none';
             });
         });
+    </script>
+    <script>
+        // Fetch CSRF token and set it in the settings form
+        fetch(`${API_BASE}/api/csrf_token.php`, { credentials: 'include' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.csrf_token) {
+                    document.getElementById('csrf_token_settings').value = data.csrf_token;
+                }
+            });
     </script>
 </body>
 </html>

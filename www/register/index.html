@@ -102,14 +102,7 @@
                         <div class="form-hint">Enter your invite key to create an account</div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="csrf_token" class="form-label">
-                            <i class="ai-key"></i>
-                            CSRF Token
-                        </label>
-                        <input type="text" id="csrf_token" name="csrf_token" class="form-input" required>
-                        <div class="form-hint">This is TEMPORARY, we are testing the registration.</div>
-                    </div>
+                    <input type="hidden" id="csrf_token" name="csrf_token">
 
                     <div class="form-options">
                         <label class="checkbox-container">
@@ -162,6 +155,7 @@
     </section>
 
     <script>
+        const API_BASE = (window.location.port === '5500') ? 'http://127.0.0.1:8000' : window.location.origin;
         // Toggle password visibility
         function togglePassword() {
             const passwordInput = document.getElementById('password');
@@ -277,9 +271,10 @@
             submitBtn.disabled = true;
 
             try {
-                const response = await fetch('../api/register.php', {
+                const response = await fetch(`${API_BASE}/api/register.php`, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    credentials: 'include'
                 });
 
                 const data = await response.json();
@@ -313,6 +308,20 @@
                 this.parentElement.classList.remove('focused');
             });
         });
+    </script>
+    <script>
+        // Fetch CSRF token for registration form
+        (async function() {
+            try {
+                const res = await fetch(`${API_BASE}/api/csrf_token.php`, { credentials: 'include' });
+                const data = await res.json();
+                if (data && data.csrf_token) {
+                    document.getElementById('csrf_token').value = data.csrf_token;
+                }
+            } catch (e) {
+                console.error('Failed to load CSRF token', e);
+            }
+        })();
     </script>
 </body>
 </html>

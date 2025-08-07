@@ -34,18 +34,8 @@ if ($db_type === 'supabase') {
     define('SUPABASE_URL', $supabase_url);
     define('SUPABASE_ANON_KEY', $supabase_key);
     
-    try {
-        // Initialize Supabase client 
-        $supabase = new PHPSupabase\Service($supabase_url, $supabase_key);
-        
-        // Create a PDO-like wrapper for Supabase to maintain compatibility
-        $pdo = new SupabasePDOWrapper($supabase);
-        
-    } catch (Exception $e) {
-        error_log("Supabase connection failed: " . $e->getMessage());
-        http_response_code(500);
-        exit("Database connection failed.");
-    }
+    // Create a PDO-like wrapper for Supabase REST API
+    $pdo = new SupabasePDOWrapper($supabase_url, $supabase_key);
     
 } else {
     // -------------------------------------------------------------------
@@ -95,15 +85,17 @@ if ($db_type === 'supabase') {
 // to maintain compatibility with existing code
 
 class SupabasePDOWrapper {
-    private $supabase;
+    private $supabaseUrl;
+    private $supabaseKey;
     private $lastInsertId = null;
     
-    public function __construct($supabase) {
-        $this->supabase = $supabase;
+    public function __construct($supabaseUrl, $supabaseKey) {
+        $this->supabaseUrl = rtrim($supabaseUrl, '/');
+        $this->supabaseKey = $supabaseKey;
     }
     
     public function prepare($sql) {
-        return new SupabaseStatement($this->supabase, $sql, $this);
+        return new SupabaseStatement($this->supabaseUrl, $this->supabaseKey, $sql, $this);
     }
     
     public function lastInsertId() {
@@ -116,13 +108,15 @@ class SupabasePDOWrapper {
 }
 
 class SupabaseStatement {
-    private $supabase;
+    private $supabaseUrl;
+    private $supabaseKey;
     private $sql;
     private $pdo_wrapper;
     private $params = [];
     
-    public function __construct($supabase, $sql, $pdo_wrapper) {
-        $this->supabase = $supabase;
+    public function __construct($supabaseUrl, $supabaseKey, $sql, $pdo_wrapper) {
+        $this->supabaseUrl = $supabaseUrl;
+        $this->supabaseKey = $supabaseKey;
         $this->sql = $sql;
         $this->pdo_wrapper = $pdo_wrapper;
     }
@@ -157,38 +151,32 @@ class SupabaseStatement {
         $table = $this->extractTableName($this->sql);
         $conditions = $this->extractWhereConditions($this->sql);
         $columns = $this->extractSelectColumns($this->sql);
-        
-        $query = $this->supabase->from($table);
-        
-        if ($columns !== '*') {
-            $query = $query->select($columns);
+        $query = [];
+        // Columns
+        if ($columns && $columns !== '*') {
+            $query['select'] = $columns;
         }
-        
-        // Apply WHERE conditions
+        // Conditions
         foreach ($conditions as $condition) {
-            $query = $query->eq($condition['column'], $condition['value']);
+            $query[$condition['column']] = 'eq.' . $condition['value'];
         }
-        
-        // Apply LIMIT if present
+        // Limit
         if (strpos(strtolower($this->sql), 'limit 1') !== false) {
-            $query = $query->limit(1);
+            $query['limit'] = 1;
         }
-        
-        $response = $query->execute();
+        $url = $this->supabaseUrl . '/rest/v1/' . urlencode($table);
+        $response = $this->supabaseHttpRequest('GET', $url, $query, null);
         return new SupabaseResult($response);
     }
     
     private function executeInsert() {
         $table = $this->extractTableName($this->sql);
         $data = $this->extractInsertData($this->sql);
-        
-        $response = $this->supabase->from($table)->insert($data)->execute();
-        
-        // Set last insert ID if available
-        if (isset($response[0]['id'])) {
+        $url = $this->supabaseUrl . '/rest/v1/' . urlencode($table);
+        $response = $this->supabaseHttpRequest('POST', $url, ['return' => 'representation'], [$data]);
+        if (is_array($response) && isset($response[0]['id'])) {
             $this->pdo_wrapper->setLastInsertId($response[0]['id']);
         }
-        
         return true;
     }
     
@@ -196,28 +184,24 @@ class SupabaseStatement {
         $table = $this->extractTableName($this->sql);
         $data = $this->extractUpdateData($this->sql);
         $conditions = $this->extractWhereConditions($this->sql);
-        
-        $query = $this->supabase->from($table);
-        
+        $query = [];
         foreach ($conditions as $condition) {
-            $query = $query->eq($condition['column'], $condition['value']);
+            $query[$condition['column']] = 'eq.' . $condition['value'];
         }
-        
-        $response = $query->update($data)->execute();
+        $url = $this->supabaseUrl . '/rest/v1/' . urlencode($table);
+        $this->supabaseHttpRequest('PATCH', $url, $query, $data);
         return true;
     }
     
     private function executeDelete() {
         $table = $this->extractTableName($this->sql);
         $conditions = $this->extractWhereConditions($this->sql);
-        
-        $query = $this->supabase->from($table);
-        
+        $query = [];
         foreach ($conditions as $condition) {
-            $query = $query->eq($condition['column'], $condition['value']);
+            $query[$condition['column']] = 'eq.' . $condition['value'];
         }
-        
-        $response = $query->delete()->execute();
+        $url = $this->supabaseUrl . '/rest/v1/' . urlencode($table);
+        $this->supabaseHttpRequest('DELETE', $url, $query, null);
         return true;
     }
     
@@ -229,6 +213,44 @@ class SupabaseStatement {
         throw new Exception("Could not extract table name from SQL");
     }
     
+    private function supabaseHttpRequest($method, $url, $queryParams = [], $body = null) {
+        if (!empty($queryParams)) {
+            // Build query with proper encoding for filters
+            $parts = [];
+            foreach ($queryParams as $key => $value) {
+                $parts[] = urlencode($key) . '=' . urlencode($value);
+            }
+            $url .= '?' . implode('&', $parts);
+        }
+        $headers = [
+            'apikey: ' . $this->supabaseKey,
+            'Authorization: Bearer ' . $this->supabaseKey,
+            'Content-Type: application/json',
+            'Prefer: return=representation'
+        ];
+        $opts = [
+            'http' => [
+                'method' => $method,
+                'header' => implode("\r\n", $headers),
+                'ignore_errors' => true,
+            ]
+        ];
+        if ($body !== null) {
+            $opts['http']['content'] = json_encode($body);
+        }
+        $context = stream_context_create($opts);
+        $result = @file_get_contents($url, false, $context);
+        if ($result === false) {
+            throw new Exception('Supabase HTTP request failed');
+        }
+        $decoded = json_decode($result, true);
+        if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+            // Not JSON; try to parse status from headers
+            throw new Exception('Supabase returned non-JSON response');
+        }
+        return $decoded;
+    }
+
     private function extractSelectColumns($sql) {
         if (preg_match('/select\s+(.*?)\s+from/i', $sql, $matches)) {
             return trim($matches[1]);

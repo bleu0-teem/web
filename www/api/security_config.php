@@ -29,6 +29,22 @@ function setSecurityHeaders() {
 }
 
 /**
+ * Detect if running in local development (localhost or 127.0.0.1)
+ * @return bool
+ */
+function isLocalDevelopment() {
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $serverAddr = $_SERVER['SERVER_ADDR'] ?? '';
+    if (stripos($host, 'localhost') !== false || stripos($host, '127.0.0.1') !== false) {
+        return true;
+    }
+    if ($serverAddr === '127.0.0.1' || $serverAddr === '::1') {
+        return true;
+    }
+    return false;
+}
+
+/**
  * Validate and sanitize input
  * @param string $input The input to sanitize
  * @param string $type The type of validation (email, username, etc.)
@@ -68,8 +84,12 @@ function validateOrigin() {
     $allowedOrigins = [
         'http://localhost',
         'https://localhost',
+        'http://localhost:5500',
+        'https://localhost:5500',
         'http://127.0.0.1',
-        'https://127.0.0.1'
+        'https://127.0.0.1',
+        'http://127.0.0.1:5500',
+        'https://127.0.0.1:5500'
     ];
     
     // Add your production domain here
@@ -78,12 +98,25 @@ function validateOrigin() {
     }
     
     $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
+
+    // Fallback: if Origin missing, infer from Referer
+    if (!$origin) {
+        $referer = $_SERVER['HTTP_REFERER'] ?? null;
+        if ($referer) {
+            $scheme = parse_url($referer, PHP_URL_SCHEME) ?: 'http';
+            $host   = parse_url($referer, PHP_URL_HOST) ?: '';
+            $port   = parse_url($referer, PHP_URL_PORT);
+            if ($host) {
+                $origin = $scheme . '://' . $host . ($port ? (":" . $port) : '');
+            }
+        }
+    }
     
     if ($origin && in_array($origin, $allowedOrigins)) {
         header("Access-Control-Allow-Origin: $origin");
         header('Access-Control-Allow-Credentials: true');
         header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type');
+        header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
         return true;
     }
     
