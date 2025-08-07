@@ -28,6 +28,10 @@ function generateCSRFToken() {
  */
 function validateCSRFToken($token) {
     if (!isset($_SESSION['csrf_token'])) {
+        // Fallback to double-submit cookie pattern
+        if (isset($_COOKIE['XSRF-TOKEN'])) {
+            return hash_equals($_COOKIE['XSRF-TOKEN'], (string)$token);
+        }
         return false;
     }
     return hash_equals($_SESSION['csrf_token'], $token);

@@ -271,6 +271,10 @@
             submitBtn.disabled = true;
 
             try {
+                const xsrf = document.cookie.split('; ').find(r => r.startsWith('XSRF-TOKEN='))?.split('=')[1];
+                if (xsrf && !formData.get('csrf_token')) {
+                    formData.set('csrf_token', xsrf);
+                }
                 const response = await fetch(`${API_BASE}/api/register.php`, {
                     method: 'POST',
                     body: formData,

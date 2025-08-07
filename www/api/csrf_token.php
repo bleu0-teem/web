@@ -25,6 +25,15 @@ header('Content-Type: application/json');
 
 $token = getCSRFToken();
 
+// Also set a CSRF cookie for double-submit strategy (readable by JS)
+setcookie('XSRF-TOKEN', $token, [
+    'expires' => time() + 3600,
+    'path' => '/',
+    'secure' => false,
+    'httponly' => false,
+    'samesite' => 'Lax'
+]);
+
 echo json_encode(['csrf_token' => $token]);
 exit;
 ?>
