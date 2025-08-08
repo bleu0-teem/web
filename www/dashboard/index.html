@@ -764,13 +764,22 @@
     </script>
     <script>
         // Fetch CSRF token and set it in the settings form
-        fetch(`${API_BASE}/api/csrf_token.php`, { credentials: 'include' })
-            .then(response => response.json())
-            .then(data => {
-                if (data.csrf_token) {
+        const fetchCsrfToken = async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/csrf_token.php`, { 
+                    credentials: 'include',
+                    cache: 'no-store'
+                });
+                const data = await res.json();
+                if (data && data.csrf_token) {
                     document.getElementById('csrf_token_settings').value = data.csrf_token;
                 }
-            });
+            } catch (e) {
+                console.error('Failed to load CSRF token', e);
+                setTimeout(fetchCsrfToken, 2000);
+            }
+        };
+        fetchCsrfToken();
     </script>
 </body>
 </html>
