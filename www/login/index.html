@@ -162,9 +162,14 @@
             submitBtn.disabled = true;
             
             try {
-                const xsrf = document.cookie.split('; ').find(r => r.startsWith('XSRF-TOKEN='))?.split('=')[1];
-                if (xsrf && !formData.get('csrf_token')) {
-                    formData.set('csrf_token', xsrf);
+                // First try to get CSRF token from the hidden input field
+                let csrfToken = document.getElementById('csrf_token').value;
+                
+                // If not available, try to get from cookie as fallback
+                if (!csrfToken) {
+                    const xsrf = document.cookie.split('; ').find(r => r.startsWith('XSRF-TOKEN='))?.split('=')[1];
+                    if (xsrf) csrfToken = xsrf;
+                    if (csrfToken) formData.set('csrf_token', csrfToken);
                 }
                 const response = await fetch(`${API_BASE}/api/login.php`, {
                     method: 'POST',
@@ -206,15 +211,23 @@
     <script>
         // Fetch CSRF token for login form
         (async function() {
-            try {
-                const res = await fetch(`${API_BASE}/api/csrf_token.php`, { credentials: 'include' });
-                const data = await res.json();
-                if (data && data.csrf_token) {
-                    document.getElementById('csrf_token').value = data.csrf_token;
+            const fetchCsrfToken = async () => {
+                try {
+                    const res = await fetch(`${API_BASE}/api/csrf_token.php`, { 
+                        credentials: 'include',
+                        cache: 'no-store'
+                    });
+                    const data = await res.json();
+                    if (data && data.csrf_token) {
+                        document.getElementById('csrf_token').value = data.csrf_token;
+                    }
+                } catch (e) {
+                    console.error('Failed to load CSRF token', e);
+                    // Retry after a short delay
+                    setTimeout(fetchCsrfToken, 2000);
                 }
-            } catch (e) {
-                console.error('Failed to load CSRF token', e);
-            }
+            };
+            fetchCsrfToken();
         })();
     </script>
 </body>

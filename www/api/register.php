@@ -50,8 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 require_once 'csrf_utils.php';
 
 // Validate CSRF token
-$csrf_token = $_POST['csrf_token'] ?? '';
-if (!validateCSRFToken($csrf_token)) {
+$csrf_token = $_POST['csrf_token'] ?? null;
+
+// Fallback to cookie if not in POST
+if (!$csrf_token && isset($_COOKIE['XSRF-TOKEN'])) {
+    $csrf_token = $_COOKIE['XSRF-TOKEN'];
+}
+
+if (!$csrf_token || !validateCSRFToken($csrf_token)) {
     sendErrorResponse(403, 'Invalid CSRF token. Please refresh the page and try again.');
 }
 // ------------------------------------------------------------
