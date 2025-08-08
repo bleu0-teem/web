@@ -20,7 +20,9 @@
 error_reporting(0);
 ini_set('display_errors', 0);
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Set security headers
 require_once 'security_config.php';
@@ -55,7 +57,13 @@ validateRequestMethod(['POST']);
 // ------------------------------------------------------------
 require_once 'csrf_utils.php';
 
-if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+// Check for CSRF token in POST or fallback to cookie
+$csrf_token = $_POST['csrf_token'] ?? null;
+if (!$csrf_token && isset($_COOKIE['XSRF-TOKEN'])) {
+    $csrf_token = $_COOKIE['XSRF-TOKEN'];
+}
+
+if (!$csrf_token || !validateCSRFToken($csrf_token)) {
     sendErrorResponse(403, 'Invalid CSRF token.');
 }
 
