@@ -272,6 +272,54 @@
     <span class="icon-text">i know this page sukks, but i made it in acode on phone :3</span>
   </div>
   
+  <hr>
+<h1 style="text-align:center;color:lightblue;">reactions:</h1>
+<div id="reactions" style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-bottom: 20px;">
+  <button class="reaction-btn" onclick="addReaction('heart')" style="background:#222;border:none;border-radius:8px;padding:8px 16px;display:flex;align-items:center;cursor:pointer;color:white;">
+    <span class="material-symbols-outlined" style="font-size:22px;color:#ff6b81;">favorite</span>
+    <span style="padding-left:8px;">visitor</span>
+    <span id="count-heart" style="margin-left:10px;background:#333;padding:2px 8px;border-radius:6px;">0</span>
+  </button>
+  <button class="reaction-btn" onclick="addReaction('star')" style="background:#222;border:none;border-radius:8px;padding:8px 16px;display:flex;align-items:center;cursor:pointer;color:white;">
+    <span class="material-symbols-outlined" style="font-size:22px;color:#ffd700;">star</span>
+    <span style="padding-left:8px;">friend</span>
+    <span id="count-star" style="margin-left:10px;background:#333;padding:2px 8px;border-radius:6px;">0</span>
+  </button>
+  <button class="reaction-btn" onclick="addReaction('thumb')" style="background:#222;border:none;border-radius:8px;padding:8px 16px;display:flex;align-items:center;cursor:pointer;color:white;">
+    <span class="material-symbols-outlined" style="font-size:22px;color:#00c3ff;">thumb_up</span>
+    <span style="padding-left:8px;">bestie</span>
+    <span id="count-thumb" style="margin-left:10px;background:#333;padding:2px 8px;border-radius:6px;">0</span>
+  </button>
+  <button class="reaction-btn" onclick="addReaction('trophy')" style="background:#222;border:none;border-radius:8px;padding:8px 16px;display:flex;align-items:center;cursor:pointer;color:white;">
+    <span class="material-symbols-outlined" style="font-size:22px;color:#ff9800;">emoji_events</span>
+    <span style="padding-left:8px;">known</span>
+    <span id="count-trophy" style="margin-left:10px;background:#333;padding:2px 8px;border-radius:6px;">0</span>
+  </button>
+</div>
+<script>
+function updateReactions(data) {
+  for (const type in data) {
+    const el = document.getElementById('count-' + type);
+    if (el) el.textContent = data[type];
+  }
+}
+function fetchReactions() {
+  fetch('/api/reactions.php')
+    .then(r => r.json())
+    .then(updateReactions);
+}
+function addReaction(type) {
+  fetch('/api/reactions.php', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: 'type=' + encodeURIComponent(type)
+  })
+    .then(r => r.json())
+    .then(updateReactions);
+}
+document.addEventListener('DOMContentLoaded', fetchReactions);
+</script>
+  
   <script>
     
 class MotionBlur {
