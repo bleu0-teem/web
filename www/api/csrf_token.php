@@ -29,9 +29,10 @@ $token = getCSRFToken();
 setcookie('XSRF-TOKEN', $token, [
     'expires' => time() + 3600,
     'path' => '/',
-    'secure' => false,
+    'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
     'httponly' => false,
-    'samesite' => 'Lax'
+    'samesite' => 'Lax',
+    'domain' => ''
 ]);
 
 echo json_encode(['csrf_token' => $token]);

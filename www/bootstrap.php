@@ -22,15 +22,20 @@ if (file_exists(__DIR__ . '/.env')) {
 if (session_status() === PHP_SESSION_NONE) {
     // Configure session cookie flags before session_start
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['SERVER_PORT'] ?? '') == 443);
+    ini_set('session.use_only_cookies', '1');
     ini_set('session.cookie_httponly', '1');
     ini_set('session.cookie_secure', $isHttps ? '1' : '0');
-    ini_set('session.cookie_samesite', 'Lax');
+    ini_set('session.cookie_samesite', 'Strict');
     session_start();
 }
 
 // Generate CSRF token if not exists
 if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    try {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    } catch (Exception $e) {
+        $_SESSION['csrf_token'] = md5(uniqid(mt_rand(), true));
+    }
 }
 
 // Set default timezone

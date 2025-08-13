@@ -10,6 +10,9 @@
  * @return string The generated token
  */
 function generateCSRFToken() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     if (!isset($_SESSION['csrf_token'])) {
         try {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -27,6 +30,9 @@ function generateCSRFToken() {
  * @return bool True if valid, false otherwise
  */
 function validateCSRFToken($token) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     if (!isset($_SESSION['csrf_token'])) {
         // Fallback to double-submit cookie pattern
         if (isset($_COOKIE['XSRF-TOKEN'])) {
@@ -34,7 +40,7 @@ function validateCSRFToken($token) {
         }
         return false;
     }
-    return hash_equals($_SESSION['csrf_token'], $token);
+    return hash_equals($_SESSION['csrf_token'], (string)$token);
 }
 
 /**
@@ -42,6 +48,9 @@ function validateCSRFToken($token) {
  * @return string The new token
  */
 function regenerateCSRFToken() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     try {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     } catch (Exception $e) {
@@ -56,5 +65,8 @@ function regenerateCSRFToken() {
  * @return string The current token
  */
 function getCSRFToken() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     return generateCSRFToken();
 }
