@@ -79,6 +79,89 @@ class DatabaseUtils {
             return false;
         }
     }
+
+    /**
+     * Validate a token from the api_tokens table and return the linked user row (username)
+     */
+    public static function validateApiToken($token) {
+        self::init();
+
+        try {
+            $stmt = self::$pdo->prepare(
+                'SELECT u.id AS id, u.username AS username FROM api_tokens t JOIN users u ON u.id = t.user_id WHERE t.token = ? LIMIT 1'
+            );
+            $stmt->execute([$token]);
+            return $stmt->fetch();
+        } catch (Exception $e) {
+            error_log("Failed to validate api token: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Create an API token for a user with optional TTL in days. Returns token string or false.
+     */
+    public static function createApiToken($user_id, $ttl_days = 30) {
+        self::init();
+
+        try {
+            // Ensure table exists
+            self::$pdo->exec("CREATE TABLE IF NOT EXISTS api_tokens (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                token VARCHAR(128) NOT NULL UNIQUE,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                expires_at DATETIME DEFAULT NULL,
+                INDEX(user_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+            $token = bin2hex(random_bytes(32));
+            $expires_at = null;
+            if ($ttl_days > 0) {
+                $expires_at = (new DateTime('+'.intval($ttl_days).' days'))->format('Y-m-d H:i:s');
+            }
+
+            $stmt = self::$pdo->prepare('INSERT INTO api_tokens (user_id, token, expires_at) VALUES (?, ?, ?)');
+            $stmt->execute([$user_id, $token, $expires_at]);
+
+            return $token;
+        } catch (Exception $e) {
+            error_log('Failed to create api token: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * List API tokens for a given user_id
+     */
+    public static function listApiTokens($user_id) {
+        self::init();
+
+        try {
+            $stmt = self::$pdo->prepare('SELECT id, token, created_at, expires_at FROM api_tokens WHERE user_id = ? ORDER BY created_at DESC');
+            $stmt->execute([$user_id]);
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            error_log('Failed to list api tokens: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Revoke an API token belonging to a user. Returns true on success.
+     */
+    public static function revokeApiToken($user_id, $token) {
+        self::init();
+
+        try {
+            $stmt = self::$pdo->prepare('DELETE FROM api_tokens WHERE user_id = ? AND token = ?');
+            $stmt->execute([$user_id, $token]);
+            return $stmt->rowCount() > 0;
+        } catch (Exception $e) {
+            error_log('Failed to revoke api token: ' . $e->getMessage());
+            return false;
+        }
+    }
     
     /**
      * Check if username exists

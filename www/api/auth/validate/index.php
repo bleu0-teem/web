@@ -49,8 +49,8 @@ if ($token === '') {
 	exit;
 }
 
-// Validate using DatabaseUtils (returns user row or false)
-$user = DatabaseUtils::validateToken($token);
+// Validate using DatabaseUtils against api_tokens (returns user row or false)
+$user = DatabaseUtils::validateApiToken($token);
 
 if ($user === false) {
 	// Database error inside validateToken

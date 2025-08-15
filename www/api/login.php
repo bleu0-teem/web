@@ -154,4 +154,21 @@ session_regenerate_id(true);
 // Generate new CSRF token
 regenerateCSRFToken();
 
-sendSuccessResponse('Login successful!', ['token' => $userRow['token'] ?? null]);
+// ---------------------------
+// Generate and persist API token for this session/user (use helper)
+// ---------------------------
+$tokenToReturn = null;
+try {
+    // createApiToken returns token string or false
+    $token = DatabaseUtils::createApiToken($userRow['id'], intval($_ENV['API_TOKEN_TTL_DAYS'] ?? 30));
+    if ($token !== false) {
+        $tokenToReturn = $token;
+    } else {
+        $tokenToReturn = $userRow['token'] ?? null;
+    }
+} catch (Exception $e) {
+    error_log('createApiToken threw: ' . $e->getMessage());
+    $tokenToReturn = $userRow['token'] ?? null;
+}
+
+sendSuccessResponse('Login successful!', ['token' => $tokenToReturn]);
