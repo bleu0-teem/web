@@ -1,32 +1,32 @@
-# 💙 blue16-web
+# bluuu16 - ITS FREEE!!!!
 
-Welcome to **blue16-web**, a ROBLOX revival, that aims to run EVERY roblox version possible.  
+Welcome to **BLUE16**, a ROBLOX revival, that aims to run EVERY roblox version possible.  
 Clean design. Powerful features. Built for scalability.
 
 ---
 
-## 🚀 Features
+## Features
 
-- ⚡ **Lightning Fast**: Built for speed and performance.
-- 🎨 **Modern UI**: Sleek and aesthetic user interface.
-- 🔒 **Secure**: Security best-practices baked in.
-- ♻️ **Easy to Maintain**: Modular and well-documented codebase.
-- 🗄️ **Flexible Database**: Support for both MySQL and Supabase databases.
+- **Lightning Fast**: Built for speed and performance.
+- **Modern UI**: Sleek and aesthetic user interface.
+- **Secure**: Security best-practices baked in.
+- **Easy to Maintain**: Modular and well-documented codebase.
+- **Flexible Database**: Support for both MySQL and Supabase databases.
 
 ---
 
 - **Frontend:** [PHP](https://www.php.net/)
-- **Backend:** ... Just Static, i guess.
+- **Backend:** ??? (tech pls fill this one, im dumb)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 
 ---
 
-## 🧑‍💻 Getting Started
+## Getting Started
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/blue16-team/blue16-web.git
-   cd blue16-web
+   git clone https://github.com/bleu0-teem/web.git
+   cd web
    ```
 
 2. **Install dependencies**
@@ -75,21 +75,23 @@ Switch between databases by simply changing the `DB_TYPE` environment variable. 
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome!  
 See [CONTRIBUTING.md](CONTRIBUTING.md) for more info.
 
 ---
 
-## 📄 License
+## License
 
-MIT License © [BLUE16 TEAM](https://github.com/blue16-team)
+MIT License © [bleu0 teem omg](https://github.com/bleu0-teem)
 
 ---
 
 <p align="center">
-<img src="https://img.shields.io/github/stars/blue16-team/blue16-web?style=social" alt="GitHub Stars"/>
+<img src="https://img.shields.io/github/stars/bleu0-teem/web?style=social" alt="GitHub Stars"/>
 &nbsp;
-<img src="https://img.shields.io/github/forks/blue16-team/blue16-web?style=social" alt="GitHub Forks"/>
+<img src="https://img.shields.io/github/forks/bleu0-teem/web?style=social" alt="GitHub Forks"/>
 </p>
+
+... whos gonna star this repository anyway..?

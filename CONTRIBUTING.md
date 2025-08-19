@@ -1,8 +1,10 @@
 ---
 
+.... okay
+
 # Contributing to BLUE16 Web
 
-First, thanks for your interest in contributing! 🎉  
+First, thanks for your interest in contributing!!!
 Your help will make BLUE16 even better.
 
 ---
@@ -14,7 +16,7 @@ Your help will make BLUE16 even better.
 1. **Fork** this repository.
 2. **Clone** your fork to your local machine:
    ```bash
-   git clone https://github.com/blue16-team/blue16-web.git
+   git clone https://github.com/bleu0-teem/blue16-web.git
    cd blue16-web
     ```
 
@@ -42,7 +44,7 @@ Your help will make BLUE16 even better.
       ```bash
        git push origin feature/your-feature-name
        ```
-   2. [Open a pull request](https://github.com/blue16-team/blue16-web/pulls)
+   2. [Open a pull request](https://github.com/bleu0-teem/web/pulls)
       - Fill in the PR template.
       - Reference any issues your PR fixes.
 
@@ -61,4 +63,4 @@ Open an issue or start a discussion! We're happy to help.
 
 ---
 
-Thanks for making BLUE16 awesome! 💙
+Thanks for making BLUE16 awesome!
