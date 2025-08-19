@@ -88,7 +88,7 @@ class DatabaseUtils {
 
         try {
             $stmt = self::$pdo->prepare(
-                'SELECT u.id AS id, u.username AS username FROM api_tokens t JOIN users u ON u.id = t.user_id WHERE t.token = ? LIMIT 1'
+                'SELECT u.id AS id, u.username AS username FROM api_tokens t JOIN users u ON u.id = t.user_id WHERE t.token = ? AND (t.expires_at IS NULL OR t.expires_at > NOW()) LIMIT 1'
             );
             $stmt->execute([$token]);
             return $stmt->fetch();

@@ -37,17 +37,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
     exit;
 }
 
-// ------------------------------------------------------------
-// DEV BYPASS (run as early as possible for local testing)
-// ------------------------------------------------------------
-if (function_exists('isLocalDevelopment') && isLocalDevelopment()) {
-    require_once 'csrf_utils.php';
-    $_SESSION['user_id']  = 1;
-    $_SESSION['username'] = $_POST['username_or_email'] ?? 'devuser';
-    session_regenerate_id(true);
-    regenerateCSRFToken();
-    sendSuccessResponse('Login successful! (dev bypass)', ['token' => 'dev-token']);
-}
+// (dev bypass removed - keep environment-controlled bypass further down)
 
 // Validate request method
 validateRequestMethod(['POST']);
@@ -83,6 +73,9 @@ if ((($_ENV['APP_ENV'] ?? 'production') === 'development' || function_exists('is
 // ------------------------------------------------------------
 require_once 'db_connection.php';
 
+// Make DatabaseUtils available (helpers for api token creation/validation)
+require_once 'database_utils.php';
+
 // ------------------------------------------------------------
 // 3) RATE LIMITING
 // ------------------------------------------------------------
@@ -96,7 +89,13 @@ if (!checkRateLimit($rate_limit_key, 5, 900)) {
 // ------------------------------------------------------------
 // 4) FETCH & VALIDATE POST DATA
 // ------------------------------------------------------------
-$identifier = sanitizeInput($_POST['username_or_email'] ?? '', 'username');
+// Accept either email or username
+$rawIdent = trim($_POST['username_or_email'] ?? '');
+if (filter_var($rawIdent, FILTER_VALIDATE_EMAIL)) {
+    $identifier = $rawIdent;
+} else {
+    $identifier = sanitizeInput($rawIdent, 'username');
+}
 $password   = $_POST['password'] ?? '';
 
 // Validate input

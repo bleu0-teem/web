@@ -76,6 +76,8 @@ if (function_exists('isLocalDevelopment') && isLocalDevelopment()) {
 // 2) DATABASE CONNECTION (PDO + SSL using environment variables)
 // ------------------------------------------------------------
 require_once 'db_connection.php';
+// token helpers
+require_once 'database_utils.php';
 
 // ------------------------------------------------------------
 // 3) RATE LIMITING
