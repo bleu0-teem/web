@@ -61,7 +61,7 @@ if ($db_type === 'supabase') {
     $options = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        // If you have Aiven's CA cert (ca.pem), uncomment & adjust:
+        // If you have Aiven/something CA cert (ca.pem), uncomment & adjust:
         // PDO::MYSQL_ATTR_SSL_CA => __DIR__ . '/db/ca.pem',
     ];
     
