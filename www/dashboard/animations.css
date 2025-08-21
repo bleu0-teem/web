@@ -10,10 +10,7 @@
   100% { transform: scale(1.1); }
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
+/* removed spin keyframes to avoid continuous rotating icons */
 
 /* Base icon styles */
 .iconify {
@@ -153,11 +150,11 @@ body.dark-mode .iconify:hover {
 
 /* Custom animation for specific icons */
 .refresh-button .iconify {
-  animation: spin 2s linear infinite;
+  transition: transform 0.3s ease;
 }
 
 .refresh-button:hover .iconify {
-  animation-duration: 1s;
+  transform: rotate(22deg) scale(1.05);
 }
 
 /* Notification pulse animation */

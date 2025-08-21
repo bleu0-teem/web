@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLUE16 API Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #16213e 0%, #4fc3f7 100%);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: rgba(10, 20, 40, 0.85);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(33,150,243,0.15);
+            padding: 40px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #4fc3f7, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        h2 {
+            margin-top: 40px;
+            font-size: 1.5rem;
+            color: #4fc3f7;
+        }
+        .endpoint {
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #23395d;
+        }
+        .method {
+            font-weight: bold;
+            color: #fff;
+            background: #4fc3f7;
+            border-radius: 6px;
+            padding: 2px 10px;
+            margin-right: 10px;
+            font-size: 0.95rem;
+        }
+        .url {
+            font-family: monospace;
+            color: #fff;
+            background: #23395d;
+            border-radius: 6px;
+            padding: 2px 10px;
+            font-size: 0.95rem;
+        }
+        .desc {
+            margin: 10px 0 0 0;
+            color: #b0b0b0;
+        }
+        .params, .response {
+            background: #23395d;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            color: #fff;
+            font-size: 0.98rem;
+        }
+        .code {
+            background: #111a2b;
+            color: #4fc3f7;
+            font-family: monospace;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 0.97rem;
+            margin: 8px 0;
+            overflow-x: auto;
+        }
+        .auth {
+            color: #ffb300;
+            font-weight: bold;
+        }
+        a {
+            color: #4fc3f7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BLUE16 API Documentation</h1>
+        <p>Welcome to the official API docs for BLUE16. All endpoints return JSON. Authenticate using Bearer tokens where required.</p>
+        <h2>Endpoints</h2>
+        <div class="endpoint">
+            <span class="method">POST</span> <span class="url">/api/login.php</span>
+            <div class="desc">Login and receive an API token.</div>
+            <div class="params"><b>Params:</b> <br> <code>username/email</code>, <code>password</code></div>
+            <div class="response"><b>Response:</b> <br> <code>{ success, token, message }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">POST</span> <span class="url">/api/register.php</span>
+            <div class="desc">Register a new user and receive an API token.</div>
+            <div class="params"><b>Params:</b> <br> <code>username</code>, <code>email</code>, <code>password</code></div>
+            <div class="response"><b>Response:</b> <br> <code>{ success, token, message }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span> <span class="url">/api/auth/validate</span>
+            <div class="desc">Validate an API token. <span class="auth">Requires Bearer token</span></div>
+            <div class="response"><b>Response:</b> <br> <code>{ success, username, message }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span> <span class="url">/api/tokens.php</span>
+            <div class="desc">List your API tokens. <span class="auth">Requires Bearer token</span></div>
+            <div class="response"><b>Response:</b> <br> <code>{ tokens: [ { token, expires_at } ] }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">DELETE</span> <span class="url">/api/tokens.php</span>
+            <div class="desc">Revoke an API token. <span class="auth">Requires Bearer token</span></div>
+            <div class="params"><b>Params:</b> <br> <code>token</code></div>
+            <div class="response"><b>Response:</b> <br> <code>{ success, message }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span> <span class="url">/api/reactions.php</span>
+            <div class="desc">Get reaction counts.</div>
+            <div class="response"><b>Response:</b> <br> <code>{ heart, star, thumb, trophy, idea }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">POST</span> <span class="url">/api/reactions.php</span>
+            <div class="desc">Add a reaction.</div>
+            <div class="params"><b>Params:</b> <br> <code>type</code></div>
+            <div class="response"><b>Response:</b> <br> <code>{ success, message }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span> <span class="url">/api/createserver.php</span>
+            <div class="desc">Create a new server. <span class="auth">Requires Bearer token</span></div>
+            <div class="params"><b>Params:</b> <br> <code>name</code>, <code>type</code></div>
+            <div class="response"><b>Response:</b> <br> <code>{ success, server_id, message }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span> <span class="url">/api/deleteserver.php</span>
+            <div class="desc">Delete a server. <span class="auth">Requires Bearer token</span></div>
+            <div class="params"><b>Params:</b> <br> <code>server_id</code></div>
+            <div class="response"><b>Response:</b> <br> <code>{ success, message }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span> <span class="url">/api/invites.php</span>
+            <div class="desc">List your invite keys. <span class="auth">Requires Bearer token</span></div>
+            <div class="response"><b>Response:</b> <br> <code>{ invites: [ { key, uses, status } ] }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">POST</span> <span class="url">/api/invite_key.php</span>
+            <div class="desc">Generate a new invite key. <span class="auth">Requires Bearer token</span></div>
+            <div class="response"><b>Response:</b> <br> <code>{ success, key, message }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span> <span class="url">/api/check_invite_key.php</span>
+            <div class="desc">Check if an invite key is valid.</div>
+            <div class="params"><b>Params:</b> <br> <code>key</code></div>
+            <div class="response"><b>Response:</b> <br> <code>{ valid, message }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span> <span class="url">/api/hibp.php</span>
+            <div class="desc">Check if a password is pwned (HaveIBeenPwned).</div>
+            <div class="params"><b>Params:</b> <br> <code>password</code></div>
+            <div class="response"><b>Response:</b> <br> <code>{ pwned, count }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span> <span class="url">/api/files</span>
+            <div class="desc">List your files. <span class="auth">Requires Bearer token</span></div>
+            <div class="response"><b>Response:</b> <br> <code>{ files: [ { name, size, uploaded_at } ] }</code></div>
+        </div>
+        <div class="endpoint">
+            <span class="method">POST</span> <span class="url">/api/files</span>
+            <div class="desc">Upload a file. <span class="auth">Requires Bearer token</span></div>
+            <div class="params"><b>Params:</b> <br> <code>file</code></div>
+            <div class="response"><b>Response:</b> <br> <code>{ success, file, message }</code></div>
+        </div>
+    </div>
+</body>
+</html>

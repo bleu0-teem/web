@@ -6,7 +6,7 @@
     <title>Offline - BLUE16</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="https://unpkg.com/akar-icons-fonts"></script>
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
     <style>
         .offline-section {
             min-height: 100vh;
@@ -58,7 +58,7 @@
             margin: 0 auto 40px;
             font-size: 3rem;
             color: white;
-            animation: pulse 2s ease-in-out infinite;
+            /* animation removed for cleaner look */
         }
 
         .offline-title {
@@ -82,15 +82,14 @@
             display: flex;
             gap: 20px;
             justify-content: center;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
+    /* Removed misplaced lines */
 
         .offline-info {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
             padding: 30px;
+    /* Remove particles and float animation for a cleaner look */
             backdrop-filter: blur(10px);
             margin-top: 40px;
         }
@@ -102,7 +101,6 @@
             margin-bottom: 15px;
         }
 
-        .offline-info p {
             color: #b0b0b0;
             line-height: 1.6;
             margin-bottom: 15px;
@@ -115,6 +113,19 @@
             padding: 8px 16px;
             background: rgba(255, 71, 87, 0.1);
             border: 1px solid rgba(255, 71, 87, 0.3);
+        .offline-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #4fc3f7, #2196f3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 40px;
+            font-size: 3rem;
+            color: white;
+            box-shadow: 0 4px 24px rgba(33,150,243,0.2);
+        }
             border-radius: 20px;
             color: #ff4757;
             font-size: 0.9rem;
@@ -166,32 +177,28 @@
 
     <!-- Offline Section -->
     <section class="offline-section">
-        <div class="offline-background">
-            <div class="offline-particles"></div>
-        </div>
+    <div class="offline-background"></div>
         
         <div class="offline-container">
             <div class="offline-icon">
-                <i class="ai-wifi-off"></i>
+                <span class="iconify" data-icon="mdi:cloud-off-outline" style="font-size: 64px;"></span>
             </div>
             
-            <h1 class="offline-title">BLUE16 is Currently Offline</h1>
+            <h1 class="offline-title">You're Offline</h1>
             <p class="offline-subtitle">
-                We're experiencing some technical difficulties. Our team is working hard to get everything back up and running as soon as possible.
+                No internet connection detected.<br>Please check your network and try again.
             </p>
-            
             <div class="status-indicator">
-                <i class="ai-warning"></i>
+                <span class="iconify" data-icon="mdi:alert" style="font-size: 1.2em;"></span>
                 Maintenance Mode
             </div>
-            
             <div class="offline-actions">
                 <button class="btn btn-primary" onclick="location.reload()">
-                    <i class="ai-refresh"></i>
+                    <span class="iconify" data-icon="mdi:refresh"></span>
                     Try Again
                 </button>
                 <a href="index.html" class="btn btn-secondary">
-                    <i class="ai-home"></i>
+                    <span class="iconify" data-icon="mdi:home"></span>
                     Go Home
                 </a>
             </div>

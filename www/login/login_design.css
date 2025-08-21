@@ -685,12 +685,19 @@ section .wave span:nth-child(3) {
 }
 
 /* Loading Animation */
+/* Loading Animation: idle by default, animate only when .spin is applied */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
 .ai-spinner {
+  /* no animation by default to avoid continuous motion
+     add the 'spin' class to enable the rotating animation */
+  display: inline-block;
+}
+
+.ai-spinner.spin {
   animation: spin 1s linear infinite;
 }
 
