@@ -1,3 +1,5 @@
+/* Removed spin keyframes and continuous rotating icon animations for a cleaner, static dashboard UI. */
+
 /* Icon animation keyframes */
 @keyframes iconPulse {
   0% { transform: scale(1); }
@@ -10,13 +12,10 @@
   100% { transform: scale(1.1); }
 }
 
-/* removed spin keyframes to avoid continuous rotating icons */
-
 /* Base icon styles */
 .iconify {
   transition: all 0.3s ease;
   cursor: pointer;
-  animation: iconPulse 2s ease-in-out infinite;
 }
 
 .iconify:hover {
@@ -145,7 +144,7 @@ body.dark-mode .iconify:hover {
 
 /* Loading animation for icons */
 .iconify.loading {
-  animation: iconPulse 1.5s ease-in-out infinite;
+  /* No spin animation */
 }
 
 /* Custom animation for specific icons */

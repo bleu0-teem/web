@@ -1,6 +1,6 @@
-# bluuu16 - ITS FREEE!!!!
+# BLUE16 Web
 
-Welcome to **BLUE16**, a ROBLOX revival, that aims to run EVERY roblox version possible.  
+Welcome to **BLUE16**, a ROBLOX revival project aiming to run EVERY Roblox version possible.  
 Clean design. Powerful features. Built for scalability.
 
 ---
@@ -15,9 +15,12 @@ Clean design. Powerful features. Built for scalability.
 
 ---
 
-- **Frontend:** [PHP](https://www.php.net/)
-- **Backend:** ??? (tech pls fill this one, im dumb)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+## Tech Stack
+
+- **Frontend:** PHP
+- **Backend:** PHP (API-first, modular)
+- **Styling:** Tailwind CSS
+- **Database:** MySQL or Supabase (switchable)
 
 ---
 
@@ -55,23 +58,9 @@ Clean design. Powerful features. Built for scalability.
 
 ---
 
-## 🗄️ Database Support
+## Database Support
 
-Blue16 Web supports both traditional MySQL and modern Supabase databases:
-
-### MySQL
-- Full control over your database server
-- Traditional SQL operations
-- Wide hosting support
-
-### Supabase (Recommended)
-- Zero server maintenance
-- Built-in real-time features
-- Automatic REST/GraphQL APIs
-- Built-in authentication
-- Web-based dashboard
-
-Switch between databases by simply changing the `DB_TYPE` environment variable. No code changes required!
+Blue16 Web supports both traditional MySQL and modern Supabase databases. Switch between them by changing the `DB_TYPE` environment variable. No code changes required!
 
 ---
 
@@ -79,6 +68,19 @@ Switch between databases by simply changing the `DB_TYPE` environment variable. 
 
 Contributions are welcome!  
 See [CONTRIBUTING.md](CONTRIBUTING.md) for more info.
+
+---
+
+## FAQ
+
+**Q: What is BLUE16?**
+A: A revival project for Roblox, aiming to support all versions with a modern, secure, and scalable web interface.
+
+**Q: Which databases are supported?**
+A: MySQL and Supabase. See [DATABASE.md](www/DATABASE.md) for details.
+
+**Q: How do I get support?**
+A: Open an issue on GitHub or check the documentation.
 
 ---
 

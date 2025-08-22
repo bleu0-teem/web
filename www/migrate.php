@@ -30,6 +30,8 @@ $schemas = [
             email VARCHAR(255) UNIQUE NOT NULL,
             password_hash VARCHAR(255) NOT NULL,
             token VARCHAR(255),
+            reset_token VARCHAR(255),
+            reset_token_expiry TIMESTAMP NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ",

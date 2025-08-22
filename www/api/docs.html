@@ -6,71 +6,181 @@
     <title>BLUE16 API Documentation</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --accent: #4fc3f7;
+            --bg: #10182a;
+            --bg-card: #18223a;
+            --bg-sidebar: #151d2b;
+            --border: #23395d;
+            --text: #fff;
+            --text-muted: #b0b0b0;
+            --success: #4caf50;
+            --danger: #f44336;
+            --warning: #ffb300;
+        }
+        html, body {
+            height: 100%;
+        }
         body {
-            background: linear-gradient(135deg, #16213e 0%, #4fc3f7 100%);
-            color: #fff;
+            background: var(--bg);
+            color: var(--text);
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 0;
+            min-height: 100vh;
+            display: flex;
         }
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            min-height: 100vh;
+            position: sticky;
+            top: 0;
+            left: 0;
+            padding: 40px 0 40px 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+        .sidebar h2 {
+            color: var(--accent);
+            font-size: 1.3rem;
+            margin: 0 0 30px 40px;
+            letter-spacing: 1px;
+        }
+        .sidebar-nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-left: 40px;
+        }
+        .sidebar-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 10px 0 10px 12px;
+            border-left: 3px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .sidebar-nav a.active, .sidebar-nav a:hover {
+            color: var(--accent);
+            border-left: 3px solid var(--accent);
+            background: rgba(79,195,247,0.07);
+        }
+        .main {
+            flex: 1;
+            padding: 0 0 40px 0;
+            min-width: 0;
+        }
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 9;
+        }
+        .env-select, .search-box {
+            background: #111a2b;
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.98rem;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 10px; }
+        .badge { display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; margin-left: 8px; }
+        .badge-auth { background: rgba(79,195,247,0.15); color: var(--accent); border: 1px solid var(--accent); }
+        .badge-csrf { background: rgba(255,179,0,0.15); color: var(--warning); border: 1px solid var(--warning); }
         .container {
             max-width: 900px;
-            margin: 40px auto;
-            background: rgba(10, 20, 40, 0.85);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(33,150,243,0.15);
-            padding: 40px;
+            margin: 40px auto 0 auto;
+            background: var(--bg-card);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(33,150,243,0.10);
+            padding: 48px 40px 40px 40px;
         }
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.7rem;
             margin-bottom: 10px;
-            background: linear-gradient(90deg, #4fc3f7, #fff);
+            background: linear-gradient(90deg, var(--accent), #fff 80%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+        .intro {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
         h2 {
-            margin-top: 40px;
+            margin-top: 48px;
             font-size: 1.5rem;
-            color: #4fc3f7;
+            color: var(--accent);
+            letter-spacing: 1px;
         }
-        .endpoint {
+        .endpoint-card {
+            background: #151d2b;
+            border: 1px solid var(--border);
+            border-radius: 14px;
             margin-bottom: 32px;
-            padding-bottom: 24px;
-            border-bottom: 1px solid #23395d;
+            padding: 32px 28px 24px 28px;
+            box-shadow: 0 2px 12px rgba(33,150,243,0.07);
+            transition: box-shadow 0.2s;
         }
+        .endpoint-card:hover {
+            box-shadow: 0 8px 32px rgba(33,150,243,0.18);
+        }
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 10px;
+        }
+        .endpoint-tools { margin-left: auto; display: flex; gap: 8px; }
+        .tool-btn { cursor: pointer; background: #111a2b; border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; }
+        .collapsible { cursor: pointer; }
         .method {
             font-weight: bold;
             color: #fff;
-            background: #4fc3f7;
+            background: var(--accent);
             border-radius: 6px;
-            padding: 2px 10px;
-            margin-right: 10px;
-            font-size: 0.95rem;
+            padding: 2px 14px;
+            font-size: 1rem;
+            letter-spacing: 1px;
         }
         .url {
             font-family: monospace;
             color: #fff;
-            background: #23395d;
+            background: var(--border);
             border-radius: 6px;
-            padding: 2px 10px;
-            font-size: 0.95rem;
+            padding: 2px 12px;
+            font-size: 1rem;
         }
         .desc {
             margin: 10px 0 0 0;
-            color: #b0b0b0;
+            color: var(--text-muted);
+            font-size: 1.08rem;
         }
         .params, .response {
-            background: #23395d;
+            background: #1e2940;
             border-radius: 8px;
             padding: 16px;
-            margin: 12px 0;
+            margin: 14px 0 0 0;
             color: #fff;
-            font-size: 0.98rem;
+            font-size: 1.01rem;
+        }
+        .params b, .response b {
+            color: var(--accent);
         }
         .code {
             background: #111a2b;
-            color: #4fc3f7;
+            color: var(--accent);
             font-family: monospace;
             border-radius: 6px;
             padding: 10px;
@@ -79,103 +189,284 @@
             overflow-x: auto;
         }
         .auth {
-            color: #ffb300;
+            color: var(--warning);
             font-weight: bold;
         }
+        .hidden { display: none; }
         a {
-            color: #4fc3f7;
+            color: var(--accent);
+        }
+        @media (max-width: 1100px) {
+            .container { margin: 40px 10px 0 10px; }
+            .sidebar { display: none; }
+        }
+        @media (max-width: 700px) {
+            .container { padding: 24px 8px 24px 8px; }
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.1rem; }
         }
     </style>
+    <script>
+        // Scroll to endpoint on sidebar click
+        document.addEventListener('DOMContentLoaded', function() {
+            const base = (window.location.port === '5500') ? 'http://127.0.0.1:8000' : window.location.origin;
+            const baseSelect = document.getElementById('env');
+            if (baseSelect) {
+                baseSelect.value = base;
+            }
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    const target = document.getElementById(this.getAttribute('href').substring(1));
+                    if (target) {
+                        window.scrollTo({
+                            top: target.getBoundingClientRect().top + window.scrollY - 40,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Copy buttons
+            document.querySelectorAll('[data-copy]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetSel = btn.getAttribute('data-copy');
+                    const el = btn.closest('.endpoint-card').querySelector(targetSel);
+                    if (el) {
+                        const text = el.innerText || el.textContent;
+                        navigator.clipboard.writeText(text).then(() => {
+                            btn.textContent = 'Copied!';
+                            setTimeout(() => btn.textContent = 'Copy', 1200);
+                        });
+                    }
+                });
+            });
+
+            // Collapse/expand
+            document.querySelectorAll('[data-toggle]')?.forEach(t => {
+                t.addEventListener('click', () => {
+                    const sel = t.getAttribute('data-toggle');
+                    const target = t.closest('.endpoint-card').querySelector(sel);
+                    if (target) target.classList.toggle('hidden');
+                });
+            });
+
+            // Search filter
+            const search = document.getElementById('search');
+            if (search) {
+                search.addEventListener('input', () => {
+                    const q = search.value.trim().toLowerCase();
+                    document.querySelectorAll('.endpoint-card').forEach(card => {
+                        const text = card.innerText.toLowerCase();
+                        card.style.display = text.includes(q) ? '' : 'none';
+                    });
+                });
+            }
+        });
+    </script>
 </head>
 <body>
-    <div class="container">
-        <h1>BLUE16 API Documentation</h1>
-        <p>Welcome to the official API docs for BLUE16. All endpoints return JSON. Authenticate using Bearer tokens where required.</p>
-        <h2>Endpoints</h2>
-        <div class="endpoint">
-            <span class="method">POST</span> <span class="url">/api/login.php</span>
-            <div class="desc">Login and receive an API token.</div>
-            <div class="params"><b>Params:</b> <br> <code>username/email</code>, <code>password</code></div>
-            <div class="response"><b>Response:</b> <br> <code>{ success, token, message }</code></div>
+    <nav class="sidebar">
+        <h2>API Endpoints</h2>
+        <div class="sidebar-nav">
+            <a href="#login" class="active">Login</a>
+            <a href="#register">Register</a>
+            <a href="#forgot">Forgot Password</a>
+            <a href="#reset">Reset Password</a>
+            <a href="#validate">Validate Token</a>
+            <a href="#tokens">Tokens</a>
+            <a href="#reactions">Reactions</a>
+            <a href="#servers">Servers</a>
+            <a href="#invites">Invites</a>
+            <a href="#hibp">HIBP</a>
+            <a href="#files">Files</a>
         </div>
-        <div class="endpoint">
-            <span class="method">POST</span> <span class="url">/api/register.php</span>
-            <div class="desc">Register a new user and receive an API token.</div>
-            <div class="params"><b>Params:</b> <br> <code>username</code>, <code>email</code>, <code>password</code></div>
-            <div class="response"><b>Response:</b> <br> <code>{ success, token, message }</code></div>
+    </nav>
+    <main class="main">
+        <div class="topbar">
+            <div class="topbar-left">
+                <strong>Base URL</strong>
+                <select id="env" class="env-select">
+                    <option value="http://127.0.0.1:8000">Local (http://127.0.0.1:8000)</option>
+                    <option value="">Current Origin</option>
+                </select>
+            </div>
+            <input id="search" class="search-box" placeholder="Search endpoints, params, responses..." />
         </div>
-        <div class="endpoint">
-            <span class="method">GET</span> <span class="url">/api/auth/validate</span>
-            <div class="desc">Validate an API token. <span class="auth">Requires Bearer token</span></div>
-            <div class="response"><b>Response:</b> <br> <code>{ success, username, message }</code></div>
+        <div class="container">
+            <h1>BLUE16 API Documentation</h1>
+            <div class="intro">Welcome to the official API docs for BLUE16. All endpoints return JSON. Use Bearer tokens for protected routes <span class="badge badge-auth">Auth</span>. Most POST requests require a CSRF token <span class="badge badge-csrf">CSRF</span>.</div>
+            <h2>Endpoints</h2>
+            <div class="endpoint-card" id="health">
+                <div class="endpoint-header">
+                    <span class="method">GET</span> <span class="url">/api/health.php</span>
+                    <div class="endpoint-tools">
+                        <button class="tool-btn" data-copy=".url">Copy</button>
+                        <button class="tool-btn collapsible" data-toggle=".endpoint-body">Toggle</button>
+                    </div>
+                </div>
+                <div class="desc">Health check for services (DB, game server, file server).</div>
+                <div class="endpoint-body">
+                    <div class="response"><b>Response:</b> <br> <code>{ status, services: { db, game_server, file_server } }</code></div>
+                </div>
+            </div>
+            <div class="endpoint-card" id="login">
+                <div class="endpoint-header">
+                    <span class="method">POST</span> <span class="url">/api/login.php</span>
+                    <div class="endpoint-tools">
+                        <button class="tool-btn" data-copy=".url">Copy</button>
+                        <button class="tool-btn collapsible" data-toggle=".endpoint-body">Toggle</button>
+                    </div>
+                </div>
+                <div class="desc">Login and receive an API token. <span class="badge badge-csrf">CSRF</span></div>
+                <div class="endpoint-body">
+                    <div class="params"><b>Params:</b> <br> <code>username_or_email</code>, <code>password</code>, <code>csrf_token</code></div>
+                    <div class="response"><b>Response:</b> <br> <code>{ status: 200, token, message }</code></div>
+                </div>
+            </div>
+            <div class="endpoint-card" id="register">
+                <div class="endpoint-header">
+                    <span class="method">POST</span> <span class="url">/api/register.php</span>
+                    <div class="endpoint-tools">
+                        <button class="tool-btn" data-copy=".url">Copy</button>
+                        <button class="tool-btn collapsible" data-toggle=".endpoint-body">Toggle</button>
+                    </div>
+                </div>
+                <div class="desc">Register a new user and receive an API token. <span class="badge badge-csrf">CSRF</span></div>
+                <div class="endpoint-body">
+                    <div class="params"><b>Params:</b> <br> <code>username</code>, <code>email</code>, <code>password</code>, <code>invite_key</code>, <code>csrf_token</code></div>
+                    <div class="response"><b>Response:</b> <br> <code>{ status: 200, token, message }</code></div>
+                </div>
+            </div>
+            <div class="endpoint-card" id="forgot">
+                <div class="endpoint-header">
+                    <span class="method">POST</span> <span class="url">/api/forgot_password.php</span>
+                    <div class="endpoint-tools">
+                        <button class="tool-btn" data-copy=".url">Copy</button>
+                        <button class="tool-btn collapsible" data-toggle=".endpoint-body">Toggle</button>
+                    </div>
+                </div>
+                <div class="desc">Request a password reset link by email or username. <span class="badge badge-csrf">CSRF</span></div>
+                <div class="endpoint-body">
+                    <div class="params"><b>Params:</b> <br> <code>identifier</code> (email or username), <code>csrf_token</code></div>
+                    <div class="response"><b>Response:</b> <br> <code>{ status: 200, message }</code></div>
+                </div>
+            </div>
+            <div class="endpoint-card" id="reset">
+                <div class="endpoint-header">
+                    <span class="method">POST</span> <span class="url">/api/reset_password.php</span>
+                    <div class="endpoint-tools">
+                        <button class="tool-btn" data-copy=".url">Copy</button>
+                        <button class="tool-btn collapsible" data-toggle=".endpoint-body">Toggle</button>
+                    </div>
+                </div>
+                <div class="desc">Reset your password using a reset token. <span class="badge badge-csrf">CSRF</span></div>
+                <div class="endpoint-body">
+                    <div class="params"><b>Params:</b> <br> <code>reset_token</code>, <code>password</code>, <code>confirm_password</code>, <code>csrf_token</code></div>
+                    <div class="response"><b>Response:</b> <br> <code>{ status: 200, message }</code></div>
+                </div>
+            </div>
+            <div class="endpoint-card" id="validate">
+                <div class="endpoint-header">
+                    <span class="method">GET</span> <span class="url">/api/auth/validate</span>
+                </div>
+                <div class="desc">Validate an API token. <span class="auth">Requires Bearer token</span></div>
+                <div class="response"><b>Response:</b> <br> <code>{ success, username, message }</code></div>
+            </div>
+            <div class="endpoint-card" id="tokens">
+                <div class="endpoint-header">
+                    <span class="method">GET</span> <span class="url">/api/tokens.php</span>
+                </div>
+                <div class="desc">List your API tokens. <span class="auth">Requires Bearer token</span></div>
+                <div class="response"><b>Response:</b> <br> <code>{ tokens: [ { token, expires_at } ] }</code></div>
+            </div>
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method">DELETE</span> <span class="url">/api/tokens.php</span>
+                </div>
+                <div class="desc">Revoke an API token. <span class="auth">Requires Bearer token</span></div>
+                <div class="params"><b>Params:</b> <br> <code>token</code></div>
+                <div class="response"><b>Response:</b> <br> <code>{ success, message }</code></div>
+            </div>
+            <div class="endpoint-card" id="reactions">
+                <div class="endpoint-header">
+                    <span class="method">GET</span> <span class="url">/api/reactions.php</span>
+                </div>
+                <div class="desc">Get reaction counts.</div>
+                <div class="response"><b>Response:</b> <br> <code>{ heart, star, thumb, trophy, idea }</code></div>
+            </div>
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method">POST</span> <span class="url">/api/reactions.php</span>
+                </div>
+                <div class="desc">Add a reaction.</div>
+                <div class="params"><b>Params:</b> <br> <code>type</code></div>
+                <div class="response"><b>Response:</b> <br> <code>{ success, message }</code></div>
+            </div>
+            <div class="endpoint-card" id="servers">
+                <div class="endpoint-header">
+                    <span class="method">POST</span> <span class="url">/api/createserver.php</span>
+                </div>
+                <div class="desc">Create a new server. <span class="auth">Requires Bearer token</span></div>
+                <div class="params"><b>Params:</b> <br> <code>name</code>, <code>type</code></div>
+                <div class="response"><b>Response:</b> <br> <code>{ success, server_id, message }</code></div>
+            </div>
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method">DELETE</span> <span class="url">/api/deleteserver.php</span>
+                </div>
+                <div class="desc">Delete a server. <span class="auth">Requires Bearer token</span></div>
+                <div class="params"><b>Params:</b> <br> <code>server_id</code></div>
+                <div class="response"><b>Response:</b> <br> <code>{ success, message }</code></div>
+            </div>
+            <div class="endpoint-card" id="invites">
+                <div class="endpoint-header">
+                    <span class="method">GET</span> <span class="url">/api/invites.php</span>
+                </div>
+                <div class="desc">List your invite keys. <span class="auth">Requires Bearer token</span></div>
+                <div class="response"><b>Response:</b> <br> <code>{ invites: [ { key, uses, status } ] }</code></div>
+            </div>
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method">POST</span> <span class="url">/api/invite_key.php</span>
+                </div>
+                <div class="desc">Generate a new invite key. <span class="auth">Requires Bearer token</span></div>
+                <div class="response"><b>Response:</b> <br> <code>{ success, key, message }</code></div>
+            </div>
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method">GET</span> <span class="url">/api/check_invite_key.php</span>
+                </div>
+                <div class="desc">Check if an invite key is valid.</div>
+                <div class="params"><b>Params:</b> <br> <code>key</code></div>
+                <div class="response"><b>Response:</b> <br> <code>{ valid, message }</code></div>
+            </div>
+            <div class="endpoint-card" id="hibp">
+                <div class="endpoint-header">
+                    <span class="method">GET</span> <span class="url">/api/hibp.php</span>
+                </div>
+                <div class="desc">Check if a password is pwned (HaveIBeenPwned).</div>
+                <div class="params"><b>Params:</b> <br> <code>password</code></div>
+                <div class="response"><b>Response:</b> <br> <code>{ pwned, count }</code></div>
+            </div>
+            <div class="endpoint-card" id="files">
+                <div class="endpoint-header">
+                    <span class="method">GET</span> <span class="url">/api/files</span>
+                </div>
+                <div class="desc">List your files. <span class="auth">Requires Bearer token</span></div>
+                <div class="response"><b>Response:</b> <br> <code>{ files: [ { name, size, uploaded_at } ] }</code></div>
+            </div>
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <span class="method">POST</span> <span class="url">/api/files</span>
+                </div>
+                <div class="desc">Upload a file. <span class="auth">Requires Bearer token</span></div>
+                <div class="params"><b>Params:</b> <br> <code>file</code></div>
+                <div class="response"><b>Response:</b> <br> <code>{ success, file, message }</code></div>
+            </div>
         </div>
-        <div class="endpoint">
-            <span class="method">GET</span> <span class="url">/api/tokens.php</span>
-            <div class="desc">List your API tokens. <span class="auth">Requires Bearer token</span></div>
-            <div class="response"><b>Response:</b> <br> <code>{ tokens: [ { token, expires_at } ] }</code></div>
-        </div>
-        <div class="endpoint">
-            <span class="method">DELETE</span> <span class="url">/api/tokens.php</span>
-            <div class="desc">Revoke an API token. <span class="auth">Requires Bearer token</span></div>
-            <div class="params"><b>Params:</b> <br> <code>token</code></div>
-            <div class="response"><b>Response:</b> <br> <code>{ success, message }</code></div>
-        </div>
-        <div class="endpoint">
-            <span class="method">GET</span> <span class="url">/api/reactions.php</span>
-            <div class="desc">Get reaction counts.</div>
-            <div class="response"><b>Response:</b> <br> <code>{ heart, star, thumb, trophy, idea }</code></div>
-        </div>
-        <div class="endpoint">
-            <span class="method">POST</span> <span class="url">/api/reactions.php</span>
-            <div class="desc">Add a reaction.</div>
-            <div class="params"><b>Params:</b> <br> <code>type</code></div>
-            <div class="response"><b>Response:</b> <br> <code>{ success, message }</code></div>
-        </div>
-        <div class="endpoint">
-            <span class="method">GET</span> <span class="url">/api/createserver.php</span>
-            <div class="desc">Create a new server. <span class="auth">Requires Bearer token</span></div>
-            <div class="params"><b>Params:</b> <br> <code>name</code>, <code>type</code></div>
-            <div class="response"><b>Response:</b> <br> <code>{ success, server_id, message }</code></div>
-        </div>
-        <div class="endpoint">
-            <span class="method">GET</span> <span class="url">/api/deleteserver.php</span>
-            <div class="desc">Delete a server. <span class="auth">Requires Bearer token</span></div>
-            <div class="params"><b>Params:</b> <br> <code>server_id</code></div>
-            <div class="response"><b>Response:</b> <br> <code>{ success, message }</code></div>
-        </div>
-        <div class="endpoint">
-            <span class="method">GET</span> <span class="url">/api/invites.php</span>
-            <div class="desc">List your invite keys. <span class="auth">Requires Bearer token</span></div>
-            <div class="response"><b>Response:</b> <br> <code>{ invites: [ { key, uses, status } ] }</code></div>
-        </div>
-        <div class="endpoint">
-            <span class="method">POST</span> <span class="url">/api/invite_key.php</span>
-            <div class="desc">Generate a new invite key. <span class="auth">Requires Bearer token</span></div>
-            <div class="response"><b>Response:</b> <br> <code>{ success, key, message }</code></div>
-        </div>
-        <div class="endpoint">
-            <span class="method">GET</span> <span class="url">/api/check_invite_key.php</span>
-            <div class="desc">Check if an invite key is valid.</div>
-            <div class="params"><b>Params:</b> <br> <code>key</code></div>
-            <div class="response"><b>Response:</b> <br> <code>{ valid, message }</code></div>
-        </div>
-        <div class="endpoint">
-            <span class="method">GET</span> <span class="url">/api/hibp.php</span>
-            <div class="desc">Check if a password is pwned (HaveIBeenPwned).</div>
-            <div class="params"><b>Params:</b> <br> <code>password</code></div>
-            <div class="response"><b>Response:</b> <br> <code>{ pwned, count }</code></div>
-        </div>
-        <div class="endpoint">
-            <span class="method">GET</span> <span class="url">/api/files</span>
-            <div class="desc">List your files. <span class="auth">Requires Bearer token</span></div>
-            <div class="response"><b>Response:</b> <br> <code>{ files: [ { name, size, uploaded_at } ] }</code></div>
-        </div>
-        <div class="endpoint">
-            <span class="method">POST</span> <span class="url">/api/files</span>
-            <div class="desc">Upload a file. <span class="auth">Requires Bearer token</span></div>
-            <div class="params"><b>Params:</b> <br> <code>file</code></div>
-            <div class="response"><b>Response:</b> <br> <code>{ success, file, message }</code></div>
-        </div>
-    </div>
+    </main>
 </body>
 </html>

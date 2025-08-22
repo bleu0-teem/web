@@ -98,8 +98,13 @@
                             <i class="ai-key"></i>
                             Invite Key
                         </label>
-                        <input type="text" id="invite_key" name="invite_key" class="form-input" required>
-                        <div class="form-hint">Enter your invite key to create an account</div>
+                        <input type="text" id="invite_key" name="invite_key" class="form-input" placeholder="Enter your invite key" required>
+                        <div class="form-hint">Ask an existing user for an invite key to join.</div>
+                        <label class="checkbox-container mt-2">
+                            <input type="checkbox" id="subscribe" name="subscribe">
+                            <span class="checkmark"></span>
+                            Subscribe to our newsletter for updates
+                        </label>
                     </div>
 
                     <input type="hidden" id="csrf_token" name="csrf_token">

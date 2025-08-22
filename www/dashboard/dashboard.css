@@ -15,6 +15,46 @@
   grid-template-columns: 80px 1fr;
 }
 
+/* Collapsed sidebar behavior: hide text labels, keep icons visible and centered */
+.dashboard-layout.sidebar-collapsed .sidebar {
+  overflow: hidden;
+}
+.dashboard-layout.sidebar-collapsed .sidebar-header {
+  padding: 20px 10px;
+}
+.dashboard-layout.sidebar-collapsed .sidebar-user {
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.dashboard-layout.sidebar-collapsed .user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+}
+.dashboard-layout.sidebar-collapsed .user-info,
+.dashboard-layout.sidebar-collapsed .user-name,
+.dashboard-layout.sidebar-collapsed .user-status {
+  display: none;
+}
+.dashboard-layout.sidebar-collapsed .menu-link {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+  margin-right: 0;
+  border-radius: 12px;
+}
+.dashboard-layout.sidebar-collapsed .menu-link .iconify {
+  margin: 0;
+}
+/* Hide the text span but keep the first icon span */
+.dashboard-layout.sidebar-collapsed .menu-link span:not(.iconify) {
+  display: none;
+}
+.dashboard-layout.sidebar-collapsed .sidebar-footer {
+  padding: 15px 10px;
+}
+
 /* Sidebar */
 .sidebar {
   background: rgba(255, 255, 255, 0.08);
@@ -731,6 +771,69 @@
   left: 0;
   font-weight: bold;
   font-size: 1.2rem;
+}
+
+/* Server Status */
+.server-status {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: clamp(10px, 1.2vw, 14px);
+  min-height: 56px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.status-indicator {
+  width: clamp(10px, 1.2vw, 16px);
+  height: clamp(10px, 1.2vw, 16px);
+  border-radius: 50%;
+  background: #888;
+  box-shadow: 0 0 8px rgba(255,255,255,0.15);
+}
+.status-indicator.online {
+  background: #4caf50;
+  box-shadow: 0 0 10px rgba(76,175,80,0.7);
+}
+.status-indicator.offline {
+  background: #f44336;
+  box-shadow: 0 0 10px rgba(244,67,54,0.6);
+}
+.status-indicator.maintenance {
+  background: #ffb300;
+  box-shadow: 0 0 10px rgba(255,179,0,0.6);
+}
+.status-info {
+  display: flex;
+  flex-direction: column;
+}
+.status-name {
+  font-weight: 600;
+  color: #fff;
+}
+.status-details {
+  color: #b0b0b0;
+  font-size: clamp(0.9rem, 1vw, 1rem);
+}
+
+@media (max-width: 600px) {
+  .server-status {
+    grid-template-columns: 1fr;
+  }
+  .status-item {
+    gap: 10px;
+    min-height: 52px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .status-name { font-size: 1rem; }
+  .status-details { font-size: 1rem; }
 }
 
 /* Files Section */
