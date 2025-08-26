@@ -1,4 +1,4 @@
-# Project TODO (v2) — 2025-08-22
+# Web TODO (v2) — 2025-08-26
  
 Legend:
  - Priority P0 (now), P1 (next), P2 (later)
@@ -12,10 +12,12 @@ Legend:
  - [x] Dashboard: Command Palette (Ctrl/Cmd+K) quick navigation (P2)
  - [x] Auth: register/login fixes, CSRF wiring, better forgot/reset flows (P0)
  - [x] Dashboard: Profile & Settings redesign + functionality (P0)
+ - [x] Rewrote fully README.md (P0)
+ - [x] Deleted my BIO from website completely (P0)
  
 ## In Progress
- - [ ] Verify end-to-end flows in dashboard (servers, files, invites, notifications) (P0)
- - [ ] Align profile/settings API routes with backend (confirm paths/fields) (P0)
+ - [ ] Verify end-to-end flows in dashboard (servers, files, invites, notifications) (P2)
+ - [ ] Align profile/settings API routes with backend (confirm paths/fields) (P2)
  
 ## P0 — Next Up (must-have)
  - [ ] Notifications bell: ensure it reflects unread count and marks-as-read via API
