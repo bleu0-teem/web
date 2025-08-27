@@ -1,4 +1,4 @@
-# BLUE16 Websie Source
+# BLUE16 Website Source
 
 <p align="center">
   <img src="https://img.shields.io/github/stars/bleu0-teem/web?style=for-the-badge&logo=github&label=Stars" alt="GitHub Stars"/>
