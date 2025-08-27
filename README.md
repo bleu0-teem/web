@@ -1,4 +1,4 @@
-# BLUE16 Web
+# BLUE16 Websie Source
 
 <p align="center">
   <img src="https://img.shields.io/github/stars/bleu0-teem/web?style=for-the-badge&logo=github&label=Stars" alt="GitHub Stars"/>
@@ -8,7 +8,7 @@
 
 ## ✨ Unleash Roblox's Legacy: The Ultimate Revival Project
 
-Welcome to **BLUE16 Web** – an ambitious open-source ROBLOX revival project dedicated to the incredible goal of running **EVERY Roblox version possible**. We're building a platform that marries nostalgic functionality with modern web standards: clean design, robust features, and built for unparalleled scalability.
+Welcome to **BLUE16** – an ambitious open-source ROBLOX revival project dedicated to the incredible goal of running **EVERY Roblox version possible**. We're building a platform that marries nostalgic functionality with modern web standards: clean design, robust features, and built for unparalleled scalability.
 
 ---
 
@@ -26,7 +26,7 @@ Experience a revival platform engineered for the modern web:
 
 ## 🛠️ Tech Stack
 
-BLUE16 Web is powered by a reliable and modern stack:
+BLUE16 is powered by a reliable and modern stack:
 
 *   **Frontend:** PHP (with a focus on clean, component-based rendering)
 *   **Backend:** PHP (API-first, modular, and extensible)
@@ -37,7 +37,7 @@ BLUE16 Web is powered by a reliable and modern stack:
 
 ## 🏁 Getting Started
 
-Follow these steps to get your BLUE16 Web instance up and running locally or on your server.
+Follow these steps to get your BLUE16 website instance up and running locally or on your server.
 
 ### Prerequisites
 
@@ -78,7 +78,7 @@ Ensure you have the following installed on your system:
 
 ### Database Selection
 
-BLUE16 Web provides first-class support for two powerful database options:
+BLUE16 provides first-class support for two powerful database options:
 
 *   **MySQL:** Set `DB_TYPE=mysql` in your `.env` file and provide your MySQL connection details.
 *   **Supabase:** Set `DB_TYPE=supabase` in your `.env` file and configure your Supabase project keys.
@@ -116,5 +116,5 @@ Copyright © [bleu0 teem omg](https://github.com/bleu0-teem)
 
 ---
 
-### Loved BLUE16 Web? Show your support! ⭐
+### Loved BLUE16? Show your support! ⭐
 If you find this project exciting or useful, please consider starring our repository! Your support helps our open-source efforts thrive.
