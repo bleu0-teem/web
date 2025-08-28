@@ -1,54 +1,44 @@
-
 -- PlaySolo2006-2009.lua
--- This script lets you play solo in classic Roblox Studio 2006-2009.
--- It is a modified version of the original PlaySolo2006-2009.lua script from:
---   https://archive.org/download/roblox-clients-2006-2021/
---
--- You are using this script for free and hosting on blue16.xyz.
--- Please do not remove these comments. Credit is appreciated! :3
--- Enjoy your blue16 server!
+-- Enhances solo play in classic Roblox Studio (2006–2009)
+-- Modified from the original script: https://archive.org/download/roblox-clients-2006-2021/
+-- Hosted on blue16.site. Please credit if you share. :3
 
 -- Services
-local Visit = game:service("Visit")
-local Players = game:service("Players")
-local RunService = game:service("RunService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
 
--- Create Player
-local player = game.Players.LocalPlayer
-
+-- Create or get the local player
+local player = Players.LocalPlayer
 if not player then
-	player = game.Players:createLocalPlayer(0)
+    player = Players:createLocalPlayer(0)
 end
 
-local function waitForChild(parent,childName)
-	local child
-	
-	while true do
-		child = parent:findFirstChild(childName)
-		
-		if child then
-			break
-		else
-			parent.ChildAdded:wait()
-		end
-	end
-	
-	return child
+-- Wait for the player's character to load
+local function waitForChild(parent, name)
+    local child = parent:FindFirstChild(name)
+    while not child do
+        parent.ChildAdded:Wait()
+        child = parent:FindFirstChild(name)
+    end
+    return child
 end
 
-local function onChanged(property)
-	if property == "Character" then
-		local humanoid = waitForChild(player.Character, "Humanoid")
-		
-		humanoid.Died:connect(function ()
-			wait(5)
-			player:LoadCharacter()
-		end)
-	end
+-- Handle character respawn
+local function onCharacterAdded(character)
+    local humanoid = waitForChild(character, "Humanoid")
+    humanoid.Died:Connect(function()
+        print("You died! Respawning in 5 seconds...")
+        wait(5)
+        player:LoadCharacter()
+    end)
 end
 
-player.Changed:connect(onChanged)
+-- Connect to the CharacterAdded event
+player.CharacterAdded:Connect(onCharacterAdded)
+
+-- Initial character load
 player:LoadCharacter()
 
--- Start the game.
-RunService:run()
+-- Start the game loop
+RunService:Run()

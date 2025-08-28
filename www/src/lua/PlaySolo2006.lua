@@ -4,7 +4,7 @@
 -- It is a modified version of the original PlaySolo2006.lua script from:
 --   https://archive.org/download/roblox-clients-2006-2021/
 --
--- You are using this script for free and hosting on blue16.xyz.
+-- You are using this script for free and hosting on blue16.site.
 -- Please do not remove these comments. Credit is appreciated! :3
 -- Enjoy your blue16 server!
 

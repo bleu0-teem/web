@@ -6,7 +6,7 @@
 -- it is a modified version of the original StartServer.lua script from
 -- https://archive.org/download/roblox-clients-2006-2021/
 
--- you are using this script for free and hosting on blue16.xyz.
+-- you are using this script for free and hosting on blue16.site.
 -- so please do not remove these comments. credit is appreciated ;3
 -- enjoy ur blue16 server!
 
