@@ -142,6 +142,7 @@ let keyValidated = false;
       { src: "https://blue16.site/etc/captcha/images/mango.webp", label: 'mango' },
       { src: "https://blue16.site/etc/captcha/images/jackpot.jpg", label: 'jackpot' },
       { src: "https://blue16.site/etc/captcha/images/key.jpg", label: 'key' }
+      { src: "https://blue16.site/etc/captcha/images/peach.jpg", label: 'peach' }
     ];
     const segments = imageSources.map(({ src, label }) => {
      if (!src) return { image: null, label };
@@ -726,7 +727,11 @@ function launchVoltStageTricky(repeatCount = 1) {
     { label: "Train", volts: [330, 600, 750, 1000, 1500, 25000] },
     { label: "Hair Dryer", volts: [110, 220, 230, 240] },
     { label: "Fan", volts: [110, 220, 230] },
-    { label: "Screwdriver", volts: [] }
+    { label: "Screwdriver", volts: [] },
+    { label: "pineapple", volts: [] },
+    { label: "apple", volts: [] },
+    { label: "mango", volts: [] },
+    { label: "peach", volts: [] }
   ];
   // Possible voltages to choose from
   const voltages = [
@@ -822,7 +827,7 @@ function launchVoltStageTricky(repeatCount = 1) {
     captcha.addEventListener('click', () => {
       startSpeedrunTimer()
       document.getElementById('captcha').style.display = 'none';
-      ['apple','banana','pineapple','watermelon','mango'].forEach(label => {
+      ['apple','banana','pineapple','watermelon','mango','peach'].forEach(label => {
     const a = new Audio(`https://blue16.site/etc/captcha/audios/${label}.mp3`);
     fruitAudioMap[label] = a;
   });
