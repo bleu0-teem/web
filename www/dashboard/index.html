@@ -322,7 +322,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+
                 </section>
 
                 <!-- Download Section -->
@@ -668,60 +668,112 @@
                     <div class="section-header">
                         <h2 class="section-title">Profile</h2>
                         <p class="section-subtitle">Manage your public info and account security.</p>
-                    </div>
-                    <div class="profile-content" style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-                        <div class="profile-avatar" style="background:#121a2b; border:1px solid #24314d; border-radius:14px; padding:18px; display:flex; flex-direction:column; align-items:center; gap:12px; min-width:220px;">
-                            <img id="avatar-preview" src="" alt="Avatar" style="width:96px; height:96px; border-radius:50%; object-fit:cover; border:2px solid #24314d; display:none;" />
-                            <span id="avatar-fallback" class="iconify" data-icon="mdi:account-circle" style="font-size: 96px; color:#4fc3f7;"></span>
-                            <small style="color:#b0b0b0">PNG/JPG recommended</small>
+                        <div class="profile-view-toggle">
+                            <button type="button" class="profile-view-btn" data-view="roblox">
+                                <span class="iconify" data-icon="mdi:account-box"></span>
+                                Roblox
+                            </button>
+                            <button type="button" class="profile-view-btn active" data-view="forum">
+                                <span class="iconify" data-icon="mdi:forum"></span>
+                                Forum
+                            </button>
                         </div>
-                        <div style="flex:1; min-width:280px; max-width:520px;">
-                            <form id="profile-form" class="profile-info">
-                                <input type="hidden" id="csrf_token_profile" name="csrf_token" />
-                                <div class="form-group">
-                                    <label for="profile-username">Username</label>
-                                    <input type="text" id="profile-username" name="username" class="form-input" placeholder="Your username" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="profile-email">Email</label>
-                                    <input type="email" id="profile-email" name="email" class="form-input" placeholder="you@example.com" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="profile-avatar">Avatar URL</label>
-                                    <input type="url" id="profile-avatar" name="avatar" class="form-input" placeholder="https://...">
-                                </div>
-                                <div style="display:flex; gap:12px; align-items:center;">
-                                    <button type="submit" class="btn btn-primary" id="profile-save">Save Changes</button>
-                                    <button type="button" class="btn btn-secondary" id="profile-cancel">Reset</button>
-                                    <span id="profile-feedback" style="color:#4fc3f7;"></span>
-                                </div>
-                            </form>
-                            <div style="height:1px; background:#24314d; margin:20px 0;"></div>
-                            <details style="background:#121a2b; border:1px solid #24314d; border-radius:12px; padding:14px;">
-                                <summary style="cursor:pointer; color:#4fc3f7; font-weight:600;">Change Password</summary>
-                                <form id="password-form" style="margin-top:12px; display:grid; gap:10px; max-width:520px;">
-                                    <input type="hidden" id="csrf_token_password" name="csrf_token" />
-                                    <div class="form-group">
-                                        <label for="old-password">Current Password</label>
-                                        <input type="password" id="old-password" name="old_password" class="form-input" required>
+                    </div>
+
+                    <div class="profile-container">
+                        <div class="profile-grid">
+                            <!-- Profile Card -->
+                            <div class="profile-card-large">
+                                <div class="profile-card-header">
+                                    <div class="profile-avatar-large">
+                                        <img src="../src/img/pfp.png" alt="User Avatar">
+                                        <button class="change-avatar-btn-large">
+                                            <span class="iconify" data-icon="mdi:camera"></span>
+                                        </button>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="new-password">New Password</label>
-                                        <input type="password" id="new-password" name="new_password" class="form-input" required>
-                                        <div id="pw-strength" style="height:6px; background:#0e1424; border-radius:999px; overflow:hidden; margin-top:6px;">
-                                            <div id="pw-bar" style="height:100%; width:0%; background:linear-gradient(90deg,#f44336,#ffb300,#4caf50); transition:width .2s ease;"></div>
+                                    <div class="profile-info-large">
+                                        <h3 class="profile-name-large" id="profile-username">kitty</h3>
+                                        <p class="profile-email-large" id="profile-email">kitty@example.com</p>
+                                    </div>
+                                </div>
+                                <div class="profile-card-body">
+                                    <div class="profile-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-value">12</span>
+                                            <span class="stat-label">Games Played</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-value">3</span>
+                                            <span class="stat-label">Servers Hosted</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-value">8</span>
+                                            <span class="stat-label">Achievements</span>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="confirm-password">Confirm New Password</label>
-                                        <input type="password" id="confirm-password" name="confirm_password" class="form-input" required>
+                                    <div class="profile-badges-large">
+                                        <span class="badge-large verified">Verified</span>
+                                        <span class="badge-large veteran">Veteran</span>
                                     </div>
-                                    <div style="display:flex; gap:12px; align-items:center;">
-                                        <button type="submit" class="btn btn-primary" id="password-save">Update Password</button>
-                                        <span id="password-feedback" style="color:#4fc3f7;"></span>
+                                </div>
+                            </div>
+
+                            <!-- Account Details Card -->
+                            <div class="profile-card-large">
+                                <div class="card-header">
+                                    <h4 class="card-title">Account Details</h4>
+                                    <button class="btn btn-secondary btn-sm">Edit Profile</button>
+                                </div>
+                                <div class="card-content">
+                                    <div class="info-grid-large">
+                                        <div class="info-item-large">
+                                            <span class="info-label-large">Username</span>
+                                            <span class="info-value-large" id="info-username">kitty</span>
+                                        </div>
+                                        <div class="info-item-large">
+                                            <span class="info-label-large">Email Address</span>
+                                            <span class="info-value-large" id="info-email">kitty@example.com</span>
+                                        </div>
+                                        <div class="info-item-large">
+                                            <span class="info-label-large">Account Standing</span>
+                                            <span class="info-value-large good-standing">Good</span>
+                                        </div>
+                                        <div class="info-item-large">
+                                            <span class="info-label-large">Joined Date</span>
+                                            <span class="info-value-large" id="info-joined">June 1, 2023</span>
+                                        </div>
+                                        <div class="info-item-large">
+                                            <span class="info-label-large">Last Login</span>
+                                            <span class="info-value-large" id="info-last-login">2 hours ago</span>
+                                        </div>
                                     </div>
-                                </form>
-                            </details>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Settings Card -->
+                        <div class="profile-card-large security-card">
+                            <div class="card-header">
+                                <h4 class="card-title">Security Settings</h4>
+                            </div>
+                            <div class="card-content">
+                                <div class="security-options-large">
+                                    <div class="security-option-large">
+                                        <div class="option-info-large">
+                                            <h5>Change Password</h5>
+                                            <p>For added security, we recommend using a unique password for your BLUE16 account.</p>
+                                        </div>
+                                        <button class="btn btn-secondary">Change Password</button>
+                                    </div>
+                                    <div class="security-option-large">
+                                        <div class="option-info-large">
+                                            <h5>Two-Factor Authentication (2FA)</h5>
+                                            <p>Protect your account from unauthorized access by enabling 2FA.</p>
+                                        </div>
+                                        <button class="btn btn-primary">Enable 2FA</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -732,42 +784,49 @@
                         <h2 class="section-title">Settings</h2>
                         <p class="section-subtitle">Personalize your experience and privacy.</p>
                     </div>
-                    <div class="settings-content" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px; align-items:start;">
-                        <form id="settings-form" style="background:#121a2b; border:1px solid #24314d; border-radius:12px; padding:16px;">
-                            <input type="hidden" id="csrf_token_settings" name="csrf_token" />
-                            <h3 style="margin-top:0; color:#4fc3f7;">Preferences</h3>
-                            <div class="form-group">
-                                <label for="setting-theme">Theme</label>
-                                <select id="setting-theme" name="theme">
-                                    <option value="dark">Dark</option>
-                                    <option value="light">Light</option>
-                                </select>
-                            </div>
-                            <div class="form-group" style="display:flex; align-items:center; gap:8px;">
-                                <input type="checkbox" id="setting-email" name="email_notifications" checked>
-                                <label for="setting-email" style="margin:0;">Email Notifications</label>
-                            </div>
-                            <div class="form-group" style="display:flex; align-items:center; gap:8px;">
-                                <input type="checkbox" id="setting-online" name="show_online" checked>
-                                <label for="setting-online" style="margin:0;">Show Online Status</label>
-                            </div>
-                            <div style="display:flex; gap:12px; align-items:center;">
-                                <button type="submit" class="btn btn-primary" id="settings-save">Save Settings</button>
-                                <button type="button" class="btn btn-secondary" id="settings-cancel">Reset</button>
-                                <span id="settings-feedback" style="color:#4fc3f7;"></span>
-                            </div>
-                        </form>
-                        <div style="background:#121a2b; border:1px solid #24314d; border-radius:12px; padding:16px;">
-                            <h3 style="margin-top:0; color:#ffb300;">Danger Zone</h3>
-                            <p style="color:#b0b0b0; margin-top:0;">Deleting your account is irreversible. All your data will be permanently removed.</p>
-                            <button class="btn btn-secondary" id="delete-account-btn" style="border-color:#f44336; color:#f44336;">Delete Account</button>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
 
+                    <div class="settings-container">
+                        <div class="settings-grid">
+                            <!-- General Settings -->
+                            <div class="settings-card-large">
+                                <div class="card-header">
+                                    <h4 class="card-title">General</h4>
+                                </div>
+                                <div class="card-content">
+                                    <div class="setting-item-large">
+                                        <div class="setting-info-large">
+                                            <h5>Theme</h5>
+                                            <p>Choose your preferred interface theme.</p>
+                                        </div>
+                                        <div class="setting-control-large">
+                                            <div class="theme-selector">
+                                                <button class="theme-option active" data-theme="dark">
+                                                    <span class="iconify" data-icon="mdi:weather-night"></span>
+                                                    <span>Dark</span>
+                                                </button>
+                                                <button class="theme-option" data-theme="light">
+                                                    <span class="iconify" data-icon="mdi:white-balance-sunny"></span>
+                                                    <span>Light</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="setting-item-large">
+                                        <div class="setting-info-large">
+                                            <h5>Language</h5>
+                                            <p>Select the language for the dashboard.</p>
+                                        </div>
+                                        <div class="setting-control-large">
+                                            <select class="form-select-large">
+                                                <option>English (US)</option>
+                                                <option>Español</option>
+                                                <option>Français</option>
+                                                <option>Deutsch</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
     <script>
         const API_BASE = (window.location.port === '5500') ? 'http://127.0.0.1:8000' : window.location.origin;
         // Navigation functionality
@@ -970,11 +1029,45 @@
             });
         }
 
+        // Avatar file upload -> preview and local persistence as data URL
+        (function(){
+            const fileInput = document.getElementById('avatar-file');
+            const uploadBtn = document.getElementById('avatar-upload-btn');
+            const clearBtn = document.getElementById('avatar-clear-btn');
+            const urlInput = document.getElementById('profile-avatar');
+            if (uploadBtn && fileInput){
+                uploadBtn.addEventListener('click', ()=> fileInput.click());
+            }
+            if (fileInput){
+                fileInput.addEventListener('change', ()=>{
+                    const file = fileInput.files && fileInput.files[0];
+                    if (!file) return;
+                    if (!file.type.startsWith('image/')) { alert('Please select an image file.'); return; }
+                    const reader = new FileReader();
+                    reader.onload = function(){
+                        const dataUrl = String(reader.result||'');
+                        updateAvatarPreview(dataUrl);
+                        if (urlInput) urlInput.value = dataUrl;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            if (clearBtn){
+                clearBtn.addEventListener('click', ()=>{
+                    if (urlInput) urlInput.value = '';
+                    updateAvatarPreview('');
+                });
+            }
+        })();
+
         // Load user profile (from API or localStorage)
         async function loadProfile(){
             const usernameEl = document.getElementById('profile-username');
             const emailEl = document.getElementById('profile-email');
             const avatarEl = document.getElementById('profile-avatar');
+            const displayEl = document.getElementById('profile-displayname');
+            const bioEl = document.getElementById('profile-bio');
+            const socialEl = document.getElementById('profile-social');
             let loaded = false;
             try {
                 const res = await fetch(`${API_BASE}/api/me.php`, { credentials: 'include', cache: 'no-store' });
@@ -984,7 +1077,11 @@
                         if (me.username) usernameEl.value = me.username;
                         if (me.email) emailEl.value = me.email;
                         if (me.avatar) { avatarEl.value = me.avatar; updateAvatarPreview(me.avatar); }
+                        if (me.display_name && displayEl) displayEl.value = me.display_name;
+                        if (me.bio && bioEl) bioEl.value = me.bio;
+                        if (me.social && socialEl) socialEl.value = me.social;
                         loaded = true;
+                        if (window.syncProfilePreview) window.syncProfilePreview();
                     }
                 }
             } catch(e){ /* ignore */ }
@@ -992,7 +1089,11 @@
                 const saved = JSON.parse(localStorage.getItem('user_profile')||'{}');
                 if (saved.username) usernameEl.value = saved.username;
                 if (saved.email) emailEl.value = saved.email;
-                if (saved.avatar){ avatarEl.value = saved.avatar; updateAvatarPreview(saved.avatar); }
+                if (saved.avatar && avatarEl){ avatarEl.value = saved.avatar; updateAvatarPreview(saved.avatar); }
+                if (saved.display_name && displayEl) displayEl.value = saved.display_name;
+                if (saved.bio && bioEl) bioEl.value = saved.bio;
+                if (saved.social && socialEl) socialEl.value = saved.social;
+                if (window.syncProfilePreview) window.syncProfilePreview();
             }
         }
         loadProfile();
@@ -1005,6 +1106,9 @@
                 username: document.getElementById('profile-username').value.trim(),
                 email: document.getElementById('profile-email').value.trim(),
                 avatar: document.getElementById('profile-avatar').value.trim(),
+                display_name: (document.getElementById('profile-displayname')||{value:''}).value.trim(),
+                bio: (document.getElementById('profile-bio')||{value:''}).value.trim(),
+                social: (document.getElementById('profile-social')||{value:''}).value.trim(),
             };
             if (!body.username || !body.email){
                 notify(profileFeedback, 'Username and email are required.', false);
@@ -1024,6 +1128,7 @@
                 localStorage.setItem('user_profile', JSON.stringify(body));
                 notify(profileFeedback, 'Saved locally (offline). Will sync when online.');
             }
+            if (window.syncProfilePreview) window.syncProfilePreview();
         });
         document.getElementById('profile-cancel')?.addEventListener('click', ()=>{
             profileForm.reset();
@@ -1077,11 +1182,41 @@
             const t = theme === 'light' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', t);
         }
+        function applyAccent(color){
+            const c = /^#([0-9a-f]{3}){1,2}$/i.test(color) ? color : '#4fc3f7';
+            document.documentElement.style.setProperty('--accent', c);
+        }
+        function applyReducedMotion(on){
+            const root = document.documentElement;
+            if (on) {
+                root.style.setProperty('--motion', '0');
+                // Reduce transitions
+                const styleId = 'reduced-motion-style';
+                let st = document.getElementById(styleId);
+                if (!st){
+                    st = document.createElement('style');
+                    st.id = styleId;
+                    st.textContent = '*{transition:none !important; animation:none !important}';
+                    document.head.appendChild(st);
+                }
+            } else {
+                const st = document.getElementById('reduced-motion-style');
+                if (st) st.remove();
+            }
+        }
         function loadSettings(){
             const saved = JSON.parse(localStorage.getItem('user_settings')||'{}');
-            if (saved.theme) { document.getElementById('setting-theme').value = saved.theme; applyTheme(saved.theme); }
-            if (typeof saved.email_notifications === 'boolean') document.getElementById('setting-email').checked = saved.email_notifications;
-            if (typeof saved.show_online === 'boolean') document.getElementById('setting-online').checked = saved.show_online;
+            const themeEl = document.getElementById('setting-theme');
+            const emailEl = document.getElementById('setting-email');
+            const onlineEl = document.getElementById('setting-online');
+            const accentEl = document.getElementById('setting-accent');
+            const reducedEl = document.getElementById('setting-reduced-motion');
+            
+            if (saved.theme && themeEl) { themeEl.value = saved.theme; applyTheme(saved.theme); }
+            if (typeof saved.email_notifications === 'boolean' && emailEl) emailEl.checked = saved.email_notifications;
+            if (typeof saved.show_online === 'boolean' && onlineEl) onlineEl.checked = saved.show_online;
+            if (saved.accent && accentEl) { accentEl.value = saved.accent; applyAccent(saved.accent); }
+            if (typeof saved.reduced_motion === 'boolean' && reducedEl) { reducedEl.checked = saved.reduced_motion; applyReducedMotion(saved.reduced_motion); }
         }
         loadSettings();
 
@@ -1092,8 +1227,12 @@
                 theme: document.getElementById('setting-theme').value,
                 email_notifications: document.getElementById('setting-email').checked,
                 show_online: document.getElementById('setting-online').checked,
+                accent: (document.getElementById('setting-accent')||{value:'#4fc3f7'}).value,
+                reduced_motion: (document.getElementById('setting-reduced-motion')||{checked:false}).checked,
             };
             applyTheme(body.theme);
+            applyAccent(body.accent);
+            applyReducedMotion(body.reduced_motion);
             localStorage.setItem('user_settings', JSON.stringify(body));
             const csrf = (document.getElementById('csrf_token_settings')||{}).value;
             const result = await tryPost([
@@ -1110,6 +1249,67 @@
             loadSettings();
             notify(settingsFeedback, 'Reverted changes');
         });
+        document.getElementById('settings-defaults')?.addEventListener('click', ()=>{
+            const defaults = { theme:'dark', email_notifications:true, show_online:true, accent:'#4fc3f7', reduced_motion:false };
+            localStorage.setItem('user_settings', JSON.stringify(defaults));
+            applyTheme(defaults.theme); applyAccent(defaults.accent); applyReducedMotion(defaults.reduced_motion);
+            loadSettings();
+            notify(settingsFeedback, 'Defaults restored');
+        });
+
+        // Live theme preview updates
+        (function(){
+            const themeSel = document.getElementById('setting-theme');
+            const accentInp = document.getElementById('setting-accent');
+            const reduced = document.getElementById('setting-reduced-motion');
+            function update(){
+                applyTheme(themeSel.value);
+                applyAccent(accentInp.value);
+                applyReducedMotion(reduced.checked);
+            }
+            themeSel?.addEventListener('change', update);
+            accentInp?.addEventListener('input', update);
+            reduced?.addEventListener('change', update);
+        })();
+
+        // Profile preview live updates
+        (function(){
+            const disp = document.getElementById('profile-displayname');
+            const user = document.getElementById('profile-username');
+            const bio = document.getElementById('profile-bio');
+            const social = document.getElementById('profile-social');
+            const link = document.getElementById('preview-link');
+            const nameEl = document.getElementById('preview-name');
+            const userEl = document.getElementById('preview-username');
+            const bioEl = document.getElementById('preview-bio');
+            const pImg = document.getElementById('preview-avatar');
+            const pFallback = document.getElementById('preview-fallback');
+            function setAvatar(url){
+                if (url){ pImg.src = url; pImg.style.display='block'; pFallback.style.display='none'; }
+                else { pImg.src=''; pImg.style.display='none'; pFallback.style.display='block'; }
+            }
+            function sync(){
+                nameEl.textContent = disp?.value?.trim() || 'Your Name';
+                userEl.textContent = '@' + (user?.value?.trim() || 'username');
+                bioEl.textContent = bio?.value?.trim() || 'Write a short bio to introduce yourself.';
+                const s = social?.value?.trim();
+                if (s) { link.style.display='inline'; link.href = s; try { link.textContent = new URL(s).host; } catch { link.textContent = s; } }
+                else { link.style.display='none'; link.href='#'; link.textContent=''; }
+                const av = (document.getElementById('profile-avatar')||{value:''}).value.trim();
+                setAvatar(av);
+            }
+            ['input','change'].forEach(ev=>{
+                disp?.addEventListener(ev, sync);
+                user?.addEventListener(ev, sync);
+                bio?.addEventListener(ev, sync);
+                social?.addEventListener(ev, sync);
+                document.getElementById('profile-avatar')?.addEventListener(ev, sync);
+            });
+            // Expose for load/save triggers
+            window.syncProfilePreview = sync;
+            // Initial sync after loadProfile fills values (in case it hasn't yet, this is harmless)
+            setTimeout(sync, 0);
+        })();
         // Logout button logic
         const logoutBtn = document.querySelector('.menu-link[href="../index.html"]');
         if (logoutBtn) {
@@ -1181,17 +1381,39 @@
             document.getElementById('pageTitle').textContent = 'Profile';
         });
 
-        // Server Status: visually distinct (add a border and shadow)
-        document.addEventListener('DOMContentLoaded', function() {
-            const serverStatusCard = document.querySelector('#dashboard-section .server-status');
-            if (serverStatusCard) {
-                serverStatusCard.style.border = '2px solid #4fc3f7';
-                serverStatusCard.style.boxShadow = '0 0 16px 0 #4fc3f7cc';
-                serverStatusCard.style.background = 'rgba(33,150,243,0.08)';
-                serverStatusCard.style.borderRadius = '18px';
+        // Profile View Toggle (Roblox | Forum)
+        (function() {
+            function initProfileViewToggle() {
+                const section = document.getElementById('profile-section');
+                if (!section) return;
+                const STORAGE_KEY = 'profile_view';
+                function applyProfileView(view){
+                    const v = (view === 'roblox') ? 'roblox' : 'forum';
+                    try { localStorage.setItem(STORAGE_KEY, v); } catch(e){}
+                    section.classList.toggle('profile-roblox', v === 'roblox');
+                    section.classList.toggle('profile-forum', v === 'forum');
+                    document.querySelectorAll('.profile-view-btn').forEach(btn => {
+                        btn.classList.toggle('active', btn.getAttribute('data-view') === v);
+                    });
+                }
+                // Bind buttons
+                document.querySelectorAll('.profile-view-btn').forEach(btn => {
+                    btn.addEventListener('click', () => applyProfileView(btn.getAttribute('data-view')));
+                });
+                // Apply saved view or default to 'forum'
+                const saved = (function(){ try { return localStorage.getItem(STORAGE_KEY) || 'forum'; } catch(e){ return 'forum'; } })();
+                applyProfileView(saved);
             }
+            
+            // Try to initialize immediately, or wait for DOMContentLoaded if needed
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initProfileViewToggle);
+            } else {
+                initProfileViewToggle();
+            }
+        })();
 
-            // Command Palette (Ctrl/Cmd+K) for quick navigation
+        // Command Palette (Ctrl/Cmd+K) for quick navigation
             const palette = document.createElement('div');
             palette.id = 'cmdk';
             palette.style.cssText = 'display:none; position:fixed; inset:0; z-index:10000; background:rgba(10,20,40,.6); align-items:flex-start; justify-content:center; padding-top:10vh;';
@@ -1265,11 +1487,10 @@
               const el = e.target.closest('.cmdk-item');
               if (el) activate(el.getAttribute('data-key'));
             });
-        });
     </script>
     <script>
         // Live Server Status polling and rendering
-        (function(){
+        document.addEventListener('DOMContentLoaded', function(){
             const STATUS_CLASSES = ['online','offline','maintenance'];
             const mapKeyToDom = {
                 main: { ind: 'status-main-ind', details: 'status-main-details', label: 'Main Server' },

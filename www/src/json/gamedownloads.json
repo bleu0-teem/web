@@ -1,0 +1,334 @@
+{
+  "roblox_games": [
+    {
+      "id": "classic_obby",
+      "name": "Classic Obby Course",
+      "file_type": "rbxl",
+      "file_name": "Classic_Obby_Course.rbxl",
+      "download_url": "https://github.com/blue16-team/blue16-web/raw/refs/heads/main/www/src/files/games/Classic_Obby_Course.rbxl",
+      "file_size": "2.4 MB",
+      "file_size_bytes": 2516582,
+      "md5_hash": "d41d8cd98f00b204e9800998ecf8427e",
+      "sha256_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "creator": "RobloxUser123",
+      "creator_id": "123456789",
+      "genre": "Obstacle Course",
+      "subgenre": "Platformer",
+      "description": "A classic obstacle course featuring challenging jumps, moving platforms, and tricky obstacles. Test your skills and see if you can reach the finish line!",
+      "created_date": "2020-05-15",
+      "last_updated": "2021-02-20",
+      "version": "1.2",
+      "max_players": 10,
+      "recommended_players": "1-4",
+      "difficulty": "Medium",
+      "estimated_playtime": "15-30 minutes",
+      "tags": [
+        "obby",
+        "platformer",
+        "challenging",
+        "classic",
+        "solo"
+      ],
+      "features": [
+        "Multiple checkpoint system",
+        "Moving platforms",
+        "Lava obstacles",
+        "Speedrun timer",
+        "Leaderboard"
+      ],
+      "screenshots": [
+        "https://example.com/screenshots/obby1.png",
+        "https://example.com/screenshots/obby2.png",
+        "https://example.com/screenshots/obby3.png"
+      ],
+      "video_url": "https://example.com/videos/obby_gameplay.mp4",
+      "rating": 4.5,
+      "total_ratings": 1250,
+      "downloads": 15420,
+      "likes": 8750,
+      "dislikes": 450,
+      "comments_enabled": true,
+      "requires_roblox_studio": true,
+      "minimum_studio_version": "2020.01",
+      "compatibility": [
+        "Windows",
+        "Mac",
+        "Linux"
+      ],
+      "notes": "This game requires basic platforming skills. Save frequently at checkpoints!"
+    },
+    {
+      "id": "tycoon_simulator",
+      "name": "Pizza Tycoon Simulator",
+      "file_type": "rbxl",
+      "file_name": "Pizza_Tycoon_Simulator.rbxl",
+      "download_url": "https://github.com/blue16-team/blue16-web/raw/refs/heads/main/www/src/files/games/Pizza_Tycoon_Simulator.rbxl",
+      "file_size": "8.7 MB",
+      "file_size_bytes": 9122680,
+      "md5_hash": "d41d8cd98f00b204e9800998ecf8427e",
+      "sha256_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "creator": "TycoonMaster",
+      "creator_id": "987654321",
+      "genre": "Tycoon",
+      "subgenre": "Simulation",
+      "description": "Build and manage your own pizza empire! Start with a small shop and expand to become the biggest pizza chain in Roblox. Hire staff, upgrade equipment, and serve customers.",
+      "created_date": "2021-08-10",
+      "last_updated": "2023-01-15",
+      "version": "2.1",
+      "max_players": 6,
+      "recommended_players": "1-6",
+      "difficulty": "Easy",
+      "estimated_playtime": "1-3 hours",
+      "tags": [
+        "tycoon",
+        "simulation",
+        "management",
+        "pizza",
+        "business"
+      ],
+      "features": [
+        "Complete pizza shop management",
+        "Staff hiring system",
+        "Equipment upgrades",
+        "Customer satisfaction mechanics",
+        "Multiplayer co-op support"
+      ],
+      "screenshots": [
+        "https://example.com/screenshots/tycoon1.png",
+        "https://example.com/screenshots/tycoon2.png"
+      ],
+      "video_url": "https://example.com/videos/tycoon_gameplay.mp4",
+      "rating": 4.2,
+      "total_ratings": 890,
+      "downloads": 5630,
+      "likes": 4120,
+      "dislikes": 280,
+      "comments_enabled": true,
+      "requires_roblox_studio": true,
+      "minimum_studio_version": "2021.06",
+      "compatibility": [
+        "Windows",
+        "Mac"
+      ],
+      "notes": "Best played with friends for maximum efficiency!"
+    },
+    {
+      "id": "fps_arena",
+      "name": "Block FPS Arena",
+      "file_type": "rbxl",
+      "file_name": "Block_FPS_Arena.rbxl",
+      "download_url": "https://github.com/blue16-team/blue16-web/raw/refs/heads/main/www/src/files/games/Block_FPS_Arena.rbxl",
+      "file_size": "12.3 MB",
+      "file_size_bytes": 12897484,
+      "md5_hash": "d41d8cd98f00b204e9800998ecf8427e",
+      "sha256_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "creator": "FPSDeveloper",
+      "creator_id": "456789123",
+      "genre": "First Person Shooter",
+      "subgenre": "Arena",
+      "description": "Fast-paced block-style FPS with multiple weapons, game modes, and maps. Battle against friends or AI in this action-packed arena shooter!",
+      "created_date": "2022-03-25",
+      "last_updated": "2023-06-10",
+      "version": "1.5",
+      "max_players": 12,
+      "recommended_players": "4-12",
+      "difficulty": "Hard",
+      "estimated_playtime": "10-20 minutes per match",
+      "tags": [
+        "fps",
+        "shooter",
+        "arena",
+        "multiplayer",
+        "competitive"
+      ],
+      "features": [
+        "Multiple weapon types",
+        "Various game modes (Deathmatch, Team Deathmatch, Capture the Flag)",
+        "Customizable loadouts",
+        "Map voting system",
+        "Killstreak rewards"
+      ],
+      "screenshots": [
+        "https://example.com/screenshots/fps1.png",
+        "https://example.com/screenshots/fps2.png",
+        "https://example.com/screenshots/fps3.png"
+      ],
+      "video_url": "https://example.com/videos/fps_gameplay.mp4",
+      "rating": 4.7,
+      "total_ratings": 2150,
+      "downloads": 32890,
+      "likes": 19850,
+      "dislikes": 980,
+      "comments_enabled": true,
+      "requires_roblox_studio": true,
+      "minimum_studio_version": "2022.01",
+      "compatibility": [
+        "Windows",
+        "Mac"
+      ],
+      "notes": "Requires good internet connection for smooth multiplayer experience."
+    },
+    {
+      "id": "racing_game",
+      "name": "Speed Racing Championship",
+      "file_type": "rbxl",
+      "file_name": "Speed_Racing_Championship.rbxl",
+      "download_url": "https://github.com/blue16-team/blue16-web/raw/refs/heads/main/www/src/files/games/Speed_Racing_Championship.rbxl",
+      "file_size": "15.8 MB",
+      "file_size_bytes": 16567500,
+      "md5_hash": "d41d8cd98f00b204e9800998ecf8427e",
+      "sha256_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "creator": "RaceMaster",
+      "creator_id": "789123456",
+      "genre": "Racing",
+      "subgenre": "Sports",
+      "description": "High-speed racing game with multiple tracks, customizable cars, and championship mode. Drift, boost, and race your way to victory!",
+      "created_date": "2021-11-05",
+      "last_updated": "2023-04-20",
+      "version": "3.0",
+      "max_players": 8,
+      "recommended_players": "2-8",
+      "difficulty": "Medium",
+      "estimated_playtime": "30-60 minutes per session",
+      "tags": [
+        "racing",
+        "sports",
+        "cars",
+        "drifting",
+        "championship"
+      ],
+      "features": [
+        "Multiple race tracks",
+        "Car customization system",
+        "Drift mechanics",
+        "Boost system",
+        "Championship mode with progression"
+      ],
+      "screenshots": [
+        "https://example.com/screenshots/racing1.png",
+        "https://example.com/screenshots/racing2.png"
+      ],
+      "video_url": "https://example.com/videos/racing_gameplay.mp4",
+      "rating": 4.3,
+      "total_ratings": 1680,
+      "downloads": 22450,
+      "likes": 13200,
+      "dislikes": 750,
+      "comments_enabled": true,
+      "requires_roblox_studio": true,
+      "minimum_studio_version": "2021.09",
+      "compatibility": [
+        "Windows",
+        "Mac",
+        "Linux"
+      ],
+      "notes": "Controller recommended for best experience."
+    },
+    {
+      "id": "building_model",
+      "name": "Modern House Building Set",
+      "file_type": "rbxm",
+      "file_name": "Modern_House_Building_Set.rbxm",
+      "download_url": "https://github.com/blue16-team/blue16-web/raw/refs/heads/main/www/src/files/games/Modern_House_Building_Set.rbxm",
+      "file_size": "4.2 MB",
+      "file_size_bytes": 4404019,
+      "md5_hash": "d41d8cd98f00b204e9800998ecf8427e",
+      "sha256_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "creator": "BuilderPro",
+      "creator_id": "321654987",
+      "genre": "Building",
+      "subgenre": "Model",
+      "description": "A comprehensive building set containing modern house components, furniture, and decorative items. Perfect for creating contemporary buildings in your games.",
+      "created_date": "2022-07-18",
+      "last_updated": "2023-02-28",
+      "version": "1.8",
+      "max_players": 1,
+      "recommended_players": "1",
+      "difficulty": "Easy",
+      "estimated_playtime": "N/A (Building asset)",
+      "tags": [
+        "building",
+        "model",
+        "house",
+        "furniture",
+        "modern",
+        "asset"
+      ],
+      "features": [
+        "Multiple house styles",
+        "Furniture collection",
+        "Decorative items",
+        "Modular building system",
+        "Customizable colors and materials"
+      ],
+      "screenshots": [
+        "https://example.com/screenshots/house1.png",
+        "https://example.com/screenshots/house2.png"
+      ],
+      "video_url": "https://example.com/videos/house_demo.mp4",
+      "rating": 4.8,
+      "total_ratings": 920,
+      "downloads": 8750,
+      "likes": 6800,
+      "dislikes": 120,
+      "comments_enabled": true,
+      "requires_roblox_studio": true,
+      "minimum_studio_version": "2022.03",
+      "compatibility": [
+        "Windows",
+        "Mac",
+        "Linux"
+      ],
+      "notes": "This is a model package, not a playable game. Import into Roblox Studio to use."
+    }
+  ],
+  "metadata": {
+    "total_games": 5,
+    "total_file_types": [
+      "rbxl",
+      "rbxm"
+    ],
+    "last_updated": "2024-01-15T00:00:00Z",
+    "api_version": "1.0",
+    "supported_platforms": [
+      "Windows",
+      "Mac",
+      "Linux"
+    ],
+    "download_base_url": "https://github.com/blue16-team/blue16-web/raw/refs/heads/main/www/src/files/games/",
+    "file_formats": [
+      "rbxl",
+      "rbxm"
+    ],
+    "checksum_algorithm": "sha256",
+    "genres": [
+      "Obstacle Course",
+      "Tycoon",
+      "First Person Shooter",
+      "Racing",
+      "Building"
+    ]
+  },
+  "download_instructions": {
+    "general": {
+      "steps": [
+        "Download the game file (.rbxl or .rbxm) for your desired game",
+        "Open Roblox Studio",
+        "For .rbxl files: File > Open and select the downloaded file",
+        "For .rbxm files: Insert > Model and select the downloaded file",
+        "Test the game in Studio or publish to Roblox",
+        "Enjoy playing or building!"
+      ],
+      "requirements": [
+        "Roblox Studio installed",
+        "Stable internet connection",
+        "Adequate storage space for game files",
+        "Computer meeting Roblox Studio system requirements"
+      ],
+      "file_types": {
+        "rbxl": "Roblox Place File - Complete game or place",
+        "rbxm": "Roblox Model File - Building assets or models"
+      }
+    }
+  }
+}

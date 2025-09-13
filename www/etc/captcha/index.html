@@ -71,12 +71,34 @@
       pointer-events: auto;
     }
     .limbo-glow { box-shadow: 0 0 20px 8px #0f0; }
+    /* Limbo timer */
+    #limboTimer {
+      position: absolute; top: 8px; right: 8px;
+      background: #000; color: #0f0; padding: 6px 10px;
+      border-radius: 6px; font-weight: bold; display:none;
+    }
+    /* Emoji stage */
+    #emojiStage { display:none; text-align:center; }
+    #emojiGrid { display:grid; grid-template-columns: repeat(4, 70px); gap:12px; justify-content:center; margin-top:12px; }
+    .emojiBtn { font-size: 32px; width:70px; height:70px; border-radius:12px; border:2px solid #bbb; cursor:pointer; background:#fafafa; transition:.2s; }
+    /* Bubble stage */
+    #bubbleStage { display:none; text-align:center; }
+    #bubbleWrap { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:12px; max-width:420px; }
+    .bubble { width:60px; height:60px; border-radius:50%; background:#e0f7fa; box-shadow: inset -6px -8px 16px #b2ebf2, inset 6px 8px 12px #fff; cursor:pointer; transition:.15s; }
+    .bubble.popped { background:#eee; box-shadow:none; transform: scale(0.9); }
   </style>
 </head>
 <body>
   <!-- Add this where you like, e.g. at the top of <body> -->
 <button id="speedrunToggleBtn" style="position:fixed;top:18px;right:18px;z-index:1000;font-size:18px;padding:6px 18px;border-radius:8px;cursor:pointer;">Speedrun: OFF</button>
 <div id="speedrunTimer" style="display:none;position:fixed;top:16px;left:16px;padding:7px 18px;background:#222;color:#fff;border-radius:9px;font-size:19px;z-index:2000;box-shadow:0 2px 10px #0003;">⏱️ <span id="speedrunTimeValue">0.00</span> s</div>
+
+<!-- Dev tools toggle and panel -->
+<button id="devToggleBtn" style="position:fixed;top:62px;right:18px;z-index:1100;font-size:16px;padding:6px 14px;border-radius:8px;cursor:pointer;background:#eee;">Dev: OFF</button>
+<div id="devPanel" style="display:none;position:fixed;top:108px;right:18px;background:#1e1e1e;color:#fff;padding:10px 12px;border-radius:10px;z-index:1100;box-shadow:0 4px 18px #0006;min-width:180px;">
+  <div style="font-weight:bold;margin-bottom:8px;">Dev Tools</div>
+  <button id="devSkipBtn" style="width:100%;padding:8px 10px;border-radius:8px;border:0;background:#3498db;color:#fff;cursor:pointer;">Skip Stage ➡️</button>
+</div>
 
   <div class="captcha" id="captcha">
     <div class="checkbox-box" id="cbox"></div>
@@ -97,6 +119,20 @@
 <p id="answerFeedback"></p>
 </div>
 <div id="limboKeysStage"></div>
+
+<!-- Odd Emoji Out Stage -->
+<div id="emojiStage">
+  <h3>Find the odd emoji out</h3>
+  <div id="emojiGrid"></div>
+  <p id="emojiFeedback" style="font-weight:bold;margin-top:10px;"></p>
+</div>
+
+<!-- Bubble Wrap Stage -->
+<div id="bubbleStage">
+  <h3>Pop 10 bubbles to proceed</h3>
+  <div id="bubbleWrap"></div>
+  <p id="bubbleFeedback" style="font-weight:bold;margin-top:10px;"></p>
+</div>
 
 <div class="end" id="end" style="display:none;">
   <h4>
@@ -142,7 +178,8 @@ let keyValidated = false;
       { src: "https://blue16.site/etc/captcha/images/mango.webp", label: 'mango' },
       { src: "https://blue16.site/etc/captcha/images/jackpot.jpg", label: 'jackpot' },
       { src: "https://blue16.site/etc/captcha/images/key.jpg", label: 'key' },
-      { src: "https://blue16.site/etc/captcha/images/peach.jpg", label: 'peach' }
+      { src: "https://blue16.site/etc/captcha/images/peach.jpg", label: 'peach' },
+      { src: "https://blue16.site/etc/captcha/images/sigmund.png", label: 'sigmund' }
     ];
     const segments = imageSources.map(({ src, label }) => {
      if (!src) return { image: null, label };
@@ -168,6 +205,139 @@ let speedrunFinalTime = null;
 const speedrunToggleBtn = document.getElementById('speedrunToggleBtn');
 const speedrunTimerDiv = document.getElementById('speedrunTimer');
 const speedrunTimeValue = document.getElementById('speedrunTimeValue');
+
+// Dev tools state
+window.devSettings = window.devSettings || { enabled: false };
+const devToggleBtn = document.getElementById('devToggleBtn');
+const devPanel = document.getElementById('devPanel');
+const devSkipBtn = document.getElementById('devSkipBtn');
+
+function updateDevToggle() {
+  devToggleBtn.textContent = 'Dev: ' + (window.devSettings.enabled ? 'ON' : 'OFF');
+  devToggleBtn.style.background = window.devSettings.enabled ? '#ffeb3b' : '#eee';
+  devPanel.style.display = window.devSettings.enabled ? 'block' : 'none';
+}
+devToggleBtn.onclick = function() {
+  window.devSettings.enabled = !window.devSettings.enabled;
+  updateDevToggle();
+};
+updateDevToggle();
+
+// Dev Tools: Skip Stage logic
+function devRemoveOverlays() {
+  const rain = document.getElementById('coinRainCanvas');
+  if (rain) rain.remove();
+  // Remove any fullscreen fixed images (fruit overlays)
+  document.querySelectorAll('img').forEach(img => {
+    const st = img.style || {};
+    if (img.id === 'sigmundForeverOverlay') return; // preserve Sigmund overlay
+    if (st.position === 'fixed' && (st.zIndex === '9999' || parseInt(st.zIndex) >= 9999)) {
+      try { img.remove(); } catch (e) {}
+    }
+  });
+}
+
+// Persistent Sigmund overlay (stays until reload)
+function showSigmundForever() {
+  if (document.getElementById('sigmundForeverOverlay')) return;
+  const seg = segments.find(s => s.label === 'sigmund');
+  const src = seg && seg.image ? seg.image.src : 'https://blue16.site/etc/captcha/images/sigmund.png';
+  const img = document.createElement('img');
+  img.id = 'sigmundForeverOverlay';
+  img.src = src;
+  img.style.position = 'fixed';
+  img.style.top = '0';
+  img.style.left = '0';
+  img.style.width = '100vw';
+  img.style.height = '100vh';
+  img.style.objectFit = 'contain';
+  img.style.zIndex = '10001';
+  img.style.pointerEvents = 'none'; // do not block UI
+  img.style.background = 'rgba(255,255,255,1)';
+  document.body.appendChild(img);
+}
+
+function devSkipStage() {
+  if (!window.devSettings.enabled) return;
+  devRemoveOverlays();
+  const el = (id) => document.getElementById(id);
+  const isShown = (node) => node && node.style && node.style.display !== 'none';
+
+  // Force-stop Limbo timers if they exist
+  if (window.limboRotIv) { try { clearInterval(window.limboRotIv); } catch(e) {} window.limboRotIv = null; }
+  if (window.limboTimerIv) { try { clearInterval(window.limboTimerIv); } catch(e) {} window.limboTimerIv = null; }
+  window.limboActive = false;
+
+  const captcha = el('captcha');
+  const wheel = el('wheelCanvas');
+  const spinBtn = el('spinAgain');
+  const math = el('mathStage');
+  const limbo = el('limboKeysStage');
+  const volt = el('voltStage');
+  const emoji = el('emojiStage');
+  const bubble = el('bubbleStage');
+  const end = el('end');
+
+  // Early stages → go to math
+  if (isShown(captcha) || isShown(wheel)) {
+    if (!window.captchaSettings.speedrunMode && !speedrunStartTime) {
+      startSpeedrunTimer();
+    }
+    if (captcha) captcha.style.display = 'none';
+    if (wheel) { wheel.style.display = 'none'; }
+    if (spinBtn) { spinBtn.style.display = 'none'; }
+    renderMathQuiz();
+    return;
+  }
+
+  // Math → Limbo
+  if (isShown(math)) {
+    launchLimboKeysStage();
+    return;
+  }
+
+  // Limbo → Volt
+  if (isShown(limbo)) {
+    // Extra safety: stop any limbo timers before leaving
+    if (window.limboRotIv) { try { clearInterval(window.limboRotIv); } catch(e) {} window.limboRotIv = null; }
+    if (window.limboTimerIv) { try { clearInterval(window.limboTimerIv); } catch(e) {} window.limboTimerIv = null; }
+    window.limboActive = false;
+    // Hide limbo UI and remove its timer badge if present
+    try { limbo.style.display = 'none'; } catch(e) {}
+    const lt = document.getElementById('limboTimer');
+    if (lt && lt.parentElement) { try { lt.parentElement.removeChild(lt); } catch(e) {} }
+    launchVoltStageTricky(3); // jump to final volt round
+    return;
+  }
+
+  // Volt → Emoji
+  if (isShown(volt)) {
+    volt.style.display = 'none';
+    launchEmojiStage();
+    return;
+  }
+
+  // Emoji → Bubble
+  if (isShown(emoji)) {
+    emoji.style.display = 'none';
+    launchBubbleStage();
+    return;
+  }
+
+  // Bubble → End
+  if (isShown(bubble)) {
+    bubble.style.display = 'none';
+    stopSpeedrunTimer();
+    el('end').style.display = 'block';
+    return;
+  }
+
+  // If at end, do nothing
+}
+
+devSkipBtn.onclick = function() {
+  devSkipStage();
+};
 
 // Toggler logic
 function updateSpeedrunToggleBtn() {
@@ -211,28 +381,144 @@ function stopSpeedrunTimer() {
     clearInterval(speedrunTimerInterval);
   }
 }
+
+// Jackpot visuals and spin-to-jackpot logic
+const coinImg = new Image();
+let coinImageReady = false;
+coinImg.src = 'https://blue16.site/etc/captcha/images/coin.png';
+coinImg.onload = () => { coinImageReady = true; };
+const jackpotAudio = new Audio('https://blue16.site/etc/captcha/audios/jackpot.mp3');
+
+function playJackpotAndCoins() {
+  // Full-screen overlay canvas for coin rain
+  const rainCanvas = document.createElement('canvas');
+  rainCanvas.id = 'coinRainCanvas';
+  rainCanvas.style.position = 'fixed';
+  rainCanvas.style.top = '0';
+  rainCanvas.style.left = '0';
+  rainCanvas.style.width = '100vw';
+  rainCanvas.style.height = '100vh';
+  rainCanvas.style.pointerEvents = 'none';
+  rainCanvas.style.zIndex = '10000';
+  document.body.appendChild(rainCanvas);
+
+  function resize() {
+    rainCanvas.width = window.innerWidth;
+    rainCanvas.height = window.innerHeight;
+  }
+  resize();
+  const rainCtx = rainCanvas.getContext('2d');
+
+  const coins = [];
+  let produced = 0;
+  function createCoin() {
+    coins.push({
+      x: Math.random() * rainCanvas.width,
+      y: -20,
+      vy: 2 + Math.random() * 3,
+      size: 20 + Math.random() * 20,
+      rot: Math.random() * Math.PI * 2,
+      vrot: (Math.random() - 0.5) * 0.2
+    });
+    produced++;
+  }
+  const totalCoins = 80;
+  for (let i = 0; i < totalCoins; i++) setTimeout(createCoin, i * 60);
+
+  let animId;
+  function animateCoins() {
+    animId = requestAnimationFrame(animateCoins);
+    if (!coinImageReady) return;
+    rainCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
+    // Update/draw coins
+    for (let i = coins.length - 1; i >= 0; i--) {
+      const c = coins[i];
+      c.y += c.vy; c.rot += c.vrot;
+      rainCtx.save();
+      rainCtx.translate(c.x, c.y);
+      rainCtx.rotate(c.rot);
+      rainCtx.drawImage(coinImg, -c.size/2, -c.size/2, c.size, c.size);
+      rainCtx.restore();
+      if (c.y - c.size > rainCanvas.height) coins.splice(i, 1);
+    }
+    // Stop when all coins have spawned and none remain visible
+    if (produced >= totalCoins && coins.length === 0 && document.body.contains(rainCanvas)) {
+      cancelAnimationFrame(animId);
+      rainCanvas.remove();
+      return;
+    }
+  }
+  animateCoins();
+  // Optional: cleanup on resize
+  const onResize = () => resize();
+  window.addEventListener('resize', onResize);
+  const observer = new MutationObserver(() => {
+    if (!document.body.contains(rainCanvas)) {
+      window.removeEventListener('resize', onResize);
+      observer.disconnect();
+    }
+  });
+  observer.observe(document.body, { childList: true });
+}
+
+function dazzlingJackpotEffect() {
+  try { jackpotAudio.currentTime = 0; jackpotAudio.play(); } catch (e) {}
+  const orig = canvas.style.border;
+  let flashes = 0;
+  const iv = setInterval(() => {
+    canvas.style.border = (flashes % 2 === 0) ? '8px solid gold' : orig;
+    flashes++;
+    if (flashes > 8) { clearInterval(iv); canvas.style.border = orig; }
+  }, 150);
+}
+
+function triggerKeyToJackpot(normAngle) {
+  const jackpotIndex = segments.findIndex(s => s.label === 'jackpot');
+  if (jackpotIndex < 0) return;
+  const targetAngle = 2 * Math.PI * (num - jackpotIndex) / num;
+  const delta = ((normAngle - targetAngle + 2*Math.PI) % (2*Math.PI));
+  const totalFrames = 60;
+  let frame = 0;
+  const startAng = angle;
+
+  function wobble() {
+    frame++;
+    const t = frame / totalFrames;
+    angle = startAng - delta * (1 - Math.pow(1 - t, 3));
+    drawWheel(angle);
+    if (frame < totalFrames) requestAnimationFrame(wobble);
+    else {
+      dazzlingJackpotEffect();
+      canvas.classList.add('jackpot-active');
+      playJackpotAndCoins();
+      setTimeout(() => { canvas.classList.remove('jackpot-active'); }, 5000);
+      console.log('Tricked to Jackpot!');
+    }
+  }
+  wobble();
+}
     
     function loadAllImages(callback) {
      let loaded = 0;
      const total = segments.filter(s => s.image).length;
     
      if (total === 0) {
-       callback();
-       return;
+       callback();
+       return;
      }
     
      segments.forEach(seg => {
-       if (seg.image) {
-         seg.image.onload = () => {
-           loaded++;
-           if (loaded === total) callback();
-         };
-         seg.image.onerror = () => {
-           console.warn(`Failed to load image: ${seg.image.src}`);
-           loaded++;
-           if (loaded === total) callback();
-         };
-       }
+       if (seg.image) {
+         seg.image.onload = () => {
+           loaded++;
+           if (loaded === total) callback();
+         };
+         seg.image.onerror = () => {
+           console.warn(`Failed to load image: ${seg.image.src}`);
+           loaded++;
+           if (loaded === total) callback();
+         };
+       }
      });
     }
 
@@ -280,6 +566,7 @@ function pickMathQuestion() {
 
 function renderMathQuiz() {
   const quiz = pickMathQuestion();
+  window.currentMathQ = quiz; // track for submit
   const canvas = document.getElementById('mathCanvas');
   const ctx = canvas.getContext('2d');
   drawWrappedText(ctx, canvas, quiz.q);
@@ -290,7 +577,6 @@ function renderMathQuiz() {
   const hintBtn = document.getElementById('revealHint');
   const hintText = document.getElementById('hintFeedback');
   const answerInput = document.getElementById('userAnswer');
-  const submitBtn = document.getElementById('submitAnswer');
   const feedback = document.getElementById('answerFeedback');
 
   hintBtn.disabled = false;
@@ -302,17 +588,6 @@ function renderMathQuiz() {
     const hintPool = Math.random() < 0.5 ? realHints : fakeHints;
     hintText.textContent = hintPool[Math.floor(Math.random() * hintPool.length)];
     hintBtn.disabled = false;
-  };
-
-  submitBtn.onclick = () => {
-    if (!quiz.a) {
-      feedback.textContent = "Solutions aren't auto-checkable.";
-    } else if (answerInput.value.trim() === quiz.a) {
-      feedback.textContent = "Correct.";
-      launchLimboKeysStage();
-    } else {
-      feedback.textContent = "Incorrect.";
-    }
   };
 }
 
@@ -342,61 +617,270 @@ function drawWrappedText(ctx, canvas, text) {
   ctx.fillText(line, 20, y);
 }
 
+function showFruitFullscreen(label) {
+  const seg = segments.find(s => s.label === label);
+  if (!seg || !seg.image) return;
+
+  // Fullscreen overlay
+  const overlayImg = document.createElement('img');
+  overlayImg.src = seg.image.src;
+  overlayImg.style.position = 'fixed';
+  overlayImg.style.top = 0;
+  overlayImg.style.left = 0;
+  overlayImg.style.width = '100vw';
+  overlayImg.style.height = '100vh';
+  overlayImg.style.objectFit = 'contain';
+  overlayImg.style.zIndex = 9999;
+  overlayImg.style.backgroundColor = 'rgba(255,255,255,1)';
+  document.body.appendChild(overlayImg);
+
+  // Minimum display time
+  const MIN_MS = 900;
+  const start = performance.now();
+  let canDismiss = false;
+  setTimeout(() => { canDismiss = true; }, MIN_MS);
+
+  function safeRemove() {
+    const remain = MIN_MS - (performance.now() - start);
+    if (remain > 0) {
+      setTimeout(() => overlayImg.remove(), remain);
+    } else {
+      overlayImg.remove();
+    }
+  }
+
+  // Play sound if mapped; otherwise fallback timeout
+  const audio = fruitAudioMap[label];
+  if (audio) {
+    try {
+      audio.currentTime = 0;
+      const p = audio.play();
+      if (p && typeof p.then === 'function') {
+        p.catch(() => setTimeout(safeRemove, 1200));
+      }
+      const onEnded = () => { audio.removeEventListener('ended', onEnded); safeRemove(); };
+      audio.addEventListener('ended', onEnded);
+    } catch (e) {
+      setTimeout(safeRemove, 1200);
+    }
+  } else {
+    setTimeout(safeRemove, 1000);
+  }
+
+  // Allow user dismiss after min time
+  overlayImg.addEventListener('click', () => { if (canDismiss) safeRemove(); });
+}
+
 function blockCopyPaste(el) {
   ['copy', 'paste', 'cut', 'contextmenu'].forEach(evt =>
     el.addEventListener(evt, e => e.preventDefault())
   );
 }
 
+function launchLimboKeysStage(round = 1) {
+  document.getElementById('mathStage').style.display = 'none';
+  const limboDiv = document.getElementById('limboKeysStage');
+  limboDiv.style.display = 'block';
+  limboDiv.innerHTML = ''; // reset
 
+  // Add/Show timer
+  const timer = document.createElement('div');
+  timer.id = 'limboTimer';
+  timer.textContent = '10.0s';
+  limboDiv.appendChild(timer);
+  timer.style.display = 'block';
 
+  const N = 16 + (round - 1) * 4; // harder each round
+  const R = 160;
+  const orbiters = [];
+  const keys = [];
+  let correct = Math.floor(Math.random() * N);
 
-    function drawWheel(baseAngle = 0) {
-      const anglePer = (2 * Math.PI) / num;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // 1. Start in a centered grid
+  const gridSize = Math.ceil(Math.sqrt(N));
+  const spacing = 70;
+  const offset = (gridSize - 1) * spacing / 2;
+  for (let i = 0; i < N; i++) {
+    const row = Math.floor(i / gridSize);
+    const col = i % gridSize;
+    const x = (col * spacing) - offset;
+    const y = (row * spacing) - offset;
 
-      segments.forEach((seg, i) => {
-        const start = baseAngle + i * anglePer;
-        const end = start + anglePer;
-        ctx.beginPath();
-        ctx.moveTo(center, center);
-        ctx.arc(center, center, radius, start, end);
-       ctx.fillStyle = i % 3 === 0 ? '#b0e0e6' : 
-               i % 3 === 1 ? '#ffcccb' : 
-               '#13c4d4';
-        ctx.fill();
+    const orbiter = document.createElement('div');
+    orbiter.className = 'limbo-orbiter';
+    orbiter.style.transform = `translate(${x}px, ${y}px)`;
 
-        const midAngle = start + anglePer/2;
-        const imgX = center + Math.cos(midAngle) * radius * 0.6;
-        const imgY = center + Math.sin(midAngle) * radius * 0.6;
-        const size = radius * 0.3;
+    const k = document.createElement('div');
+    k.className = 'limbo-key';
+    k.textContent = '🔑';
+    k.style.transform = `translate(0,0)`;
+    orbiter.appendChild(k);
+    limboDiv.appendChild(orbiter);
 
-        if (seg.image && seg.image.complete && seg.image.naturalWidth !== 0) {
-       ctx.drawImage(seg.image, imgX - size / 2, imgY - size / 2, size, size);
-      } else {
-       // fallback: draw label instead
-       ctx.save();
-       ctx.fillStyle = '#000';
-       ctx.font = '16px Arial';
-       ctx.textAlign = 'center';
-       ctx.translate(imgX, imgY);
-       ctx.rotate(midAngle + Math.PI / 2);
-       ctx.fillText(seg.label, 0, 0);
-       ctx.restore();
-      }
+    orbiters.push(orbiter);
+    keys.push(k);
+  }
 
+  // 2. Glow correct key for orientation (short)
+  keys[correct].classList.add('limbo-glow');
+  setTimeout(() => {
+    keys[correct].classList.remove('limbo-glow');
+
+    // 3. Shatter (scatter near center)
+    const scatter = setInterval(() => {
+      orbiters.forEach((orb, i) => {
+        const dx = (Math.random() - 0.5) * 160;
+        const dy = (Math.random() - 0.5) * 160;
+        orb.style.transform = `translate(${dx}px,${dy}px)`;
+        keys[i].style.transform = `translate(0,0)`;
+      });
+    }, 100);
+
+    setTimeout(() => {
+      clearInterval(scatter);
+
+      // 4. Snap into circle and start rotation speeds
+      const speeds = [];
+      orbiters.forEach((orb, i) => {
+        const baseAngle = (360 / N) * i;
+        orb.style.transform = `rotate(${baseAngle}deg)`;
+        speeds[i] = (Math.random() * 0.6 + 0.2) * (i % 2 === 0 ? 1 : -1) * (round); // cw/ccw variety
+      });
+      keys.forEach((k, i) => {
+        const baseAngle = (360 / N) * i;
+        k.style.transform = `translate(${R}px,0) rotate(${-baseAngle}deg)`;
       });
 
-      // indicator arrow
-      ctx.beginPath();
-      ctx.moveTo(center + radius - 10, center);
-      ctx.lineTo(center + radius + 20, center - 10);
-      ctx.lineTo(center + radius + 20, center + 10);
-      ctx.fillStyle = '#333';
-      ctx.fill();
-    }
-    let spinning = false;
-    let angle = 0, velocity = 0, friction = 0.99;
+      // Rotation animation
+      // Clear any previous limbo intervals
+      if (window.limboRotIv) { try { clearInterval(window.limboRotIv); } catch(e) {} window.limboRotIv = null; }
+      if (window.limboTimerIv) { try { clearInterval(window.limboTimerIv); } catch(e) {} window.limboTimerIv = null; }
+      window.limboActive = true;
+      let rotFrame = 0;
+      const rotIv = setInterval(() => {
+        rotFrame++;
+        orbiters.forEach((orb, i) => {
+          const a = ((360 / N) * i) + rotFrame * speeds[i];
+          orb.style.transform = `rotate(${a}deg)`;
+          keys[i].style.transform = `translate(${R}px,0) rotate(${-a}deg)`;
+        });
+      }, 40);
+      window.limboRotIv = rotIv;
+
+      // Countdown timer
+      let t = 10 - (round - 1) * 2; // 10s then 8s
+      const tIv = setInterval(() => {
+        // If limbo got aborted (e.g., via dev skip), stop timers silently
+        if (!window.limboActive || limboDiv.style.display === 'none') {
+          clearInterval(tIv); clearInterval(rotIv);
+          window.limboTimerIv = null; window.limboRotIv = null;
+          return;
+        }
+        t -= 0.1;
+        timer.textContent = t.toFixed(1) + 's';
+        if (t <= 0) {
+          clearInterval(tIv); clearInterval(rotIv);
+          window.limboActive = false; window.limboTimerIv = null; window.limboRotIv = null;
+          // In Dev mode, do not interrupt flow on timeouts
+          if (window.devSettings && window.devSettings.enabled) {
+            return;
+          }
+          alert('Time up!');
+          location.reload();
+        }
+      }, 100);
+      window.limboTimerIv = tIv;
+
+      // Click handlers
+      keys.forEach((k, i) => {
+        k.onclick = () => {
+          clearInterval(tIv); clearInterval(rotIv);
+          window.limboActive = false;
+          window.limboRotIv = null; window.limboTimerIv = null;
+          if (i === correct) {
+            alert('nice');
+            if (round < 2) {
+              // Next harder round
+              setTimeout(() => launchLimboKeysStage(round + 1), 300);
+            } else {
+              // Proceed
+              launchVoltStageTricky();
+            }
+          } else {
+            alert('nope');
+            location.reload();
+          }
+        };
+      });
+    }, 1500); // scatter duration
+  }, 1200); // glow duration
+}
+
+// Patch math quiz submit to trigger Limbo Keys stage on correct
+document.getElementById('submitAnswer').onclick = function() {
+  const mathCanvas = document.getElementById('mathCanvas');
+  const ctx = mathCanvas.getContext('2d');
+  // Get the current question
+  const currentQ = window.currentMathQ;
+  const feedback = document.getElementById('answerFeedback');
+  const answerInput = document.getElementById('userAnswer');
+  if (!window.currentMathQ || !window.currentMathQ.a) {
+    feedback.textContent = "Solutions aren't auto-checkable.";
+  } else if (answerInput.value.trim() === window.currentMathQ.a) {
+    feedback.textContent = "Correct.";
+    setTimeout(launchLimboKeysStage, 1000);
+  } else {
+    feedback.textContent = "Incorrect.";
+  }
+};
+
+function drawWheel(baseAngle = 0) {
+  const anglePer = (2 * Math.PI) / num;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  segments.forEach((seg, i) => {
+    const start = baseAngle + i * anglePer;
+    const end = start + anglePer;
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.arc(center, center, radius, start, end);
+   ctx.fillStyle = i % 3 === 0 ? '#b0e0e6' : 
+               i % 3 === 1 ? '#ffcccb' : 
+               '#13c4d4';
+    ctx.fill();
+
+    const midAngle = start + anglePer/2;
+    const imgX = center + Math.cos(midAngle) * radius * 0.6;
+    const imgY = center + Math.sin(midAngle) * radius * 0.6;
+    const size = radius * 0.3;
+
+    if (seg.image && seg.image.complete && seg.image.naturalWidth !== 0) {
+   ctx.drawImage(seg.image, imgX - size / 2, imgY - size / 2, size, size);
+  } else {
+   // fallback: draw label instead
+   ctx.save();
+   ctx.fillStyle = '#000';
+   ctx.font = '16px Arial';
+   ctx.textAlign = 'center';
+   ctx.translate(imgX, imgY);
+   ctx.rotate(midAngle + Math.PI / 2);
+   ctx.fillText(seg.label, 0, 0);
+   ctx.restore();
+  }
+
+  });
+
+  // indicator arrow
+  ctx.beginPath();
+  ctx.moveTo(center + radius - 10, center);
+  ctx.lineTo(center + radius + 20, center - 10);
+  ctx.lineTo(center + radius + 20, center + 10);
+  ctx.fillStyle = '#333';
+  ctx.fill();
+}
+
+let spinning = false;
+let angle = 0, velocity = 0, friction = 0.99;
 
 function startSpin() {
   velocity = Math.random() * 0.05 + 0.03;
@@ -425,22 +909,28 @@ function animate() {
     if (result === 'key') {
   if (!hasTrolled) {
     hasTrolled = true;
-    triggerKeyToJackpot(normAngle);
+    triggerKeyToJackpot(normalized);
     console.log('First key → trolled!');
   } else {
-    console.log('Second key → validated, opening math stage');
+    console.log('Second key → validated, opening math stage')
   canvas.style.display = spinAgainBtn.style.display = 'none';
     renderMathQuiz();
   }
     } else {
-      if (result === 'jackpot') { dazzlingJackpotEffect();
-      canvas.classList.add('jackpot-active');
-    playJackpotAndCoins();
-    setTimeout(() => {
-      canvas.classList.remove('jackpot-active');
-    }, 5000);
+      if (result === 'jackpot') {
+        dazzlingJackpotEffect();
+        canvas.classList.add('jackpot-active');
+        playJackpotAndCoins();
+        setTimeout(() => {
+          canvas.classList.remove('jackpot-active');
+        }, 5000);
+      } else if (result === 'sigmund') {
+        // Show Sigmund forever and do not show fruit overlay
+        showSigmundForever();
+      } else if (result !== 'key') {
+        // Only show fruit fullscreen for actual fruits, not jackpot/key
+        showFruitFullscreen(result);
       }
-      showFruitFullscreen(result);
       console.log(`Result: ${result}`);
     }
 
@@ -448,256 +938,6 @@ function animate() {
     drawWheel(angle);
     requestAnimationFrame(animate);
   }
-}
-
-function launchLimboKeysStage() {
-      document.getElementById('mathStage').style.display = 'none';
-      const limboDiv = document.getElementById('limboKeysStage');
-      limboDiv.style.display = 'block';
-      limboDiv.innerHTML = ''; // reset
-
-      const N = 10, R = 150;
-      const orbiters = [];
-      const keys = [];
-      const correct = Math.floor(Math.random() * N);
-
-      // 1. Start in a centered grid
-      const gridSize = Math.ceil(Math.sqrt(N));
-      const spacing = 70;
-      const offset = (gridSize - 1) * spacing / 2;
-      for (let i = 0; i < N; i++) {
-        const row = Math.floor(i / gridSize);
-        const col = i % gridSize;
-        const x = (col * spacing) - offset;
-        const y = (row * spacing) - offset;
-
-        const orbiter = document.createElement('div');
-        orbiter.className = 'limbo-orbiter';
-        orbiter.style.transform = `translate(${x}px, ${y}px)`;
-
-        const k = document.createElement('div');
-        k.className = 'limbo-key';
-        k.textContent = '🔑';
-        k.style.transform = `translate(0,0)`;
-        orbiter.appendChild(k);
-        limboDiv.appendChild(orbiter);
-
-        orbiters.push(orbiter);
-        keys.push(k);
-      }
-
-      // 2. Glow correct key for orientation
-      keys[correct].classList.add('limbo-glow');
-      setTimeout(() => {
-        keys[correct].classList.remove('limbo-glow');
-
-        // 3. Shatter (scatter near center)
-        const scatter = setInterval(() => {
-          orbiters.forEach((orb, i) => {
-            const dx = (Math.random() - 0.5) * 160;
-            const dy = (Math.random() - 0.5) * 160;
-            orb.style.transform = `translate(${dx}px,${dy}px)`;
-            keys[i].style.transform = `translate(0,0)`;
-          });
-        }, 100);
-
-        setTimeout(() => {
-          clearInterval(scatter);
-
-          // 4. Snap into static circle (no orbit animation)
-          orbiters.forEach((orb, i) => {
-            const angle = (360 / N) * i;
-            orb.style.transform = `rotate(${angle}deg)`;
-          });
-          keys.forEach((k, i) => {
-            const angle = (360 / N) * i;
-            k.style.transform = `translate(${R}px,0) rotate(${-angle}deg)`;
-            k.onclick = () => {
-              if (i === correct) {
-                alert('lol');
-                launchVoltStageTricky();
-              } else {
-                alert('lol');
-                location.reload();
-              }
-            };
-          });
-        }, 2000); // scatter duration
-      }, 2000); // glow duration
-    }
-
-    // Patch math quiz submit to trigger Limbo Keys stage on correct
-    document.getElementById('submitAnswer').onclick = function() {
-      const mathCanvas = document.getElementById('mathCanvas');
-      const ctx = mathCanvas.getContext('2d');
-      // Get the current question
-      const currentQ = window.currentMathQ;
-      const feedback = document.getElementById('answerFeedback');
-      const answerInput = document.getElementById('userAnswer');
-      if (!window.currentMathQ || !window.currentMathQ.a) {
-        feedback.textContent = "Solutions aren't auto-checkable.";
-      } else if (answerInput.value.trim() === window.currentMathQ.a) {
-        feedback.textContent = "Correct.";
-        setTimeout(launchLimboKeysStage, 1000);
-      } else {
-        feedback.textContent = "Incorrect.";
-      }
-    };
-
-    // Patch renderMathQuiz to track current question
-    function renderMathQuiz() {
-      const quiz = pickMathQuestion();
-      window.currentMathQ = quiz; // track for submit
-      const canvas = document.getElementById('mathCanvas');
-      const ctx = canvas.getContext('2d');
-      drawWrappedText(ctx, canvas, quiz.q);
-      
-      document.getElementById('wheelCanvas').style.display = spinAgainBtn.style.display = 'none';
-      document.getElementById('mathStage').style.display = 'block';
-
-      const hintBtn = document.getElementById('revealHint');
-      const hintText = document.getElementById('hintFeedback');
-      const answerInput = document.getElementById('userAnswer');
-      const feedback = document.getElementById('answerFeedback');
-
-      hintBtn.disabled = false;
-      hintText.textContent = '';
-      feedback.textContent = '';
-      answerInput.value = '';
-
-      hintBtn.onclick = () => {
-        const hintPool = Math.random() < 0.5 ? realHints : fakeHints;
-        hintText.textContent = hintPool[Math.floor(Math.random() * hintPool.length)];
-        hintBtn.disabled = false;
-      };
-    }
-
-function showFruitFullscreen(label) {
-  const seg = segments.find(s => s.label === label);
-  if (!seg || !seg.image) return;
-
-  // Create fullscreen overlay image
-  const overlayImg = document.createElement('img');
-  overlayImg.src = seg.image.src;
-  overlayImg.style.position = 'fixed';
-  overlayImg.style.top = 0;
-  overlayImg.style.left = 0;
-  overlayImg.style.width = '100vw';
-  overlayImg.style.height = '100vh';
-  overlayImg.style.objectFit = 'contain';
-  overlayImg.style.zIndex = 9999;
-  overlayImg.style.backgroundColor = 'rgba(255,255,255,1)';
-  document.body.appendChild(overlayImg);
-
-  // Create and play sound
-  const audio = fruitAudioMap[label];
-  if (audio) {
-    audio.currentTime = 0;
-    audio.play().catch(e => console.warn('Audio failed:', e));
-    audio.addEventListener('ended', () => overlayImg.remove());
-  } else {
-    overlayImg.remove();
-  }
-}
-
-
-//test
-
-
-const coinImg = new Image();
-const normAngle = 0
-coinImg.src = 'https://blue16.site/etc/captcha/images/coin.png';
-let coinImageReady = false;
-coinImg.onload = () => { coinImageReady = true; };
-const jackpotAudio = new Audio('https://blue16.site/etc/captcha/audios/jackpot.mp3');
-
-function playJackpotAndCoins() {
-  
-  const coins = [];
-  function createCoin() {
-    coins.push({
-      x: Math.random() * canvas.width,
-      y: -20,
-      vy: 2 + Math.random() * 3,
-      size: 20 + Math.random() * 20,
-      rot: Math.random() * Math.PI * 2,
-      vrot: (Math.random() - 0.5) * 0.2
-    });
-  }
-
-  for (let i = 0; i < 30; i++) {
-    setTimeout(createCoin, i * 100);
-  }
-
-  function animateCoins() {
-    if (!coinImageReady) return requestAnimationFrame(animateCoins);
-    if (coins.length === 0) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawWheel(angle);
-    coins.forEach((c, i) => {
-      c.y += c.vy;
-      c.rot += c.vrot;
-      ctx.save();
-      ctx.translate(c.x, c.y);
-      ctx.rotate(c.rot);
-      ctx.drawImage(coinImg, -c.size/2, -c.size/2, c.size, c.size);
-      ctx.restore();
-      if (c.y - c.size > canvas.height) coins.splice(i, 1);
-    });
-    requestAnimationFrame(animateCoins);
-  }
-
-  // Start after first coin scheduled
-  setTimeout(animateCoins, 100);
-}
-
-function triggerKeyToJackpot(normAngle) {
-  const jackpotIndex = segments.findIndex(s => s.label === 'jackpot');
-  const targetAngle = 2 * Math.PI * (num - jackpotIndex) / num;
-  const delta = ((normAngle - targetAngle + 2*Math.PI) % (2*Math.PI));
-  const totalFrames = 60;
-  let frame = 0;
-  const startAng = angle;
-
-  function wobble() {
-    frame++;
-    const t = frame / totalFrames;
-    // smoother ease-out interpolation
-    angle = startAng - delta * (1 - Math.pow(1 - t, 3));
-    angle += Math.sin(frame * 0.3) * (0.02 * (1 - t)); // little wobble along the way
-    drawWheel(angle);
-    if (frame < totalFrames) requestAnimationFrame(wobble);
-    else {
-      dazzlingJackpotEffect();
-      canvas.classList.add('jackpot-active');
-    playJackpotAndCoins();
-    setTimeout(() => {
-      canvas.classList.remove('jackpot-active');
-    }, 5000);
-      console.log('Tricked to Jackpot!');
-    }
-  }
-  wobble();
-}
-
-
-
-function dazzlingJackpotEffect() {
-  jackpotAudio.play();
-  const orig = canvas.style.border;
-  let flashes = 0;
-  const iv = setInterval(() => {
-    canvas.style.border = (flashes % 2 === 0)
-      ? '8px solid gold'
-      : orig;
-    flashes++;
-    if (flashes > 8) {
-      clearInterval(iv);
-      canvas.style.border = orig;
-    }
-  }, 150);
-  canvas.classList.add('shake');
-  setTimeout(() => canvas.classList.remove('shake'), 800);
 }
 
 function launchVoltStageTricky(repeatCount = 1) {
@@ -788,10 +1028,8 @@ function launchVoltStageTricky(repeatCount = 1) {
         } else {
           setTimeout(() => {
             feedback.textContent = "Verification complete!";
-            stopSpeedrunTimer()
             document.getElementById('voltStage').style.display = 'none';
-            document.getElementById('end').style.display = 'block';
-            // Optionally continue to next page/step here
+            launchEmojiStage();
           }, 900);
         }
       } else {
@@ -810,7 +1048,8 @@ function launchVoltStageTricky(repeatCount = 1) {
         } else {
           setTimeout(() => {
             feedback.textContent = "Verification complete!";
-            // Optionally continue to next page/step here
+            document.getElementById('voltStage').style.display = 'none';
+            launchEmojiStage();
           }, 900);
         }
       } else {
@@ -823,6 +1062,85 @@ function launchVoltStageTricky(repeatCount = 1) {
   };
 }
 
+// Funny Stage 1: Odd Emoji Out
+function launchEmojiStage() {
+  const stage = document.getElementById('emojiStage');
+  const grid = document.getElementById('emojiGrid');
+  const fb = document.getElementById('emojiFeedback');
+  stage.style.display = 'block';
+  grid.innerHTML = '';
+  fb.textContent = '';
+
+  // Choose base and odd emojis
+  const sets = [
+    { base: '😀', odd: '😎' },
+    { base: '🍎', odd: '🍐' },
+    { base: '🐶', odd: '🐱' },
+    { base: '🌞', odd: '🌝' },
+    { base: '🍩', odd: '🍪' },
+  ];
+  const pick = sets[Math.floor(Math.random() * sets.length)];
+
+  const total = 16;
+  const oddIndex = Math.floor(Math.random() * total);
+  for (let i = 0; i < total; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'emojiBtn';
+    btn.textContent = i === oddIndex ? pick.odd : pick.base;
+    btn.onclick = () => {
+      if (i === oddIndex) {
+        btn.style.border = '2px solid #27ae60';
+        fb.style.color = '#27ae60';
+        fb.textContent = '✅ Correct!';
+        setTimeout(() => { stage.style.display = 'none'; launchBubbleStage(); }, 700);
+      } else {
+        btn.style.border = '2px solid #e74c3c';
+        fb.style.color = '#e74c3c';
+        fb.textContent = '❌ Nope!';
+        setTimeout(() => location.reload(), 900);
+      }
+    };
+    grid.appendChild(btn);
+  }
+}
+
+// Funny Stage 2: Bubble Wrap
+function launchBubbleStage() {
+  const stage = document.getElementById('bubbleStage');
+  const wrap = document.getElementById('bubbleWrap');
+  const fb = document.getElementById('bubbleFeedback');
+  stage.style.display = 'block';
+  wrap.innerHTML = '';
+  fb.textContent = '';
+
+  let popped = 0;
+  const need = 10;
+  for (let i = 0; i < 18; i++) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    // Low random chance that this bubble is a secret Sigmund trigger
+    const isSigmundBubble = Math.random() < 0.12; // ~12% chance
+    b.onclick = () => {
+      if (b.classList.contains('popped')) return;
+      b.classList.add('popped');
+      popped++;
+      fb.textContent = `Popped ${popped}/${need}`;
+      if (isSigmundBubble) {
+        showSigmundForever();
+      }
+      if (popped >= need) {
+        fb.style.color = '#27ae60';
+        fb.textContent = 'All done!';
+        setTimeout(() => {
+          stage.style.display = 'none';
+          stopSpeedrunTimer();
+          document.getElementById('end').style.display = 'block';
+        }, 600);
+      }
+    };
+    wrap.appendChild(b);
+  }
+}
 
     captcha.addEventListener('click', () => {
       startSpeedrunTimer()

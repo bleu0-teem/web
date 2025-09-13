@@ -294,6 +294,77 @@
   overflow-y: auto;
 }
 
+/* Profile View Toggle */
+.profile-view-toggle {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.profile-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: #cfe6f7;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.profile-view-btn:hover {
+  background: rgba(255,255,255,0.12);
+}
+.profile-view-btn.active {
+  background: linear-gradient(135deg, #4fc3f7, #2196f3);
+  color: #fff;
+  border-color: rgba(79,195,247,0.6);
+  box-shadow: 0 6px 18px rgba(79,195,247,.35);
+}
+
+/* Forum (default) vs Roblox profile layouts */
+.profile-forum .profile-grid {
+  /* Explicit to avoid empty ruleset lint; matches default forum layout */
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+}
+
+.profile-roblox .profile-grid {
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+}
+
+.profile-roblox .profile-card-large:first-child .profile-avatar-large img {
+  width: 128px;
+  height: 128px;
+}
+.profile-roblox .profile-card-large:first-child .profile-card-header {
+  align-items: flex-start;
+}
+.profile-roblox .profile-info-large .profile-name-large {
+  font-size: 2rem;
+}
+.profile-roblox .profile-card-body .profile-stats {
+  justify-content: flex-start;
+  gap: 14px;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.profile-roblox .profile-stats .stat-item {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 10px 14px;
+  border-radius: 12px;
+  min-width: 120px;
+}
+.profile-roblox .badge-large {
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.profile-roblox #profile-preview {
+  max-width: 420px;
+}
+
 /* Content Sections */
 .content-section {
   display: none;
@@ -575,6 +646,141 @@
 .quick-action-btn i {
   color: #4fc3f7;
   font-size: 1.2rem;
+}
+
+/* Settings Section */
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.settings-card-large {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius-lg);
+    padding: 24px;
+}
+
+.setting-item-large {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.setting-item-large:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.setting-item-large:first-child {
+    padding-top: 0;
+}
+
+.setting-info-large h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px;
+}
+
+.setting-info-large p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.theme-selector {
+    display: flex;
+    gap: 12px;
+}
+
+.theme-option {
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.theme-option.active, .theme-option:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+}
+
+.form-select-large {
+    min-width: 180px;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 10px 14px;
+    font-size: 1rem;
+}
+
+.switch-large {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+}
+
+.switch-large input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider-large {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--input-bg);
+    transition: .4s;
+}
+
+.slider-large:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider-large {
+    background-color: var(--primary-color);
+}
+
+input:checked + .slider-large:before {
+    transform: translateX(24px);
+}
+
+.slider-large.round {
+    border-radius: 34px;
+}
+
+.slider-large.round:before {
+    border-radius: 50%;
+}
+
+.settings-actions {
+    margin-top: 24px;
+    display: flex;
+    gap: 16px;
 }
 
 /* News List */
