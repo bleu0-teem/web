@@ -134,6 +134,33 @@
   <p id="bubbleFeedback" style="font-weight:bold;margin-top:10px;"></p>
 </div>
 
+<!-- Osu Stage -->
+<div id="osuStage" style="display:none; text-align:center;">
+  <h3>Hit the circles!</h3>
+  <p>Click the circles before they shrink. Score 5 to pass.</p>
+  <canvas id="osuCanvas" width="420" height="420" style="background:#111;border-radius:12px;border:2px solid #444;"></canvas>
+  <p id="osuInfo" style="margin-top:8px;font-weight:bold;"></p>
+</div>
+
+<!-- Find Key Stage (3 chests, 2 keys) -->
+<div id="findKeyStage" style="display:none; text-align:center;">
+  <h3>Find the key</h3>
+  <p>You have <span id="keysLeft">2</span> keys. Pick two chests. Treasure rains, but only one chest has the key!</p>
+  <div id="chestGrid" style="display:grid;grid-template-columns:repeat(3,160px);gap:20px;justify-content:center;margin-top:12px;"></div>
+  <p id="findKeyFeedback" style="font-weight:bold;margin-top:10px;"></p>
+</div>
+
+<!-- Lockpick Mini-game overlay -->
+<div id="lockpickOverlay" style="display:none;position:fixed;inset:0;background:#000a;z-index:12000;align-items:center;justify-content:center;">
+  <div style="background:#1e1e1e;color:#fff;padding:18px 20px;border-radius:12px;box-shadow:0 8px 30px #0006;">
+    <h3 style="margin:0 0 8px 0;">Lockpick the last chest!</h3>
+    <p style="margin:0 0 10px 0;">Catch the moving key by clicking it.</p>
+    <div style="position:relative;width:360px;height:220px;background:#111;border:2px solid #444;border-radius:10px;overflow:hidden;">
+      <img id="lockpickKey" src="https://blue16.site/etc/captcha/images/key.jpg" alt="key" style="position:absolute;width:48px;height:48px;left:10px;top:10px;cursor:pointer;">
+    </div>
+  </div>
+</div>
+
 <div class="end" id="end" style="display:none;">
   <h4>
   hi! you made it :'3<br>
@@ -179,7 +206,7 @@ let keyValidated = false;
       { src: "https://blue16.site/etc/captcha/images/jackpot.jpg", label: 'jackpot' },
       { src: "https://blue16.site/etc/captcha/images/key.jpg", label: 'key' },
       { src: "https://blue16.site/etc/captcha/images/peach.jpg", label: 'peach' },
-      { src: "https://blue16.site/etc/captcha/images/sigmund.png", label: 'sigmund' }
+      { src: "https://blue16.site/etc/captcha/images/sigmund.webp", label: 'sigmund' }
     ];
     const segments = imageSources.map(({ src, label }) => {
      if (!src) return { image: null, label };
@@ -241,7 +268,7 @@ function devRemoveOverlays() {
 function showSigmundForever() {
   if (document.getElementById('sigmundForeverOverlay')) return;
   const seg = segments.find(s => s.label === 'sigmund');
-  const src = seg && seg.image ? seg.image.src : 'https://blue16.site/etc/captcha/images/sigmund.png';
+  const src = seg && seg.image ? seg.image.src : 'https://blue16.site/etc/captcha/images/sigmund.webp';
   const img = document.createElement('img');
   img.id = 'sigmundForeverOverlay';
   img.src = src;
@@ -276,6 +303,8 @@ function devSkipStage() {
   const volt = el('voltStage');
   const emoji = el('emojiStage');
   const bubble = el('bubbleStage');
+  const osu = el('osuStage');
+  const findKey = el('findKeyStage');
   const end = el('end');
 
   // Early stages → go to math
@@ -324,9 +353,23 @@ function devSkipStage() {
     return;
   }
 
-  // Bubble → End
+  // Bubble → Osu
   if (isShown(bubble)) {
     bubble.style.display = 'none';
+    launchOsuStage();
+    return;
+  }
+
+  // Osu → FindKey
+  if (isShown(osu)) {
+    osu.style.display = 'none';
+    launchFindKeyStage();
+    return;
+  }
+
+  // FindKey → End
+  if (isShown(findKey)) {
+    findKey.style.display = 'none';
     stopSpeedrunTimer();
     el('end').style.display = 'block';
     return;
@@ -1133,13 +1176,125 @@ function launchBubbleStage() {
         fb.textContent = 'All done!';
         setTimeout(() => {
           stage.style.display = 'none';
-          stopSpeedrunTimer();
-          document.getElementById('end').style.display = 'block';
+          // Next: Osu stage
+          launchOsuStage();
         }, 600);
       }
     };
     wrap.appendChild(b);
   }
+}
+
+// Osu-like simple click mini-game
+function launchOsuStage() {
+  const stage = document.getElementById('osuStage');
+  stage.style.display = 'block';
+  const canvas = document.getElementById('osuCanvas');
+  const info = document.getElementById('osuInfo');
+  const ctx = canvas.getContext('2d');
+  let targets = [];
+  let score = 0, total = 5;
+  function spawn() {
+    const x = 40 + Math.random() * (canvas.width - 80);
+    const y = 40 + Math.random() * (canvas.height - 80);
+    targets.push({ x, y, r: 40, alive: true });
+  }
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    targets.forEach(t => {
+      if (!t.alive) return;
+      ctx.beginPath(); ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 4; ctx.arc(t.x, t.y, t.r, 0, Math.PI*2); ctx.stroke();
+      t.r -= 0.6;
+      if (t.r <= 8) { t.alive = false; }
+    });
+    info.textContent = `Score: ${score}/${total}`;
+    if (score >= total) {
+      stage.style.display = 'none';
+      launchFindKeyStage();
+      return;
+    }
+    requestAnimationFrame(draw);
+  }
+  canvas.onclick = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    targets.forEach(t => {
+      if (t.alive) {
+        const dx = mx - t.x, dy = my - t.y;
+        if (dx*dx + dy*dy <= t.r*t.r) { t.alive = false; score++; spawn(); }
+      }
+    });
+  };
+  targets = []; score = 0; for (let i=0;i<1;i++) spawn();
+  draw();
+}
+
+// Find Key stage with 3 chests and 2 keys
+function launchFindKeyStage() {
+  const stage = document.getElementById('findKeyStage');
+  const grid = document.getElementById('chestGrid');
+  const keysLeftEl = document.getElementById('keysLeft');
+  const fb = document.getElementById('findKeyFeedback');
+  stage.style.display = 'block';
+  grid.innerHTML = ''; fb.textContent='';
+  let keys = 2;
+  keysLeftEl.textContent = keys;
+  const chestSrcClosed = 'https://blue16.site/etc/captcha/images/closedchest.jpg';
+  const chestSrcOpen = 'https://blue16.site/etc/captcha/images/openedchest.jpg';
+  // 1% chance that a random chest immediately contains a key
+  const keyAtStart = Math.random() < 0.01 ? Math.floor(Math.random()*3) : -1;
+
+  for (let i=0;i<3;i++) {
+    const img = document.createElement('img');
+    img.src = chestSrcClosed; img.alt='chest';
+    img.style.width='160px'; img.style.height='120px'; img.style.objectFit='cover'; img.style.cursor='pointer'; img.style.borderRadius='10px'; img.style.border='2px solid #555';
+    img.onclick = () => {
+      if (img.dataset.opened === '1' || keys<=0) return;
+      img.src = chestSrcOpen; img.dataset.opened = '1';
+      if (keyAtStart === i) {
+        fb.style.color = '#27ae60'; fb.textContent = 'You found a key!';
+        showSigmundForever(); // fun cameo if found early
+        // Finish flow
+        setTimeout(() => { stage.style.display='none'; stopSpeedrunTimer(); document.getElementById('end').style.display='block'; }, 900);
+        return;
+      }
+      // Treasure reward
+      playTreasureRain(2800);
+      keys--; keysLeftEl.textContent = keys;
+      try { treasureSound.currentTime=0; treasureSound.play(); } catch(e) {}
+      if (keys === 0) {
+        // Both attempts used; lockpick the last chest
+        launchLockpickMinigame(() => {
+          fb.style.color = '#27ae60'; fb.textContent = 'Lockpicked! You got the key!';
+          setTimeout(() => { stage.style.display='none'; stopSpeedrunTimer(); document.getElementById('end').style.display='block'; }, 900);
+        });
+      }
+    };
+    grid.appendChild(img);
+  }
+}
+
+function launchLockpickMinigame(onSuccess) {
+  const overlay = document.getElementById('lockpickOverlay');
+  const keyEl = document.getElementById('lockpickKey');
+  overlay.style.display = 'flex';
+  let vx = 3 + Math.random()*3, vy = 2 + Math.random()*3;
+  let w = 360, h = 220; let x = 10, y = 10;
+  function step() {
+    const box = keyEl.parentElement;
+    w = box.clientWidth; h = box.clientHeight;
+    x += vx; y += vy;
+    if (x <= 0 || x >= w-48) vx = -vx;
+    if (y <= 0 || y >= h-48) vy = -vy;
+    keyEl.style.left = x + 'px'; keyEl.style.top = y + 'px';
+    if (overlay.style.display !== 'flex') return;
+    requestAnimationFrame(step);
+  }
+  keyEl.onclick = () => {
+    overlay.style.display = 'none';
+    if (typeof onSuccess === 'function') onSuccess();
+  };
+  requestAnimationFrame(step);
 }
 
     captcha.addEventListener('click', () => {
