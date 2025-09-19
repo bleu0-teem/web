@@ -2,7 +2,7 @@
   "versions": [
     {
       "version": "InteractivePhysics",
-      "download_url": "https://github.com/blue16-team/blue16-web/raw/refs/heads/main/www/src/files/clients/InteractivePhysics.zip",
+      "download_url": "https://github.com/bleu0-teem/web/raw/refs/heads/main/www/src/files/clients/InteractivePhysics.zip",
       "rcc_version": null,
       "launch_arguments": null,
       "vulnerable": false,
@@ -12,7 +12,7 @@
       "patchby": null,
       "author": "Roblox",
       "altname": "InteractivePhysics (2005 version)",
-      "desc": "Interactive Physics is an educational software developed by David Baszucki and his brother Greg Baszucki in 1989 through their company, Knowledge Revolution. It served as a 2D physics simulation laboratory, allowing users to create and interact with virtual experiments by dragging components like springs, ropes, and hinges. This hands-on approach enabled students to visualize and understand complex physics concepts in a dynamic environment. The software was particularly notable for its accuracy; many textbook problems could be modeled within it, and the results closely matched analytical solutions. Interactive Physics was translated into nine languages and sold millions of copies, becoming a staple in educational settings worldwide. In 1998, Knowledge Revolution was acquired by MSC Software Corporation, where David Baszucki continued to work as Vice President. However, in 2004, he left MSC Software to co-found Roblox Corporation with Erik Cassel. Baszucki later revealed that his experiences with Interactive Physics and another simulation tool, Working Model, inspired the creation of Roblox. He envisioned a platform where users could build and interact with virtual worlds, much like they did in the physics simulations, but on a broader scale. Today, Roblox stands as a global platform that empowers users to create, share, and experience games and simulations, echoing the interactive spirit of its predecessor, Interactive Physics."
+      "desc": "Interactive Physics is a physics simulation game. It was created by Roblox. It was released in 2005. It is a physics simulation game that allows players to create and interact with virtual experiments by dragging components like springs, ropes, and hinges."
     }
   ],
   "offline": false,
