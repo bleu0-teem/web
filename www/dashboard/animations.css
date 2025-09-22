@@ -144,7 +144,7 @@ body.dark-mode .iconify:hover {
 
 /* Loading animation for icons */
 .iconify.loading {
-  /* No spin animation */
+  animation: spin 1s linear infinite;
 }
 
 /* Custom animation for specific icons */

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - BLUE16</title>
+    <title>login - blue16</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="login_design.css">
@@ -14,11 +14,11 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <img src="https://see.fontimg.com/api/rf5/nRoyY/YzA4MzM4MDJkMDY5NDQ4NDhmMjkxOTliNTQwMTAxZjMudHRm/Ymx1ZTE2/boblox-04-regular.png?r=fs&h=81&w=1250&fg=FFFFFF&bg=FFFFFF&tb=1&s=65" alt="BLUE16" class="logo-small">
+                <img src="https://see.fontimg.com/api/rf5/nRoyY/YzA4MzM4MDJkMDY5NDQ4NDhmMjkxOTliNTQwMTAxZjMudHRm/Ymx1ZTE2/boblox-04-regular.png?r=fs&h=81&w=1250&fg=FFFFFF&bg=FFFFFF&tb=1&s=65" alt="blue16" class="logo-small">
             </div>
             <div class="nav-links">
-                <a href="../" class="nav-link btn-nav">Home</a>
-                <a href="../register/" class="nav-link btn-nav btn-primary">Register</a>
+                <a href="../" class="nav-link btn-nav">home</a>
+                <a href="../register/" class="nav-link btn-nav btn-primary">register</a>
             </div>
         </div>
     </nav>
@@ -32,8 +32,8 @@
         <div class="login-container">
             <div class="login-card">
                 <div class="login-header">
-                    <h1 class="login-title">Welcome Back</h1>
-                    <p class="login-subtitle">Sign in to continue your BLUE16 journey</p>
+                    <h1 class="login-title">welcome back</h1>
+                    <p class="login-subtitle">sign in to continue your blue16 journey</p>
                 </div>
 
                 <!-- Notification Container -->
@@ -43,7 +43,7 @@
                     <div class="form-group">
                         <label for="username_or_email" class="form-label">
                             <i class="ai-person"></i>
-                            Username
+                            username or email
                         </label>
                         <input type="text" id="username_or_email" name="username_or_email" class="form-input" required>
                     </div>
@@ -51,7 +51,7 @@
                     <div class="form-group">
                         <label for="password" class="form-label">
                             <i class="ai-lock-on"></i>
-                            Password
+                            password
                         </label>
                         <div class="password-input">
                             <input type="password" id="password" name="password" class="form-input" required>
@@ -65,20 +65,20 @@
                         <label class="checkbox-container">
                             <input type="checkbox" id="remember" name="remember">
                             <span class="checkmark"></span>
-                            Remember me
+                            remember me
                         </label>
-                        <a href="forgot_password.html" class="forgot-link">Forgot password?</a>
+                        <a href="forgot_password.html" class="forgot-link">forgot password?</a>
                     </div>
 
                     <input type="hidden" id="csrf_token" name="csrf_token">
                     <button type="submit" class="btn btn-primary btn-full">
                         <i class="ai-arrow-left"></i>
-                        Sign In
+                        sign in
                     </button>
                 </form>
 
                 <div class="login-footer">
-                    <p>Don't have an account? <a href="../register/index.html" class="link-primary">Create one</a></p>
+                    <p>don't have an account? <a href="../register/index.html" class="link-primary">create one</a></p>
                 </div>
             </div>
 
@@ -87,22 +87,22 @@
                     <div class="info-icon">
                         <i class="ai-game-controller"></i>
                     </div>
-                    <h3>Classic Gaming</h3>
-                    <p>Access thousands of classic Roblox games and relive the golden era of online gaming.</p>
+                    <h3>classic gaming</h3>
+                    <p>access thousands of classic roblox games and any client</p>
                 </div>
                 <div class="info-card">
                     <div class="info-icon">
                         <i class="ai-people-group"></i>
                     </div>
-                    <h3>Community</h3>
-                    <p>Join a vibrant community of retro gaming enthusiasts and make new friends.</p>
+                    <h3>community</h3>
+                    <p>join a vibrant community of retro gaming enthusiasts and make new friends</p>
                 </div>
                 <div class="info-card">
                     <div class="info-icon">
                         <i class="ai-shield"></i>
                     </div>
-                    <h3>Secure & Safe</h3>
-                    <p>Your account is protected with industry-standard security measures.</p>
+                    <h3>secure & safe</h3>
+                    <p>your account is protected with industry standard security measures</p>
                 </div>
             </div>
         </div>
@@ -110,7 +110,7 @@
 
     <script>
         const API_BASE = (window.location.port === '5500') ? 'http://127.0.0.1:8000' : window.location.origin;
-        // Toggle password visibility
+        // toggle password visibility
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
@@ -124,7 +124,7 @@
             }
         }
 
-        // Show notification
+        // show notification
         function showNotification(message, type = 'error') {
             const container = document.getElementById('notification-container');
             const notification = document.createElement('div');
@@ -141,7 +141,7 @@
             
             container.appendChild(notification);
             
-            // Auto remove after 5 seconds
+            // auto remove after 5 seconds
             setTimeout(() => {
                 if (notification.parentElement) {
                     notification.remove();
@@ -149,7 +149,7 @@
             }, 5000);
         }
 
-        // Form submission
+        // form submission
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -157,15 +157,15 @@
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             
-            // Show loading state
-            submitBtn.innerHTML = '<i class="ai-spinner"></i> Signing In...';
+            // show loading state
+            submitBtn.innerHTML = '<i class="ai-spinner"></i> signing in...';
             submitBtn.disabled = true;
             
             try {
-                // First try to get CSRF token from the hidden input field
+                // first try to get csrf token from the hidden input field
                 let csrfToken = document.getElementById('csrf_token').value;
                 
-                // If not available, try to get from cookie as fallback
+                // if not available, try to get from cookie as fallback
                 if (!csrfToken) {
                     const xsrf = document.cookie.split('; ').find(r => r.startsWith('XSRF-TOKEN='))?.split('=')[1];
                     if (xsrf) csrfToken = xsrf;
@@ -180,24 +180,24 @@
                 const data = await response.json();
                 
                 if (response.ok && data.status === 200) {
-                    showNotification('Login successful! Redirecting...', 'success');
+                    showNotification('login successful! redirecting...', 'success');
                     setTimeout(() => {
                         window.location.href = '../dashboard/index.html';
                     }, 1500);
                 } else {
-                    showNotification(data.error || 'Login failed. Please try again.');
+                    showNotification(data.error || 'login failed. please try again.');
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                showNotification('Network error. Please check your connection and try again.');
+                console.error('login error:', error);
+                showNotification('network error. please check your connection and try again.');
             } finally {
-                // Reset button state
+                // reset button state
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
         });
 
-        // Focus effects
+        // focus effects
         document.querySelectorAll('.form-input').forEach(input => {
             input.addEventListener('focus', function() {
                 this.parentElement.classList.add('focused');
@@ -209,7 +209,7 @@
         });
     </script>
     <script>
-        // Fetch CSRF token for login form
+        // fetch csrf token for login form
         (async function() {
             const fetchCsrfToken = async () => {
                 try {
@@ -222,8 +222,8 @@
                         document.getElementById('csrf_token').value = data.csrf_token;
                     }
                 } catch (e) {
-                    console.error('Failed to load CSRF token', e);
-                    // Retry after a short delay
+                    console.error('failed to load csrf token', e);
+                    // retry after a short delay
                     setTimeout(fetchCsrfToken, 2000);
                 }
             };
