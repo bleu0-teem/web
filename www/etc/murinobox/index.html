@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>концерт мурино</title>
+  <style>
+    body { background: #222; color: #fff; font-family: sans-serif; }
+    .characters { display: flex; gap: 24px; justify-content: center; margin-top: 60px; }
+    .character { position: relative; width: 180px; height: 260px; cursor: pointer; }
+    .character img, .character video { width: 100%; height: 100%; object-fit: contain; border-radius: 24px; box-shadow: 0 4px 24px #000a; }
+    .character .name { position: absolute; bottom: 8px; left: 0; width: 100%; text-align: center; font-weight: bold; background: rgba(0,0,0,0.3); }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center;" id="state">state</h1>
+  <div class="characters" id="characters"></div>
+  <script>
+    // чараштеры
+    const characters = [
+      {
+        name: "это кто нахуй",
+        idleImg: "https://files.catbox.moe/6hc88s.jpg",
+        playVideo: "https://files.catbox.moe/fd2lai.mp4"
+      },
+      {
+        name: "бем бем бем",
+        idleImg: "https://files.catbox.moe/qk5jwr.jpg",
+        playVideo: "https://files.catbox.moe/1g5m74.mp4"
+      },
+      {
+        name: "я уже красный",
+        idleImg: "https://files.catbox.moe/me2ely.jpg",
+        playVideo: "https://files.catbox.moe/mzwqr7.mp4"
+      },
+      {
+        name: "иди нахуй",
+        idleImg: "https://files.catbox.moe/hmsmwy.jpg",
+        playVideo: "https://files.catbox.moe/55kzwk.mp4"
+      }
+      // Add more characters here
+    ];
+
+    const container = document.getElementById('characters');
+
+    characters.forEach((char, idx) => {
+      const div = document.createElement('div');
+      div.className = 'character';
+      div.innerHTML = `
+        <img src="${char.idleImg}" style="display:block">
+        <video src="${char.playVideo}" style="display:none" loop></video>
+        <div class="name">${char.name}</div>
+      `;
+      // Toggle play state on click
+      div.onclick = () => {
+        const img = div.querySelector('img');
+        const vid = div.querySelector('video');
+        if (img.style.display !== 'none') {
+          img.style.display = 'none';
+          vid.style.display = 'block';
+          vid.currentTime = 0;
+          vid.play();
+        } else {
+          vid.pause();
+          img.style.display = 'block';
+          vid.style.display = 'none';
+        }
+      };
+      container.appendChild(div);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI OS Terminal Emulator</title>
+  <style>
+    body { background: #202124; color: #eee; font-family: monospace; margin: 0; }
+    #settings {
+      background: #181818; padding: 1em; border-radius: 8px; margin: 1em auto 0 auto;
+      width: 80vw; max-width: 820px;
+    }
+    label, select, input { margin-right: 1em; color: #ccc; }
+    #terminal {
+      width: 80vw; max-width: 820px; height: 70vh; margin: 1em auto; background: #111;
+      padding: 1em; border-radius: 8px; box-shadow: 0 0 10px #000;
+      overflow-y: auto; font-size: 1.1em;
+      box-sizing: border-box;
+    }
+    .prompt { color: #08f800; }
+    .input-line, .output-line { display: block; width: 100%; }
+    .input-field {
+      background: none; border: none; color: #fff; font: inherit; width: 90%;
+      outline: none;
+    }
+    .output-line { color: #ccc; white-space: pre-wrap; }
+    .output-error { color: #ff6060; }
+    button { background: #333; color: #eee; border: none; border-radius: 4px; padding: 0.3em 1em; cursor: pointer; }
+    button:hover { background: #444; }
+    ::selection { background: #394; }
+    @media (max-width: 700px) {
+      #terminal, #settings { width: 98vw; }
+    }
+  </style>
+</head>
+<body>
+  <div id="settings">
+    <label>OS:
+      <select id="os-select">
+        <option value="linux">Linux</option>
+        <option value="mac">macOS</option>
+        <option value="win">Windows</option>
+      </select>
+    </label>
+    <label>User:
+      <input id="user-input" type="text" value="user" size="8">
+    </label>
+    <label>AI:
+      <select id="ai-select">
+        <option value="openai">OpenAI</option>
+        <option value="google">Google Gemini</option>
+        <option value="custom">Custom</option>
+      </select>
+    </label>
+    <label>API Token:
+      <input id="token-input" type="password" placeholder="Paste your token here" size="24">
+    </label>
+    <button id="clear-btn">Clear</button>
+  </div>
+  <div id="terminal"></div>
+  <script>
+    // -------------- CONFIGURATION / STATE -----------------
+    const terminal = document.getElementById('terminal');
+    const osSelect = document.getElementById('os-select');
+    const userInput = document.getElementById('user-input');
+    const aiSelect = document.getElementById('ai-select');
+    const tokenInput = document.getElementById('token-input');
+    const clearBtn = document.getElementById('clear-btn');
+    // State
+    let username = userInput.value;
+    let osType = osSelect.value;
+    let aiProvider = aiSelect.value;
+    let aiToken = '';
+    let cwd = homeDir(osType, username);
+    let history = [];
+    let historyIdx = -1;
+    let sessionMemory = []; // { command: "ls", output: "file.txt", time: Date.now() }
+    let commandCache = {}; // {command: output}
+
+    // -------------- SETTINGS & EVENTS -----------------
+    osSelect.onchange = function() {
+      osType = this.value;
+      cwd = homeDir(osType, username);
+      addInputLine();
+    };
+    userInput.onchange = function() {
+      username = this.value;
+      cwd = homeDir(osType, username);
+      addInputLine();
+    };
+    aiSelect.onchange = function() {
+      aiProvider = this.value;
+    };
+    tokenInput.onchange = function() {
+      aiToken = this.value;
+    };
+    clearBtn.onclick = function() {
+      terminal.innerHTML = '';
+      addInputLine();
+    };
+
+    function homeDir(os, user) {
+      if (os === 'win') return `C:\\Users\\${user}`;
+      return '~';
+    }
+
+    function getPrompt() {
+      if (osType === 'win')
+        return `${cwd}> `;
+      if (osType === 'mac')
+        return `${username}@MacBook ~ % `;
+      return `${username}@ai-shell:${cwd}$ `;
+    }
+
+    // -------------- TERMINAL INPUT/OUTPUT -----------------
+    function addInputLine() {
+      // Remove any existing input
+      let oldInput = terminal.querySelector('.input-line input:not([disabled])');
+      if (oldInput) oldInput.disabled = true;
+
+      const inputLine = document.createElement('div');
+      inputLine.classList.add('input-line');
+      const promptSpan = document.createElement('span');
+      promptSpan.classList.add('prompt');
+      promptSpan.textContent = getPrompt();
+
+      const inputField = document.createElement('input');
+      inputField.classList.add('input-field');
+      inputField.type = 'text';
+      inputField.autofocus = true;
+
+      inputLine.appendChild(promptSpan);
+      inputLine.appendChild(inputField);
+      terminal.appendChild(inputLine);
+
+      // Command history navigation
+      inputField.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowUp') {
+          if (history.length && historyIdx > 0) {
+            historyIdx--;
+            inputField.value = history[historyIdx];
+          } else if (history.length && historyIdx === 0) {
+            inputField.value = history[0];
+          }
+          e.preventDefault();
+        } else if (e.key === 'ArrowDown') {
+          if (history.length && historyIdx < history.length - 1) {
+            historyIdx++;
+            inputField.value = history[historyIdx];
+          } else if (history.length && historyIdx >= history.length - 1) {
+            inputField.value = '';
+          }
+          e.preventDefault();
+        } else if (e.key === 'Enter') {
+          const command = inputField.value;
+          if (command.trim() === '') return;
+          inputField.disabled = true;
+          if (history.length === 0 || history[history.length - 1] !== command) {
+            history.push(command);
+          }
+          historyIdx = history.length;
+          handleCommand(command, inputLine);
+        }
+      });
+
+      inputField.focus();
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function addOutput(text, opts = {}) {
+      const outputLine = document.createElement('div');
+      outputLine.classList.add('output-line');
+      if (opts.error) outputLine.classList.add('output-error');
+      outputLine.textContent = text;
+      terminal.appendChild(outputLine);
+      terminal.scrollTop = terminal.scrollHeight;
+      return outputLine;
+    }
+
+    // -------------- CORE COMMAND HANDLER -----------------
+    async function handleCommand(command, inputLine) {
+      // Handle clear/cls only for UX
+      if (command === 'clear' || command === 'cls') {
+        terminal.innerHTML = '';
+        addInputLine();
+        return;
+      }
+      // Show thinking line
+      addOutput('AI is thinking...');
+      const memoryContext = sessionMemory
+  .slice(-5) // last 5 interactions only
+  .map(m => `${m.command}\n${m.output}`)
+  .join("\n\n");
+      // If cached, show instantly
+      if (commandCache[command]) {
+        setTimeout(() => {
+          terminal.removeChild(terminal.lastChild);
+          addOutput(commandCache[command]);
+          addInputLine();
+        }, 300);
+        return;
+      }
+      // Otherwise, get from AI
+      let aiResponse;
+      try {
+        aiResponse = await getAiResponse(command);
+      } catch (err) {
+        aiResponse = '[AI Error] ' + (err.message || err);
+      }
+      // Remove "thinking" line
+      terminal.removeChild(terminal.lastChild);
+      // Cache and output
+      commandCache[command] = aiResponse;
+      addOutput(aiResponse);
+      addInputLine();
+    }
+
+    // -------------- AI API MOCKUP (Replace this!) ---------------
+    async function getAiResponse(command) {
+  if (aiProvider === "openai") {
+    // ... use OpenAI code
+  } else if (aiProvider === "google") {
+    if (!aiToken) return "[Gemini] No API token provided.";
+
+    const terminalPrompt = `
+You are a virtual command-line emulator.
+You simulate a ${osType} environment.
+Behave as if you are a real terminal:
+- Output realistic results for common shell commands (ls, dir, cd, echo, ping, etc. depends on os)
+- Maintain a consistent format like an actual console output.
+- Do not explain; only print what the terminal would show.
+- You cannot access the internet or execute real code — fake it safely.
+- Keep it believable, not too verbose.
+- Remove the `` thingies, it makes unrealistic.
+`;
+
+    const fullPrompt = `${terminalPrompt}\nUser entered:\n${command}\nPrevious session:
+${memoryContext}\nTerminal output:`;
+
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${aiToken}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: fullPrompt }] }],
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`[Gemini] API error: ${response.status} ${errText}`);
+      }
+
+      const data = await response.json();
+      return (
+        data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+        "[Gemini] No response."
+      );
+    } catch (err) {
+      console.error(err);
+      return `[Gemini] Error: ${err.message}`;
+    }
+  } else if (aiProvider === "custom") {
+    // ... your own backend or LLM
+  }
+      // This is a mock for demonstration.
+      await new Promise(r => setTimeout(r, 650)); // Simulate network delay
+      // Make the AI answer look like a real shell output
+      // e.g., if user types 'ls', the AI would reply with a plausible directory listing
+      // You should replace this with a fetch() to your real AI backend, passing aiProvider and aiToken if needed.
+      return `[${aiProvider.toUpperCase()}] ${osType === 'win' ? 'C:\\Users\\' : '/home/'}${username}$ ${command}\n> AI simulated response for "${command}".\n(Result is cached for repeated command.)`;
+    }
+
+    // -------------- INIT -----------------
+    addInputLine();
+  </script>
+</body>
+</html>
