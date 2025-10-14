@@ -2,7 +2,7 @@
 
 .... okay
 
-# Contributing to BLUE16 Web
+# Contributing to BLUE16
 
 First, thanks for your interest in contributing!!!
 Your help will make BLUE16 even better.
