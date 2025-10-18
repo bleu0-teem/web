@@ -41,17 +41,28 @@ class AvatarRenderer {
     
     setupCanvas() {
         // Set canvas size
-        this.canvas.width = 300;
-        this.canvas.height = 400;
-        
+        // Default logical size (CSS pixels)
+        const defaultW = 300;
+        const defaultH = 400;
+
         // Enable high DPI rendering
         const dpr = window.devicePixelRatio || 1;
         const rect = this.canvas.getBoundingClientRect();
-        this.canvas.width = rect.width * dpr;
-        this.canvas.height = rect.height * dpr;
-        this.ctx.scale(dpr, dpr);
-        this.canvas.style.width = rect.width + 'px';
-        this.canvas.style.height = rect.height + 'px';
+
+        // Use the rect if available, otherwise fall back to defaults
+        this.logicalWidth = (rect && rect.width) ? rect.width : defaultW;
+        this.logicalHeight = (rect && rect.height) ? rect.height : defaultH;
+
+        // Set backing store size
+        this.canvas.width = Math.round(this.logicalWidth * dpr);
+        this.canvas.height = Math.round(this.logicalHeight * dpr);
+
+        // Scale drawing operations so coordinates are in logical (CSS) pixels
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        // Keep visible size consistent
+        this.canvas.style.width = this.logicalWidth + 'px';
+        this.canvas.style.height = this.logicalHeight + 'px';
     }
     
     setAvatarData(avatarData) {
@@ -78,12 +89,14 @@ class AvatarRenderer {
     
     clear() {
         if (!this.ctx) return;
-        
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Add subtle background
-        this.ctx.fillStyle = 'rgba(240, 240, 240, 0.1)';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        // Clear logical area
+        const w = this.logicalWidth || (this.canvas.width / (window.devicePixelRatio || 1));
+        const h = this.logicalHeight || (this.canvas.height / (window.devicePixelRatio || 1));
+        this.ctx.clearRect(0, 0, w, h);
+
+        // Add subtle background (in logical pixels)
+        this.ctx.fillStyle = 'rgba(240, 240, 240, 0.03)';
+        this.ctx.fillRect(0, 0, w, h);
     }
     
     render() {
@@ -94,25 +107,28 @@ class AvatarRenderer {
         // Save context state
         this.ctx.save();
         
-        // Move to center of canvas
-        this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
-        
-        // Apply rotation
+        // Move to center of logical canvas
+        const centerX = (this.logicalWidth || (this.canvas.width / (window.devicePixelRatio || 1))) / 2;
+        const centerY = (this.logicalHeight || (this.canvas.height / (window.devicePixelRatio || 1))) / 2;
+        this.ctx.translate(centerX, centerY);
+
+        // Apply rotation (around center)
         this.ctx.rotate(this.rotation * Math.PI / 180);
-        
-        // Apply scale
+
+        // Apply scale (in logical pixels)
         this.ctx.scale(this.scale, this.scale);
         
         // Get current pose
         const pose = this.poses[this.currentPose] || this.poses.idle;
         
         // Render body parts in correct order (back to front)
-        this.renderBodyPart('rightLeg', pose);
-        this.renderBodyPart('leftLeg', pose);
-        this.renderBodyPart('torso', pose);
-        this.renderBodyPart('rightArm', pose);
-        this.renderBodyPart('leftArm', pose);
-        this.renderBodyPart('head', pose);
+    // Render parts back-to-front
+    this.renderBodyPart('rightLeg', pose);
+    this.renderBodyPart('leftLeg', pose);
+    this.renderBodyPart('torso', pose);
+    this.renderBodyPart('rightArm', pose);
+    this.renderBodyPart('leftArm', pose);
+    this.renderBodyPart('head', pose);
         
         // Render clothing
         this.renderClothing(pose);
@@ -129,21 +145,24 @@ class AvatarRenderer {
         
         const part = this.bodyParts[partName];
         const color = this.avatarData.body[partName + 'Color'] || '#CCCCCC';
-        
+        // Draw each part around its own pivot so rotations look natural
         this.ctx.save();
-        
-        // Apply pose transformations
+
+        // Translate to the part's local origin
+        this.ctx.translate(part.x, part.y);
+
+        // Apply pose transformations around the part center
         if (partName.includes('Arm')) {
-            this.ctx.rotate(pose.armRotation * Math.PI / 180);
+            this.ctx.rotate((pose.armRotation || 0) * Math.PI / 180);
         } else if (partName.includes('Leg')) {
-            this.ctx.rotate(pose.legRotation * Math.PI / 180);
+            this.ctx.rotate((pose.legRotation || 0) * Math.PI / 180);
         } else if (partName === 'head') {
-            this.ctx.rotate(pose.headTilt * Math.PI / 180);
+            this.ctx.rotate((pose.headTilt || 0) * Math.PI / 180);
         }
-        
-        // Draw body part with 3D effect
-        this.draw3DRect(part.x, part.y, part.width, part.height, color);
-        
+
+        // Draw body part centered at local origin
+        this.draw3DRect(0, 0, part.width, part.height, color);
+
         this.ctx.restore();
     }
     
@@ -173,30 +192,30 @@ class AvatarRenderer {
         
         // Render shirt
         if (this.avatarData.clothing.shirt) {
-            this.renderShirt(this.avatarData.clothing.shirt, pose);
+            this.renderShirt(String(this.avatarData.clothing.shirt).toLowerCase(), pose);
         }
         
         // Render pants
         if (this.avatarData.clothing.pants) {
-            this.renderPants(this.avatarData.clothing.pants, pose);
+            this.renderPants(String(this.avatarData.clothing.pants).toLowerCase(), pose);
         }
         
         // Render accessories
         if (this.avatarData.clothing.accessories) {
             this.avatarData.clothing.accessories.forEach(accessory => {
-                this.renderAccessory(accessory, pose);
+                this.renderAccessory(String(accessory).toLowerCase(), pose);
             });
         }
     }
     
     renderShirt(shirtType, pose) {
         const shirtColors = {
-            'Classic': '#FF4444',
-            'Striped': '#4444FF',
-            'Hoodie': '#333333',
-            'Jacket': '#8B4513'
+            'classic': '#FF6B6B',
+            'striped': '#4ECDC4',
+            'hoodie': '#8B5CF6',
+            'jacket': '#2D3748'
         };
-        
+
         const color = shirtColors[shirtType] || '#CCCCCC';
         const torso = this.bodyParts.torso;
         
@@ -213,9 +232,9 @@ class AvatarRenderer {
         );
         
         // Add shirt details
-        if (shirtType === 'Striped') {
+        if (shirtType === 'striped') {
             this.drawStripes(torso.x, torso.y, torso.width + 4, torso.height + 2);
-        } else if (shirtType === 'Hoodie') {
+        } else if (shirtType === 'hoodie') {
             this.drawHoodieDetails(torso.x, torso.y, torso.width + 4, torso.height + 2);
         }
         
@@ -224,12 +243,12 @@ class AvatarRenderer {
     
     renderPants(pantsType, pose) {
         const pantsColors = {
-            'Classic': '#0066CC',
-            'Jeans': '#4169E1',
-            'Shorts': '#228B22',
-            'Cargo': '#8B4513'
+            'classic': '#4A5568',
+            'jeans': '#1A365D',
+            'shorts': '#2B6CB0',
+            'cargo': '#744210'
         };
-        
+
         const color = pantsColors[pantsType] || '#CCCCCC';
         
         this.ctx.save();
@@ -265,16 +284,16 @@ class AvatarRenderer {
         this.ctx.rotate(pose.headTilt * Math.PI / 180);
         
         switch (accessoryType) {
-            case 'Hat':
+            case 'hat':
                 this.drawHat(head.x, head.y - head.height/2 - 5);
                 break;
-            case 'Glasses':
+            case 'glasses':
                 this.drawGlasses(head.x, head.y);
                 break;
-            case 'Watch':
+            case 'watch':
                 this.drawWatch(this.bodyParts.rightArm.x, this.bodyParts.rightArm.y);
                 break;
-            case 'Backpack':
+            case 'backpack':
                 this.drawBackpack(this.bodyParts.torso.x, this.bodyParts.torso.y);
                 break;
         }

@@ -407,6 +407,17 @@ class AvatarEditor {
         this.modal = modal;
         this.canvas = document.getElementById('avatarCanvas');
         this.ctx = this.canvas.getContext('2d');
+        // If renderer was created earlier (before modal), bind its canvas/context now
+        if (this.renderer) {
+            this.renderer.canvas = this.canvas;
+            this.renderer.ctx = this.ctx;
+            if (typeof this.renderer.setupCanvas === 'function') {
+                try { this.renderer.setupCanvas(); } catch (e) { /* ignore */ }
+            }
+            // Ensure avatar data is applied and rendered
+            this.renderer.setAvatarData(this.avatarData);
+            this.renderer.setPose(this.avatarData.animations.currentPose || 'idle');
+        }
     }
 
     // Bind events
