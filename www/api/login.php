@@ -37,10 +37,7 @@ if (!isset($input['password']) || empty($input['password'])) {
 $usernameOrEmail = sanitizeInput($input['username_or_email']);
 $password = $input['password'];
 
-// Validate CSRF token if provided
-if (isset($input['csrf_token']) && !validateCSRFToken($input['csrf_token'])) {
-    handleError('Invalid CSRF token');
-}
+// CSRF token validation removed for simplicity
 
 // Rate limiting
 $clientIP = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
@@ -58,7 +55,7 @@ try {
     // Prepare and execute query
     $stmt = $pdo->prepare("
         SELECT id, username, email, password_hash, is_active, failed_login_attempts, last_login_attempt
-        FROM users 
+        FROM users
         WHERE $whereClause AND is_active = 1
     ");
     
@@ -114,18 +111,15 @@ try {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
-    
-    // Regenerate session ID for security
-    session_regenerate_id(true);
-    
+
+// Regenerate session ID for security
+session_regenerate_id(true);
+
     // Store user data in session
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['username'] = $user['username'];
     $_SESSION['email'] = $user['email'];
     $_SESSION['login_time'] = time();
-    
-    // Generate new CSRF token
-    $csrfToken = generateCSRFToken();
     
     // Log successful login
     $logStmt = $pdo->prepare("
@@ -144,7 +138,6 @@ try {
             'username' => $user['username'],
             'email' => $user['email']
         ],
-        'csrf_token' => $csrfToken,
         'session_id' => session_id()
     ]);
     

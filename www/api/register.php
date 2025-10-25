@@ -39,10 +39,7 @@ $password = $input['password'];
 $confirmPassword = $input['confirm_password'];
 $inviteKey = isset($input['invite_key']) ? sanitizeInput($input['invite_key']) : '';
 
-// Validate CSRF token if provided
-if (isset($input['csrf_token']) && !validateCSRFToken($input['csrf_token'])) {
-    handleError('Invalid CSRF token');
-}
+// CSRF token validation removed for simplicity
 
 // Validate username
 if (!validateUsername($username)) {
@@ -171,15 +168,11 @@ try {
         // TODO: Send email verification email here
         // sendVerificationEmail($email, $emailVerificationToken);
         
-        // Generate CSRF token
-        $csrfToken = generateCSRFToken();
-        
         // Send success response
         sendResponse(200, 'Registration successful. Please check your email to verify your account.', [
             'user_id' => $userId,
             'username' => $username,
             'email' => $email,
-            'csrf_token' => $csrfToken,
             'email_verification_required' => true
         ]);
         

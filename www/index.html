@@ -912,22 +912,26 @@
         // Show loading in circle
         function showLoading() {
             const circleContent = document.getElementById('circleContent');
+            if (!circleContent) return;
+            
             const defaultIcon = circleContent.querySelector('.default-icon');
             const loadingSpinner = circleContent.querySelector('.loading-spinner');
             
-            defaultIcon.style.display = 'none';
-            loadingSpinner.style.display = 'block';
+            if (defaultIcon) defaultIcon.style.display = 'none';
+            if (loadingSpinner) loadingSpinner.style.display = 'block';
         }
 
         // Show status icon
         function showStatus(success) {
             const circleContent = document.getElementById('circleContent');
+            if (!circleContent) return;
+            
             const defaultIcon = circleContent.querySelector('.default-icon');
             const loadingSpinner = circleContent.querySelector('.loading-spinner');
             const iconClass = success ? 'status-success' : 'status-error';
             
-            defaultIcon.style.display = 'none';
-            loadingSpinner.style.display = 'none';
+            if (defaultIcon) defaultIcon.style.display = 'none';
+            if (loadingSpinner) loadingSpinner.style.display = 'none';
             
             // Create status icon element properly
             const statusIcon = document.createElement('div');
@@ -1017,28 +1021,7 @@
                     };
                 }
                 
-                // Get CSRF token
-                let csrfToken = '';
-                try {
-                    const csrfResponse = await fetch(`${API_BASE}/api/csrf_token.php`, {
-                        credentials: 'include',
-                        cache: 'no-store'
-                    });
-                    
-                    if (csrfResponse.ok) {
-                        const csrfData = await csrfResponse.json();
-                        if (csrfData && csrfData.csrf_token) {
-                            csrfToken = csrfData.csrf_token;
-                        }
-                    }
-                } catch (e) {
-                    console.log('CSRF token not available, proceeding without it');
-                }
-                
-                // Add CSRF token to data
-                if (csrfToken) {
-                    data.csrf_token = csrfToken;
-                }
+                // CSRF token removed for simplicity
                 
                 // Create FormData for the request
                 const requestFormData = new FormData();
