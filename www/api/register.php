@@ -1,196 +1,198 @@
 <?php
-// -------------------------------------------------------------------
-// api/register.php
-//
-// Expects POST fields:
-//   • username
-//   • email
-//   • password
-//   • confirm_password
-//   • invite_key
-//   • csrf_token
-//
-// Returns json response + HTTP status code:
-//   • 200 OK   → "Registration successful!"
-//   • 400 Bad Request → validation/breach/duplicate‐username error
-//   • 403 Forbidden → CSRF token invalid
-//   • 429 Too Many Requests → rate limit exceeded
-//   • 500 Internal Server Error → generic server error
-// -------------------------------------------------------------------
+require_once 'config.php';
 
-// Disable error display to prevent warnings from breaking JSON
-error_reporting(0);
-ini_set('display_errors', 0);
+// Set CORS headers
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
+header('Content-Type: application/json');
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Set security headers
-require_once 'security_config.php';
-require_once 'error_handler.php';
-setSecurityHeaders();
-validateOrigin();
-
-// Handle CORS preflight
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
-    header('Access-Control-Max-Age: 86400');
-    header('Content-Type: application/json');
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
     exit;
 }
 
-// Validate request method - allow POST only
+// Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    sendErrorResponse(405, 'Method not allowed. Only POST requests are accepted.');
+    sendResponse(405, 'Method not allowed');
 }
 
-// ------------------------------------------------------------
-// 1) CSRF PROTECTION (do this before any DB work)
-// ------------------------------------------------------------
-require_once 'csrf_utils.php';
-
-// Validate CSRF token
-$csrf_token = $_POST['csrf_token'] ?? null;
-
-// Fallback to cookie if not in POST
-if (!$csrf_token && isset($_COOKIE['XSRF-TOKEN'])) {
-    $csrf_token = $_COOKIE['XSRF-TOKEN'];
+// Get input data
+$input = json_decode(file_get_contents('php://input'), true);
+if (!$input) {
+    $input = $_POST; // Fallback to POST data
 }
 
-if (!$csrf_token || !validateCSRFToken($csrf_token)) {
-    sendErrorResponse(403, 'Invalid CSRF token. Please refresh the page and try again.');
-}
-// ------------------------------------------------------------
-// DEV BYPASS (for local testing without DB)
-// ------------------------------------------------------------
-if (function_exists('isLocalDevelopment') && isLocalDevelopment()) {
-    // Simulate success without DB interaction
-    $_SESSION['user_id']  = 1;
-    $_SESSION['username'] = $_POST['username'] ?? 'devuser';
-    session_regenerate_id(true);
-    regenerateCSRFToken();
-    sendSuccessResponse('Registration successful! (dev bypass)', ['token' => 'dev-token']);
-}
-
-// ------------------------------------------------------------
-// 2) DATABASE CONNECTION (PDO + SSL using environment variables)
-// ------------------------------------------------------------
-require_once 'db_connection.php';
-// token helpers
-require_once 'database_utils.php';
-
-// ------------------------------------------------------------
-// 3) RATE LIMITING
-// ------------------------------------------------------------
-$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-$rate_limit_key = "register_attempts_$ip";
-
-if (!checkRateLimit($rate_limit_key, 3, 1800)) {
-    sendErrorResponse(429, 'Too many registration attempts. Please try again later.');
-}
-
-// ------------------------------------------------------------
-// 4) FETCH & VALIDATE POST DATA
-// ------------------------------------------------------------
-$username   = sanitizeInput($_POST['username'] ?? '', 'username');
-$email      = sanitizeInput($_POST['email'] ?? '', 'email');
-$password   = $_POST['password'] ?? '';
-$confirm    = $_POST['confirm_password'] ?? '';
-$inviteKey  = trim($_POST['invite_key'] ?? '');
-$errors     = [];
-
-// 4a) Validate required fields
-if (!$username || !$email || !$password || !$confirm || !$inviteKey) {
-    $errors[] = 'Please fill in all fields.';
-}
-
-// 4b) Validate password strength
-if (!sanitizeInput($password, 'password')) {
-    $errors[] = 'Password must be at least 8 characters and contain at least one lowercase letter, one uppercase letter, and one number.';
-}
-
-// 4c) Validate password match
-if ($password !== $confirm) {
-    $errors[] = 'Passwords do not match.';
-}
-
-// 4d) Validate invite key - check against database instead of hardcoded value
-try {
-    $stmt = $pdo->prepare("SELECT id, used FROM invite_keys WHERE invite_key = :invite_key AND used = 0 LIMIT 1");
-    $stmt->execute([':invite_key' => $inviteKey]);
-    $invite = $stmt->fetch();
-    
-    if (!$invite) {
-        $errors[] = 'Invalid invite key.';
+// Validate required fields
+$requiredFields = ['username', 'email', 'password', 'confirm_password'];
+foreach ($requiredFields as $field) {
+    if (!isset($input[$field]) || empty($input[$field])) {
+        handleError(ucfirst(str_replace('_', ' ', $field)) . ' is required');
     }
-} catch (PDOException $e) {
-    logError("Invite key validation failed: " . $e->getMessage(), ['invite_key' => $inviteKey]);
-    $errors[] = 'Server error validating invite key.';
 }
 
-if ($errors) {
-    // Increment failed attempts
-    incrementRateLimit($rate_limit_key);
-    
-    sendErrorResponse(400, implode(' ', $errors));
+// Sanitize inputs
+$username = sanitizeInput($input['username']);
+$email = sanitizeInput($input['email']);
+$password = $input['password'];
+$confirmPassword = $input['confirm_password'];
+$inviteKey = isset($input['invite_key']) ? sanitizeInput($input['invite_key']) : '';
+
+// Validate CSRF token if provided
+if (isset($input['csrf_token']) && !validateCSRFToken($input['csrf_token'])) {
+    handleError('Invalid CSRF token');
 }
 
-// ------------------------------------------------------------
-// 5) CHECK PASSWORD BREACH (HIBP API)
-// ------------------------------------------------------------
-require_once 'hibp.php';
-
-if (isPwnedPassword($password)) {
-    incrementRateLimit($rate_limit_key);
-    sendErrorResponse(400, 'Password has been found in a breach. Please choose a different one.');
+// Validate username
+if (!validateUsername($username)) {
+    handleError('Username must be 3-20 characters long and contain only letters, numbers, and underscores');
 }
 
-// ------------------------------------------------------------
-// 6) CHECK FOR EXISTING USERNAME/EMAIL
-// ------------------------------------------------------------
-try {
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE username = :username OR email = :email LIMIT 1");
-    $stmt->execute([':username' => $username, ':email' => $email]);
-    $existing = $stmt->fetch();
-    
-    if ($existing) {
-        sendErrorResponse(400, 'Username or email is already taken.');
+// Validate email
+if (!validateEmail($email)) {
+    handleError('Please enter a valid email address');
+}
+
+// Validate password
+$passwordValidation = validatePassword($password);
+if ($passwordValidation !== true) {
+    handleError($passwordValidation);
+}
+
+// Check password confirmation
+if ($password !== $confirmPassword) {
+    handleError('Passwords do not match');
+}
+
+// Validate invite key if required
+if (REQUIRE_INVITE_KEY) {
+    if (empty($inviteKey)) {
+        handleError('Invite key is required');
     }
-} catch (PDOException $e) {
-    logError("Database query failed: " . $e->getMessage(), ['username' => $username, 'email' => $email]);
-    sendErrorResponse(500, 'Server error. Please try again later.');
+    
+    if (strlen($inviteKey) !== INVITE_KEY_LENGTH) {
+        handleError('Invalid invite key format');
+    }
 }
 
-// ------------------------------------------------------------
-// 7) INSERT NEW USER
-// ------------------------------------------------------------
+// Rate limiting
+$clientIP = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+if (!checkRateLimit($clientIP . '_register', 3, 300)) { // 3 attempts per 5 minutes for registration
+    handleError('Too many registration attempts. Please try again later.');
+}
+
 try {
+    $pdo = getDBConnection();
+    
+    // Check if username already exists
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE username = :username");
+    $stmt->bindParam(':username', $username);
+    $stmt->execute();
+    
+    if ($stmt->fetch()) {
+        handleError('Username already exists');
+    }
+    
+    // Check if email already exists
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+    $stmt->bindParam(':email', $email);
+    $stmt->execute();
+    
+    if ($stmt->fetch()) {
+        handleError('Email already exists');
+    }
+    
+    // Validate invite key if required
+    if (REQUIRE_INVITE_KEY) {
+        $stmt = $pdo->prepare("
+            SELECT id FROM invite_keys 
+            WHERE invite_key = :invite_key 
+            AND is_used = 0 
+            AND expires_at > NOW()
+        ");
+        $stmt->bindParam(':invite_key', $inviteKey);
+        $stmt->execute();
+        
+        $invite = $stmt->fetch();
+        if (!$invite) {
+            handleError('Invalid or expired invite key');
+        }
+    }
+    
+    // Hash password
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-    $token = bin2hex(random_bytes(32));
-
-    $insert = $pdo->prepare("
-        INSERT INTO users (username, email, password_hash, token, created_at)
-        VALUES (:username, :email, :password_hash, :token, NOW())
-    ");
-    $insert->execute([
-        ':username'      => $username,
-        ':email'         => $email,
-        ':password_hash' => $passwordHash,
-        ':token'         => $token
-    ]);
-
-    // Clear rate limiting on successful registration
-    clearRateLimit($rate_limit_key);
-
-    // Auto-login: set session values
-    $_SESSION['user_id']  = $pdo->lastInsertId();
-    $_SESSION['username'] = $username;
-
-    // Generate new CSRF token
-    regenerateCSRFToken();
-
-    sendSuccessResponse('Registration successful!', ['token' => $token]);
+    
+    // Generate email verification token
+    $emailVerificationToken = bin2hex(random_bytes(32));
+    
+    // Start transaction
+    $pdo->beginTransaction();
+    
+    try {
+        // Insert user
+        $stmt = $pdo->prepare("
+            INSERT INTO users (username, email, password_hash, email_verification_token, created_at, is_active) 
+            VALUES (:username, :email, :password_hash, :email_token, NOW(), 0)
+        ");
+        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':password_hash', $passwordHash);
+        $stmt->bindParam(':email_token', $emailVerificationToken);
+        $stmt->execute();
+        
+        $userId = $pdo->lastInsertId();
+        
+        // Mark invite key as used if required
+        if (REQUIRE_INVITE_KEY) {
+            $stmt = $pdo->prepare("
+                UPDATE invite_keys 
+                SET is_used = 1, used_by = :user_id, used_at = NOW() 
+                WHERE invite_key = :invite_key
+            ");
+            $stmt->bindParam(':user_id', $userId);
+            $stmt->bindParam(':invite_key', $inviteKey);
+            $stmt->execute();
+        }
+        
+        // Log registration
+        $stmt = $pdo->prepare("
+            INSERT INTO registration_logs (user_id, ip_address, user_agent, created_at) 
+            VALUES (:user_id, :ip_address, :user_agent, NOW())
+        ");
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->bindParam(':ip_address', $clientIP);
+        $stmt->bindParam(':user_agent', $_SERVER['HTTP_USER_AGENT'] ?? '');
+        $stmt->execute();
+        
+        // Commit transaction
+        $pdo->commit();
+        
+        // TODO: Send email verification email here
+        // sendVerificationEmail($email, $emailVerificationToken);
+        
+        // Generate CSRF token
+        $csrfToken = generateCSRFToken();
+        
+        // Send success response
+        sendResponse(200, 'Registration successful. Please check your email to verify your account.', [
+            'user_id' => $userId,
+            'username' => $username,
+            'email' => $email,
+            'csrf_token' => $csrfToken,
+            'email_verification_required' => true
+        ]);
+        
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        throw $e;
+    }
+    
 } catch (PDOException $e) {
-    logError("Database insert failed: " . $e->getMessage(), ['username' => $username, 'email' => $email]);
-    sendErrorResponse(500, 'Could not register user. Please try again later.');
+    error_log('Database error in register.php: ' . $e->getMessage());
+    handleError('Database error occurred');
+} catch (Exception $e) {
+    error_log('General error in register.php: ' . $e->getMessage());
+    handleError('An error occurred during registration');
 }
+?>

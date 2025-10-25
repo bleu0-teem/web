@@ -1,173 +1,158 @@
 <?php
+require_once 'config.php';
 
-// -------------------------------------------------------------------
-// api/login.php
-//
-// Expects POST fields:
-//   • username_or_email
-//   • password
-//   • csrf_token
-//
-// Returns json reason and token (token if success) + HTTP status code:
-//   • 200 OK   → "Login successful!"
-//   • 400 Bad Request → missing fields or pwned password
-//   • 401 Unauthorized → invalid credentials
-//   • 403 Forbidden → CSRF token invalid
-//   • 500 Internal Server Error → generic server error
-// -------------------------------------------------------------------
+// Set CORS headers
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
+header('Content-Type: application/json');
 
-// Disable error display to avoid breaking JSON responses
-error_reporting(0);
-ini_set('display_errors', 0);
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Set security headers
-require_once 'security_config.php';
-require_once 'error_handler.php';
-setSecurityHeaders();
-validateOrigin();
-
-// Handle CORS preflight
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
-    header('Access-Control-Max-Age: 86400');
-    header('Content-Type: application/json');
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
     exit;
 }
 
-// (dev bypass removed - keep environment-controlled bypass further down)
-
-// Validate request method
-validateRequestMethod(['POST']);
-
-// ------------------------------------------------------------
-// 1) CSRF PROTECTION (do this before any DB work)
-// ------------------------------------------------------------
-require_once 'csrf_utils.php';
-
-// Check for CSRF token in POST or fallback to cookie
-$csrf_token = $_POST['csrf_token'] ?? null;
-if (!$csrf_token && isset($_COOKIE['XSRF-TOKEN'])) {
-    $csrf_token = $_COOKIE['XSRF-TOKEN'];
+// Only allow POST requests
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    sendResponse(405, 'Method not allowed');
 }
 
-if (!$csrf_token || !validateCSRFToken($csrf_token)) {
-    sendErrorResponse(403, 'Invalid CSRF token.');
+// Get input data
+$input = json_decode(file_get_contents('php://input'), true);
+if (!$input) {
+    $input = $_POST; // Fallback to POST data
 }
 
-// ------------------------------------------------------------
-// DEV BYPASS (for local testing without DB)
-// ------------------------------------------------------------
-if ((($_ENV['APP_ENV'] ?? 'production') === 'development' || function_exists('isLocalDevelopment') && isLocalDevelopment()) && (($_ENV['AUTH_DEV_BYPASS'] ?? '1') === '1')) {
-    $_SESSION['user_id']  = 1;
-    $_SESSION['username'] = $_POST['username_or_email'] ?? 'devuser';
-    session_regenerate_id(true);
-    regenerateCSRFToken();
-    sendSuccessResponse('Login successful! (dev bypass)', ['token' => 'dev-token']);
+// Validate required fields
+if (!isset($input['username_or_email']) || empty($input['username_or_email'])) {
+    handleError('Username or email is required');
 }
 
-// ------------------------------------------------------------
-// 2) DATABASE CONNECTION (PDO + SSL using environment variables)
-// ------------------------------------------------------------
-require_once 'db_connection.php';
-
-// Make DatabaseUtils available (helpers for api token creation/validation)
-require_once 'database_utils.php';
-
-// ------------------------------------------------------------
-// 3) RATE LIMITING
-// ------------------------------------------------------------
-$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-$rate_limit_key = "login_attempts_$ip";
-
-if (!checkRateLimit($rate_limit_key, 5, 900)) {
-    sendErrorResponse(429, 'Too many login attempts. Please try again later.');
+if (!isset($input['password']) || empty($input['password'])) {
+    handleError('Password is required');
 }
 
-// ------------------------------------------------------------
-// 4) FETCH & VALIDATE POST DATA
-// ------------------------------------------------------------
-// Accept either email or username
-$rawIdent = trim($_POST['username_or_email'] ?? '');
-if (filter_var($rawIdent, FILTER_VALIDATE_EMAIL)) {
-    $identifier = $rawIdent;
-} else {
-    $identifier = sanitizeInput($rawIdent, 'username');
-}
-$password   = $_POST['password'] ?? '';
+// Sanitize inputs
+$usernameOrEmail = sanitizeInput($input['username_or_email']);
+$password = $input['password'];
 
-// Validate input
-if (!$identifier || empty($password)) {
-    sendErrorResponse(400, 'Please fill in both fields with valid data.');
+// Validate CSRF token if provided
+if (isset($input['csrf_token']) && !validateCSRFToken($input['csrf_token'])) {
+    handleError('Invalid CSRF token');
 }
 
-// ------------------------------------------------------------
-// 5) SERVER-SIDE "Have I Been Pwned" CHECK
-// ------------------------------------------------------------
-require_once 'hibp.php';
-
-if (isPwnedPassword($password)) {
-    sendErrorResponse(400, 'Your password has been found in breaches. Please change it.');
+// Rate limiting
+$clientIP = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+if (!checkRateLimit($clientIP)) {
+    handleError('Too many login attempts. Please try again later.');
 }
 
-// ------------------------------------------------------------
-// 6) FETCH USER FROM DATABASE & VERIFY PASSWORD
-// ------------------------------------------------------------
 try {
-    $stmt = $pdo->prepare("
-        SELECT id, username, email, password_hash, token
-        FROM users
-        WHERE username = :ident OR email = :ident
-        LIMIT 1
-    ");
-    $stmt->execute([':ident' => $identifier]);
-    $userRow = $stmt->fetch();
-} catch (PDOException $e) {
-    logError("Database query failed: " . $e->getMessage(), ['identifier' => $identifier]);
-    sendErrorResponse(500, 'Server error. Please try again later.');
-}
-
-if (!$userRow || !password_verify($password, $userRow['password_hash'])) {
-    // Increment failed attempts
-    incrementRateLimit($rate_limit_key);
+    $pdo = getDBConnection();
     
-    sendErrorResponse(401, 'Invalid username/password.');
-}
-
-// ------------------------------------------------------------
-// 7) LOGIN SUCCESS: SET SESSION & RETURN
-// ------------------------------------------------------------
-// Clear rate limiting on successful login
-clearRateLimit($rate_limit_key);
-
-$_SESSION['user_id']  = $userRow['id'];
-$_SESSION['username'] = $userRow['username'];
-
-// Regenerate session ID for security
-session_regenerate_id(true);
-
-// Cookie flags are configured globally; avoid changing session ini at runtime
-
-// Generate new CSRF token
-regenerateCSRFToken();
-
-// ---------------------------
-// Generate and persist API token for this session/user (use helper)
-// ---------------------------
-$tokenToReturn = null;
-try {
-    // createApiToken returns token string or false
-    $token = DatabaseUtils::createApiToken($userRow['id'], intval($_ENV['API_TOKEN_TTL_DAYS'] ?? 30));
-    if ($token !== false) {
-        $tokenToReturn = $token;
-    } else {
-        $tokenToReturn = $userRow['token'] ?? null;
+    // Determine if input is email or username
+    $isEmail = validateEmail($usernameOrEmail);
+    $whereClause = $isEmail ? 'email = :identifier' : 'username = :identifier';
+    
+    // Prepare and execute query
+    $stmt = $pdo->prepare("
+        SELECT id, username, email, password_hash, is_active, failed_login_attempts, last_login_attempt
+        FROM users 
+        WHERE $whereClause AND is_active = 1
+    ");
+    
+    $stmt->bindParam(':identifier', $usernameOrEmail);
+    $stmt->execute();
+    
+    $user = $stmt->fetch();
+    
+    if (!$user) {
+        handleError('Invalid credentials');
     }
+    
+    // Check if account is locked due to too many failed attempts
+    if ($user['failed_login_attempts'] >= MAX_LOGIN_ATTEMPTS) {
+        $lastAttempt = strtotime($user['last_login_attempt']);
+        if ((time() - $lastAttempt) < LOCKOUT_TIME) {
+            handleError('Account temporarily locked due to too many failed attempts');
+        } else {
+            // Reset failed attempts after lockout period
+            $resetStmt = $pdo->prepare("UPDATE users SET failed_login_attempts = 0 WHERE id = :id");
+            $resetStmt->bindParam(':id', $user['id']);
+            $resetStmt->execute();
+        }
+    }
+    
+    // Verify password
+    if (!password_verify($password, $user['password_hash'])) {
+        // Increment failed login attempts
+        $updateStmt = $pdo->prepare("
+            UPDATE users 
+            SET failed_login_attempts = failed_login_attempts + 1, 
+                last_login_attempt = NOW() 
+            WHERE id = :id
+        ");
+        $updateStmt->bindParam(':id', $user['id']);
+        $updateStmt->execute();
+        
+        handleError('Invalid credentials');
+    }
+    
+    // Reset failed login attempts on successful login
+    $resetStmt = $pdo->prepare("
+        UPDATE users 
+        SET failed_login_attempts = 0, 
+            last_login = NOW(),
+            last_login_attempt = NULL
+        WHERE id = :id
+    ");
+    $resetStmt->bindParam(':id', $user['id']);
+    $resetStmt->execute();
+    
+    // Start session
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    // Regenerate session ID for security
+    session_regenerate_id(true);
+    
+    // Store user data in session
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['email'] = $user['email'];
+    $_SESSION['login_time'] = time();
+    
+    // Generate new CSRF token
+    $csrfToken = generateCSRFToken();
+    
+    // Log successful login
+    $logStmt = $pdo->prepare("
+        INSERT INTO login_logs (user_id, ip_address, user_agent, success, created_at) 
+        VALUES (:user_id, :ip_address, :user_agent, 1, NOW())
+    ");
+    $logStmt->bindParam(':user_id', $user['id']);
+    $logStmt->bindParam(':ip_address', $clientIP);
+    $logStmt->bindParam(':user_agent', $_SERVER['HTTP_USER_AGENT'] ?? '');
+    $logStmt->execute();
+    
+    // Send success response
+    sendResponse(200, 'Login successful', [
+        'user' => [
+            'id' => $user['id'],
+            'username' => $user['username'],
+            'email' => $user['email']
+        ],
+        'csrf_token' => $csrfToken,
+        'session_id' => session_id()
+    ]);
+    
+} catch (PDOException $e) {
+    error_log('Database error in login.php: ' . $e->getMessage());
+    handleError('Database error occurred');
 } catch (Exception $e) {
-    error_log('createApiToken threw: ' . $e->getMessage());
-    $tokenToReturn = $userRow['token'] ?? null;
+    error_log('General error in login.php: ' . $e->getMessage());
+    handleError('An error occurred during login');
 }
-
-sendSuccessResponse('Login successful!', ['token' => $tokenToReturn]);
+?>

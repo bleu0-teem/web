@@ -1024,9 +1024,12 @@
                         credentials: 'include',
                         cache: 'no-store'
                     });
-                    const csrfData = await csrfResponse.json();
-                    if (csrfData && csrfData.csrf_token) {
-                        csrfToken = csrfData.csrf_token;
+                    
+                    if (csrfResponse.ok) {
+                        const csrfData = await csrfResponse.json();
+                        if (csrfData && csrfData.csrf_token) {
+                            csrfToken = csrfData.csrf_token;
+                        }
                     }
                 } catch (e) {
                     console.log('CSRF token not available, proceeding without it');
@@ -1051,6 +1054,12 @@
                     credentials: 'include'
                 });
                 
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Server returned non-JSON response');
+                }
+                
                 const result = await response.json();
                 
                 if (response.ok && result.status === 200) {
@@ -1068,16 +1077,26 @@
                 } else {
                     // Error
                     showStatus(false);
-                    showNotification(result.error || 'Operation failed. Please try again.');
-                    console.error('API Error:', result.error || 'Unknown error');
+                    showNotification(result.message || 'Operation failed. Please try again.');
+                    console.error('API Error:', result.message || 'Unknown error');
                 }
                 
             } catch (error) {
                 console.error('Network Error:', error);
                 showStatus(false);
-                showNotification('Network error. Please check your connection and try again.');
+                
+                if (error.message.includes('non-JSON')) {
+                    showNotification('Server error. Please try again later.');
+                } else if (error.message.includes('403')) {
+                    showNotification('Access denied. Please refresh and try again.');
+                } else if (error.message.includes('404')) {
+                    showNotification('Service unavailable. Please try again later.');
+                } else {
+                    showNotification('Network error. Please check your connection and try again.');
+                }
             }
         }
+
 
         // Form toggle functionality
         let isLoginMode = true;

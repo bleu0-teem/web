@@ -1,42 +1,34 @@
 <?php
-// -------------------------------------------------------------------
-// csrf_token.php - Returns current CSRF token as JSON
-// -------------------------------------------------------------------
+require_once 'config.php';
 
+// Set CORS headers
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
+header('Content-Type: application/json');
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
+// Only allow GET requests
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    sendResponse(405, 'Method not allowed');
+}
+
+// Start session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once __DIR__ . '/security_config.php';
-require_once __DIR__ . '/csrf_utils.php';
+// Generate new CSRF token
+$csrfToken = generateCSRFToken();
 
-// Security headers and CORS for dev
-setSecurityHeaders();
-validateOrigin();
-
-// Handle preflight
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
-    header('Access-Control-Max-Age: 86400');
-    header('Content-Type: application/json');
-    exit;
-}
-
-header('Content-Type: application/json');
-
-$token = getCSRFToken();
-
-// Also set a CSRF cookie for double-submit strategy (readable by JS)
-setcookie('XSRF-TOKEN', $token, [
-    'expires' => time() + 3600,
-    'path' => '/',
-    'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
-    'httponly' => false,
-    'samesite' => 'Lax',
-    'domain' => ''
+// Send response
+sendResponse(200, 'CSRF token generated', [
+    'csrf_token' => $csrfToken,
+    'timestamp' => time()
 ]);
-
-echo json_encode(['csrf_token' => $token]);
-exit;
 ?>
-
-
