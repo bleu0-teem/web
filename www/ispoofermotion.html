@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>i spoofer motion stuff</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #eee;
+    padding: 15px;
+}
+textarea {
+    width: 100%;
+    height: 200px;
+    margin: 10px 0;
+    background: #222;
+    color: #fff;
+    border: 1px solid #444;
+    padding: 10px;
+    box-sizing: border-box;
+}
+input, button {
+    padding: 8px;
+    margin: 5px 0;
+    background: #222;
+    color: #fff;
+    border: 1px solid #444;
+}
+label {
+    margin-right: 15px;
+}
+button {
+    cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<h2>remove anims from list that have your UserId or GroupId (basically removes uploaded anims)</h2>
+
+<label>
+    <input type="radio" name="mode" value="user" checked>
+    remove by UserId
+</label>
+
+<label>
+    <input type="radio" name="mode" value="group">
+    remove by GroupId
+</label>
+
+<br><br>
+
+<input type="text" id="targetId" placeholder="enter UserId or GroupId">
+
+<h3>Input Text</h3>
+<textarea id="inputText" placeholder="paste your anim list"></textarea>
+
+<button onclick="removeLines()">complete</button>
+
+<h3>output text</h3>
+<textarea id="outputText" placeholder="no output"></textarea>
+
+<script>
+function removeLines() {
+    const text = document.getElementById("inputText").value;
+    const targetId = document.getElementById("targetId").value.trim();
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+
+    if (!targetId) {
+        alert("no UserId or GroupId");
+        return;
+    }
+
+    const lines = text.split(/\r?\n/);
+    const kept = [];
+
+    for (let line of lines) {
+        let remove = false;
+
+        if (mode === "user") {
+            // Match [User:ID] anywhere in the line
+            const userRegex = new RegExp(`\\[User:${targetId}\\]`);
+            if (userRegex.test(line)) {
+                remove = true;
+            }
+        } else if (mode === "group") {
+            // Match [Group:ID] anywhere in the line
+            const groupRegex = new RegExp(`\\[Group:${targetId}\\]`);
+            if (groupRegex.test(line)) {
+                remove = true;
+            }
+        }
+
+        if (!remove) {
+            kept.push(line);
+        }
+    }
+
+    document.getElementById("outputText").value = kept.join("\n");
+}
+</script>
+
+</body>
+</html>
