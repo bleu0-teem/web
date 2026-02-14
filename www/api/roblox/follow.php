@@ -83,40 +83,22 @@ foreach ($cookies as $index => $cookie) {
         continue;
     }
     
-    // Get user info to verify the user exists
-    $userUrl = "https://friends.roblox.com/v1/users/{$userId}/follow";
-    $userCheck = makeRobloxRequest($userUrl, $cookie);
+    // Create a temporary cookie file for this session
 
-    if (!$userCheck['success']) {
-        $result['error'] = 'Request failed';
-        $result['response'] = $userCheck['response']; // show raw response
-        $errorCount++;
-        $results[] = $result;
-        continue;
-    }
-
-    $result['response'] = $userCheck['response']; // always return API response
-    $results[] = $result;
-
+    $cookieFile = tempnam(sys_get_temp_dir(), 'roblox_cookie_');
+    file_put_contents($cookieFile, ".ROBLOSECURITY\tTRUE\t/\tFALSE\t0\t.ROBLOSECURITY\t" . $cookie . "\n");
     
     // Get CSRF token from Roblox home page HTML
     $csrfUrl = "https://www.roblox.com/home";
     
-    $csrfHeaders = [
-        'Cookie: .ROBLOSECURITY=' . $cookie,
-        'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0',
-        'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language: en-US,en;q=0.5',
-        'Referer: https://www.roblox.com/',
-        'Origin: https://www.roblox.com'
-    ];
-    
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $csrfUrl);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $csrfHeaders);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFile);
+    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFile);
     
     $csrfResponse = curl_exec($ch);
     curl_close($ch);
@@ -126,40 +108,38 @@ foreach ($cookies as $index => $cookie) {
     if (preg_match("/Roblox\.XsrfToken\.setToken\('([^']+)'\);/", $csrfResponse, $matches)) {
         $csrfToken = $matches[1];
     }
-
     
-    // Make follow request
+    // Make follow request using same session
     $followUrl = "https://friends.roblox.com/v1/users/{$userId}/follow";
     
-    $headers = [
-        'Cookie: .ROBLOSECURITY=' . $cookie,
-        'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0',
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $followUrl);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Accept: application/json, text/plain, */*',
         'Accept-Language: en-US,en;q=0.5',
         'Accept-Encoding: gzip, deflate, br',
         'Referer: https://www.roblox.com/',
         'Origin: https://www.roblox.com',
-        'Connection: keep-alive'
-    ];
-    
-    if ($csrfToken) {
-        $headers[] = 'x-csrf-token: ' . $csrfToken;
-    }
-    
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $followUrl);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        'Connection: keep-alive',
+        'x-csrf-token: ' . ($csrfToken ?: '')
+    ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, '');
+    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFile);
+    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFile);
     
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-
+    
+    // Clean up cookie file
+    @unlink($cookieFile);
     
     if ($httpCode >= 200 && $httpCode < 300) {
+
         $result['success'] = true;
         $result['message'] = 'Successfully followed user';
         $successCount++;
