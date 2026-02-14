@@ -84,7 +84,7 @@ foreach ($cookies as $index => $cookie) {
     }
     
     // Get user info to verify the user exists
-    $userUrl = "https://users.roblox.com/v1/users/{$userId}";
+    $userUrl = "https://friends.roblox.com/v1/users/{$userId}/follow";
     $userCheck = makeRobloxRequest($userUrl, $cookie);
     
     if (!$userCheck['success'] || !json_decode($userCheck['response'], true)) {
