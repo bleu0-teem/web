@@ -8,6 +8,14 @@
 function verifyApiPassword() {
     $inputPassword = $_GET['api_password'] ?? $_POST['api_password'] ?? null;
     
+    // Check from JSON input body
+    if (empty($inputPassword)) {
+        $jsonInput = json_decode(file_get_contents('php://input'), true);
+        if (is_array($jsonInput) && isset($jsonInput['api_password'])) {
+            $inputPassword = $jsonInput['api_password'];
+        }
+    }
+    
     // Also check from Authorization header
     $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
     if (empty($inputPassword) && !empty($authHeader)) {
@@ -15,6 +23,7 @@ function verifyApiPassword() {
             $inputPassword = $matches[1];
         }
     }
+
     
     $envPassword = $_ENV['API_PASSWORD'] ?? getenv('API_PASSWORD');
     
