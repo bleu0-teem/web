@@ -94,18 +94,36 @@ foreach ($cookies as $index => $cookie) {
         continue;
     }
     
-    // Get CSRF token
+    // Get CSRF token from Roblox
     $csrfUrl = "https://www.roblox.com/api/csrf";
-    $csrfResponse = makeRobloxRequest($csrfUrl, $cookie, 'POST', ['cookie' => $cookie], false);
     
+    $csrfHeaders = [
+        'Cookie: .ROBLOSECURITY=' . $cookie,
+        'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0',
+        'Accept: application/json, text/plain, */*',
+        'Accept-Language: en-US,en;q=0.5',
+        'Referer: https://www.roblox.com/',
+        'Origin: https://www.roblox.com'
+    ];
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $csrfUrl);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $csrfHeaders);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+    curl_setopt($ch, CURLOPT_HEADER, true);
+    
+    $csrfResponse = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+    curl_close($ch);
+    
+    // Extract CSRF token from response headers
     $csrfToken = null;
-    if ($csrfResponse['success']) {
-        $csrfData = json_decode($csrfResponse['response'], true);
-        $csrfToken = $csrfData['token'] ?? null;
-    }
-    
-    if (!$csrfToken) {
-        $csrfToken = $_COOKIE['csrf'] ?? null;
+    $headersStr = substr($csrfResponse, 0, $headerSize);
+    if (preg_match('/x-csrf-token:\s*([^\r\n]+)/i', $headersStr, $matches)) {
+        $csrfToken = trim($matches[1]);
     }
     
     // Make join group request
@@ -113,13 +131,17 @@ foreach ($cookies as $index => $cookie) {
     
     $headers = [
         'Cookie: .ROBLOSECURITY=' . $cookie,
-        'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Content-Type: application/json',
-        'Referer: https://www.roblox.com/groups'
+        'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0',
+        'Accept: application/json, text/plain, */*',
+        'Accept-Language: en-US,en;q=0.5',
+        'Accept-Encoding: gzip, deflate, br',
+        'Referer: https://www.roblox.com/',
+        'Origin: https://www.roblox.com',
+        'Connection: keep-alive'
     ];
     
     if ($csrfToken) {
-        $headers[] = 'X-CSRF-TOKEN: ' . $csrfToken;
+        $headers[] = 'x-csrf-token: ' . $csrfToken;
     }
     
     $ch = curl_init();
@@ -128,10 +150,12 @@ foreach ($cookies as $index => $cookie) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, '');
     
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
+
     
     if ($httpCode >= 200 && $httpCode < 300) {
         $result['success'] = true;
