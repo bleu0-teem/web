@@ -96,32 +96,33 @@ foreach ($cookies as $index => $cookie) {
     
     // Create a temporary cookie file for this session
     $cookieFile = tempnam(sys_get_temp_dir(), 'roblox_cookie_');
-    file_put_contents(
-    $cookieFile,
-    ".roblox.com\tTRUE\t/\tTRUE\t0\t.ROBLOSECURITY\t" . $cookie . "\n"
-    );
- 
-    // Get CSRF token from Roblox home page HTML
-    $csrfUrl = "https://www.roblox.com/home";
+    file_put_contents($cookieFile, ".ROBLOSECURITY\tTRUE\t/\tFALSE\t0\t.ROBLOSECURITY\t" . $cookie . "\n");
+    
+    // Get CSRF token by making a POST request and extracting from response headers
+    $csrfUrl = "https://friends.roblox.com/v1/users/1/request-friendship";
     
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $csrfUrl);
+    curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_HEADER, true);
     curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFile);
     curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFile);
-
     
     $csrfResponse = curl_exec($ch);
+    $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
     curl_close($ch);
     
-    // Extract CSRF token from HTML body
+    // Extract CSRF token from response headers
     $csrfToken = null;
-    if (preg_match("/Roblox\.XsrfToken\.setToken\('([^']+)'\);/", $csrfResponse, $matches)) {
-        $csrfToken = $matches[1];
+    $headersStr = substr($csrfResponse, 0, $headerSize);
+    if (preg_match('/x-csrf-token:\s*([^\r\n]+)/i', $headersStr, $matches)) {
+        $csrfToken = trim($matches[1]);
     }
+
     
     // Make favorite request using same session
     $favoriteUrl = "https://games.roblox.com/v1/games/{$placeId}/favorite";
