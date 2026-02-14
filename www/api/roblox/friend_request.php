@@ -94,13 +94,13 @@ foreach ($cookies as $index => $cookie) {
         continue;
     }
     
-    // Get CSRF token from Roblox
-    $csrfUrl = "https://www.roblox.com/api/csrf";
+    // Get CSRF token from Roblox home page HTML
+    $csrfUrl = "https://www.roblox.com/home";
     
     $csrfHeaders = [
         'Cookie: .ROBLOSECURITY=' . $cookie,
         'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0',
-        'Accept: application/json, text/plain, */*',
+        'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language: en-US,en;q=0.5',
         'Referer: https://www.roblox.com/',
         'Origin: https://www.roblox.com'
@@ -108,26 +108,23 @@ foreach ($cookies as $index => $cookie) {
     
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $csrfUrl);
-    curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $csrfHeaders);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-    curl_setopt($ch, CURLOPT_HEADER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     
     $csrfResponse = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
     curl_close($ch);
     
-    // Extract CSRF token from response headers
+    // Extract CSRF token from HTML body
     $csrfToken = null;
-    $headersStr = substr($csrfResponse, 0, $headerSize);
-    if (preg_match('/x-csrf-token:\s*([^\r\n]+)/i', $headersStr, $matches)) {
-        $csrfToken = trim($matches[1]);
+    if (preg_match("/Roblox\.XsrfToken\.setToken\('([^']+)'\);/", $csrfResponse, $matches)) {
+        $csrfToken = $matches[1];
     }
     
     // Make friend request
-    $friendUrl = "https://friends.roblox.com/v1/users/{$userId}/request-friend";
+    $friendUrl = "https://friends.roblox.com/v1/users/{$userId}/request-friendship";
+
     
     $headers = [
         'Cookie: .ROBLOSECURITY=' . $cookie,
