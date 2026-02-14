@@ -86,7 +86,10 @@ foreach ($cookies as $index => $cookie) {
     // Create a temporary cookie file for this session
 
     $cookieFile = tempnam(sys_get_temp_dir(), 'roblox_cookie_');
-    file_put_contents($cookieFile, ".ROBLOSECURITY\tTRUE\t/\tFALSE\t0\t.ROBLOSECURITY\t" . $cookie . "\n");
+    file_put_contents(
+    $cookieFile,
+    ".roblox.com\tTRUE\t/\tTRUE\t0\t.ROBLOSECURITY\t" . $cookie . "\n"
+    );
     
     // Get CSRF token from Roblox home page HTML
     $csrfUrl = "https://www.roblox.com/home";
