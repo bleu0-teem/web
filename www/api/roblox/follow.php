@@ -111,9 +111,12 @@ foreach ($cookies as $index => $cookie) {
     if (preg_match('/x-csrf-token:\s*([^\r\n]+)/i', $headersStr, $matches)) {
         $csrfToken = trim($matches[1]);
     }
-
+    
+    // Debug: Log CSRF token (first 10 chars)
+    $result['debug_csrf'] = $csrfToken ? substr($csrfToken, 0, 10) . '...' : 'NOT FOUND';
     
     // Make follow request using same session
+
     $followUrl = "https://friends.roblox.com/v1/users/{$userId}/follow";
     
     $ch = curl_init();
@@ -144,8 +147,11 @@ foreach ($cookies as $index => $cookie) {
     // Clean up cookie file
     @unlink($cookieFile);
     
+    // Debug: Log response
+    $result['debug_http_code'] = $httpCode;
+    $result['debug_response'] = substr($response, 0, 200);
+    
     if ($httpCode >= 200 && $httpCode < 300) {
-
         $result['success'] = true;
         $result['message'] = 'Successfully followed user';
         $successCount++;
@@ -154,6 +160,7 @@ foreach ($cookies as $index => $cookie) {
         $result['error'] = $errorData['errorMessage'] ?? $errorData['message'] ?? 'Failed to follow user (HTTP ' . $httpCode . ')';
         $errorCount++;
     }
+
     
     $results[] = $result;
 }
