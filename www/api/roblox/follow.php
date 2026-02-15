@@ -83,84 +83,20 @@ foreach ($cookies as $index => $cookie) {
         continue;
     }
     
-    // Get CSRF token by making a POST request to a Roblox API endpoint
-    $csrfUrl = "https://auth.roblox.com/v2/login";
-    
+    $followUrl = "https://friends.roblox.com/v1/users/{$userId}/follow";
+
+    // Roblox CSRF flow: POST without token -> receive 403 + x-csrf-token header -> retry once with token.
+    $csrfToken = null;
+
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $csrfUrl);
+    curl_setopt($ch, CURLOPT_URL, $followUrl);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_HEADER, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['username' => '', 'password' => '']));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Cookie: .ROBLOSECURITY=' . $cookie,
-        'Content-Type: application/json',
-        'Accept: application/json',
-        'Accept-Language: en-US,en;q=0.9',
-        'Accept-Encoding: gzip, deflate, br',
-        'Referer: https://www.roblox.com/',
-        'Origin: https://www.roblox.com',
-        'Sec-Ch-Ua: "Not_A Brand";v="8", "Chromium";v="120"',
-        'Sec-Ch-Ua-Mobile: ?0',
-        'Sec-Ch-Ua-Platform: "Windows"',
-        'Sec-Fetch-Dest: empty',
-        'Sec-Fetch-Mode: cors',
-        'Sec-Fetch-Site: same-site'
-    ]);
-    
-    $csrfResponse = curl_exec($ch);
-    $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-    curl_close($ch);
-    
-    // Extract CSRF token from response headers
-    $csrfToken = null;
-    $headersStr = substr($csrfResponse, 0, $headerSize);
-    if (preg_match('/x-csrf-token:\s*([^\r\n]+)/i', $headersStr, $matches)) {
-        $csrfToken = trim($matches[1]);
-    }
-    
-    // If still no token, try alternative method
-    if (!$csrfToken) {
-        $altUrl = "https://friends.roblox.com/v1/metadata";
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $altUrl);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Cookie: .ROBLOSECURITY=' . $cookie,
-            'Accept: application/json',
-            'Accept-Language: en-US,en;q=0.9',
-            'Referer: https://www.roblox.com/',
-            'Origin: https://www.roblox.com'
-        ]);
-        
-        $altResponse = curl_exec($ch);
-        $altHeaderSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        curl_close($ch);
-        
-        $altHeadersStr = substr($altResponse, 0, $altHeaderSize);
-        if (preg_match('/x-csrf-token:\s*([^\r\n]+)/i', $altHeadersStr, $matches)) {
-            $csrfToken = trim($matches[1]);
-        }
-    }
-    
-    // Debug: Log CSRF token (first 10 chars)
-    $result['debug_csrf'] = $csrfToken ? substr($csrfToken, 0, 10) . '...' : 'NOT FOUND';
-    
-    // Make follow request using same session
-
-    $followUrl = "https://friends.roblox.com/v1/users/{$userId}/follow";
-    
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $followUrl);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36');
+    curl_setopt($ch, CURLOPT_POSTFIELDS, '');
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Cookie: .ROBLOSECURITY=' . $cookie,
         'Accept: application/json, text/plain, */*',
@@ -175,21 +111,59 @@ foreach ($cookies as $index => $cookie) {
         'Sec-Ch-Ua-Platform: "Windows"',
         'Sec-Fetch-Dest: empty',
         'Sec-Fetch-Mode: cors',
-        'Sec-Fetch-Site: same-site',
-        'x-csrf-token: ' . ($csrfToken ?: '')
+        'Sec-Fetch-Site: same-site'
     ]);
 
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, '');
-    
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $firstResponse = curl_exec($ch);
+    $firstHeaderSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+    $firstHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    $firstHeadersStr = $firstResponse !== false ? substr($firstResponse, 0, $firstHeaderSize) : '';
+    if (preg_match('/x-csrf-token:\s*([^\r\n]+)/i', $firstHeadersStr, $matches)) {
+        $csrfToken = trim($matches[1]);
+    }
+
+    // Debug: Log CSRF token (first 10 chars)
+    $result['debug_csrf'] = $csrfToken ? substr($csrfToken, 0, 10) . '...' : 'NOT FOUND';
+
+    // If the first call was a 403 and we got a token, retry once with token.
+    $response = $firstResponse;
+    $httpCode = $firstHttpCode;
+
+    if ($httpCode === 403 && $csrfToken) {
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Cookie: .ROBLOSECURITY=' . $cookie,
+            'Accept: application/json, text/plain, */*',
+            'Accept-Language: en-US,en;q=0.9',
+            'Accept-Encoding: gzip, deflate, br',
+            'Referer: https://www.roblox.com/',
+            'Origin: https://www.roblox.com',
+            'Cache-Control: no-cache',
+            'Pragma: no-cache',
+            'Sec-Ch-Ua: "Not_A Brand";v="8", "Chromium";v="120"',
+            'Sec-Ch-Ua-Mobile: ?0',
+            'Sec-Ch-Ua-Platform: "Windows"',
+            'Sec-Fetch-Dest: empty',
+            'Sec-Fetch-Mode: cors',
+            'Sec-Fetch-Site: same-site',
+            'x-csrf-token: ' . $csrfToken
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    }
+
+    $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
     curl_close($ch);
     
     // Debug: Log response
     $result['debug_http_code'] = $httpCode;
-    $result['debug_response'] = substr($response, 0, 200);
+    if ($response !== false) {
+        $body = substr($response, $headerSize);
+        $result['debug_response'] = substr($body, 0, 200);
+    } else {
+        $result['debug_response'] = '';
+    }
     
     if ($httpCode >= 200 && $httpCode < 300) {
         $result['success'] = true;
@@ -200,7 +174,7 @@ foreach ($cookies as $index => $cookie) {
         $errorMessage = $errorData['errorMessage'] ?? $errorData['message'] ?? 'Failed to follow user (HTTP ' . $httpCode . ')';
         
         // Check for challenge requirement specifically
-        if (strpos($errorMessage, 'Challenge is required') !== false || $httpCode === 403) {
+        if (strpos($errorMessage, 'Challenge is required') !== false) {
             $errorMessage = 'Challenge required - Roblox anti-bot protection detected. Try again later or use different cookies.';
         }
         
