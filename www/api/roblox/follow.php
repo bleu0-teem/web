@@ -83,19 +83,31 @@ foreach ($cookies as $index => $cookie) {
         continue;
     }
     
-    // Get CSRF token by making a POST request and extracting from response headers
-    $csrfUrl = "https://friends.roblox.com/v1/users/1/request-friendship";
+    // Get CSRF token by accessing a Roblox page first
+    $csrfUrl = "https://www.roblox.com/home";
     
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $csrfUrl);
-    curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_HEADER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Cookie: .ROBLOSECURITY=' . $cookie
+        'Cookie: .ROBLOSECURITY=' . $cookie,
+        'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'Accept-Language: en-US,en;q=0.9',
+        'Accept-Encoding: gzip, deflate, br',
+        'Cache-Control: no-cache',
+        'Pragma: no-cache',
+        'Sec-Ch-Ua: "Not_A Brand";v="8", "Chromium";v="120"',
+        'Sec-Ch-Ua-Mobile: ?0',
+        'Sec-Ch-Ua-Platform: "Windows"',
+        'Sec-Fetch-Dest: document',
+        'Sec-Fetch-Mode: navigate',
+        'Sec-Fetch-Site: none',
+        'Sec-Fetch-User: ?1',
+        'Upgrade-Insecure-Requests: 1'
     ]);
     
     $csrfResponse = curl_exec($ch);
@@ -123,9 +135,15 @@ foreach ($cookies as $index => $cookie) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Cookie: .ROBLOSECURITY=' . $cookie,
         'Accept: application/json, text/plain, */*',
-        'Accept-Language: ru,en-US;q=0.9,en;q=0.8',
+        'Accept-Language: en-US,en;q=0.9',
+        'Accept-Encoding: gzip, deflate, br',
         'Referer: https://www.roblox.com/',
         'Origin: https://www.roblox.com',
+        'Cache-Control: no-cache',
+        'Pragma: no-cache',
+        'Sec-Ch-Ua: "Not_A Brand";v="8", "Chromium";v="120"',
+        'Sec-Ch-Ua-Mobile: ?0',
+        'Sec-Ch-Ua-Platform: "Windows"',
         'Sec-Fetch-Dest: empty',
         'Sec-Fetch-Mode: cors',
         'Sec-Fetch-Site: same-site',
@@ -150,7 +168,14 @@ foreach ($cookies as $index => $cookie) {
         $successCount++;
     } else {
         $errorData = json_decode($response, true);
-        $result['error'] = $errorData['errorMessage'] ?? $errorData['message'] ?? 'Failed to follow user (HTTP ' . $httpCode . ')';
+        $errorMessage = $errorData['errorMessage'] ?? $errorData['message'] ?? 'Failed to follow user (HTTP ' . $httpCode . ')';
+        
+        // Check for challenge requirement specifically
+        if (strpos($errorMessage, 'Challenge is required') !== false || $httpCode === 403) {
+            $errorMessage = 'Challenge required - Roblox anti-bot protection detected. Try again later or use different cookies.';
+        }
+        
+        $result['error'] = $errorMessage;
         $errorCount++;
     }
 
