@@ -83,10 +83,6 @@ foreach ($cookies as $index => $cookie) {
         continue;
     }
     
-    // Create a temporary cookie file for this session
-    $cookieFile = tempnam(sys_get_temp_dir(), 'roblox_cookie_');
-    file_put_contents($cookieFile, ".ROBLOSECURITY\tTRUE\t/\tFALSE\t0\t.ROBLOSECURITY\t" . $cookie . "\n");
-    
     // Get CSRF token by making a POST request and extracting from response headers
     $csrfUrl = "https://friends.roblox.com/v1/users/1/request-friendship";
     
@@ -98,8 +94,9 @@ foreach ($cookies as $index => $cookie) {
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_HEADER, true);
-    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFile);
-    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFile);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Cookie: .ROBLOSECURITY=' . $cookie
+    ]);
     
     $csrfResponse = curl_exec($ch);
     $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
@@ -124,6 +121,7 @@ foreach ($cookies as $index => $cookie) {
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36');
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Cookie: .ROBLOSECURITY=' . $cookie,
         'Accept: application/json, text/plain, */*',
         'Accept-Language: ru,en-US;q=0.9,en;q=0.8',
         'Referer: https://www.roblox.com/',
@@ -137,15 +135,10 @@ foreach ($cookies as $index => $cookie) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, '');
-    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFile);
-    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFile);
     
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    
-    // Clean up cookie file
-    @unlink($cookieFile);
     
     // Debug: Log response
     $result['debug_http_code'] = $httpCode;
