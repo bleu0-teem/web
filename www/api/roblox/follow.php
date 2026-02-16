@@ -35,7 +35,7 @@ if (!$passwordCheck['valid']) {
 }
 
 // Get input data
-$input = json_decode(file_get_contents('php://input'), true);
+$input = getCachedJsonRequestBody();
 if (!$input) {
     $input = $_POST;
 }

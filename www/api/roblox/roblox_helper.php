@@ -4,13 +4,31 @@
  * Contains common functions for all Roblox action APIs
  */
 
+function getCachedJsonRequestBody() {
+    if (array_key_exists('__cached_json_request_body', $GLOBALS)) {
+        return $GLOBALS['__cached_json_request_body'];
+    }
+
+    $raw = file_get_contents('php://input');
+    $decoded = null;
+    if (is_string($raw) && $raw !== '') {
+        $tmp = json_decode($raw, true);
+        if (is_array($tmp)) {
+            $decoded = $tmp;
+        }
+    }
+
+    $GLOBALS['__cached_json_request_body'] = $decoded;
+    return $decoded;
+}
+
 // Verify API password from environment variables
 function verifyApiPassword() {
     $inputPassword = $_GET['api_password'] ?? $_POST['api_password'] ?? null;
     
     // Check from JSON input body
     if (empty($inputPassword)) {
-        $jsonInput = json_decode(file_get_contents('php://input'), true);
+        $jsonInput = getCachedJsonRequestBody();
         if (is_array($jsonInput) && isset($jsonInput['api_password'])) {
             $inputPassword = $jsonInput['api_password'];
         }
