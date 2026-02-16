@@ -66,12 +66,21 @@ $successCount = 0;
 $errorCount = 0;
 $alreadyCompletedCount = 0;
 
-foreach ($cookies as $index => $cookie) {
+foreach ($cookies as $index => $cookieEntry) {
+    $cookie = is_array($cookieEntry) ? ($cookieEntry['cookie'] ?? null) : $cookieEntry;
+
     $result = [
         'cookie_index' => $index,
         'success' => false,
         'error' => null
     ];
+
+    if (empty($cookie)) {
+        $result['error'] = 'Invalid cookie entry';
+        $errorCount++;
+        $results[] = $result;
+        continue;
+    }
     
     // Check if already in group
     $checkResult = checkIfAlreadyInGroup($cookie, $groupId);

@@ -66,12 +66,21 @@ $successCount = 0;
 $errorCount = 0;
 $alreadyCompletedCount = 0;
 
-foreach ($cookies as $index => $cookie) {
+foreach ($cookies as $index => $cookieEntry) {
+    $cookie = is_array($cookieEntry) ? ($cookieEntry['cookie'] ?? null) : $cookieEntry;
+
     $result = [
         'cookie_index' => $index,
         'success' => false,
         'error' => null
     ];
+
+    if (empty($cookie)) {
+        $result['error'] = 'Invalid cookie entry';
+        $errorCount++;
+        $results[] = $result;
+        continue;
+    }
     
     // Get authenticated user first to check if already liked
     $userInfo = getAuthenticatedUser($cookie);

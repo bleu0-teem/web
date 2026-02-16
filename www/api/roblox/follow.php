@@ -66,12 +66,22 @@ $successCount = 0;
 $errorCount = 0;
 $alreadyCompletedCount = 0;
 
-foreach ($cookies as $index => $cookie) {
+foreach ($cookies as $index => $cookieEntry) {
+    $cookie = is_array($cookieEntry) ? ($cookieEntry['cookie'] ?? null) : $cookieEntry;
+    $boundAuthToken = is_array($cookieEntry) ? ($cookieEntry['bound_auth_token'] ?? null) : null;
+
     $result = [
         'cookie_index' => $index,
         'success' => false,
         'error' => null
     ];
+
+    if (empty($cookie)) {
+        $result['error'] = 'Invalid cookie entry';
+        $errorCount++;
+        $results[] = $result;
+        continue;
+    }
     
     // Check if already following
     $checkResult = checkIfAlreadyFollowing($cookie, $userId);
@@ -84,8 +94,6 @@ foreach ($cookies as $index => $cookie) {
     }
     
     $followUrl = "https://friends.roblox.com/v1/users/{$userId}/follow";
-
-    // Roblox CSRF flow: POST without token -> receive 403 + x-csrf-token header -> retry once with token.
     $csrfToken = null;
 
     $ch = curl_init();
@@ -97,7 +105,7 @@ foreach ($cookies as $index => $cookie) {
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_HEADER, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, '');
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    $headers = [
         'Cookie: .ROBLOSECURITY=' . $cookie,
         'Accept: application/json, text/plain, */*',
         'Accept-Language: en-US,en;q=0.9',
@@ -112,7 +120,13 @@ foreach ($cookies as $index => $cookie) {
         'Sec-Fetch-Dest: empty',
         'Sec-Fetch-Mode: cors',
         'Sec-Fetch-Site: same-site'
-    ]);
+    ];
+
+    if (!empty($boundAuthToken)) {
+        $headers[] = 'x-bound-auth-token: ' . $boundAuthToken;
+    }
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
     $firstResponse = curl_exec($ch);
     $firstHeaderSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
@@ -123,7 +137,7 @@ foreach ($cookies as $index => $cookie) {
         $csrfToken = trim($matches[1]);
     }
 
-    // Debug: Log CSRF token (first 10 chars)
+    $result['debug_bound_auth'] = !empty($boundAuthToken);
     $result['debug_csrf'] = $csrfToken ? substr($csrfToken, 0, 10) . '...' : 'NOT FOUND';
 
     // If the first call was a 403 and we got a token, retry once with token.
@@ -131,7 +145,7 @@ foreach ($cookies as $index => $cookie) {
     $httpCode = $firstHttpCode;
 
     if ($httpCode === 403 && $csrfToken) {
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        $retryHeaders = [
             'Cookie: .ROBLOSECURITY=' . $cookie,
             'Accept: application/json, text/plain, */*',
             'Accept-Language: en-US,en;q=0.9',
@@ -147,7 +161,13 @@ foreach ($cookies as $index => $cookie) {
             'Sec-Fetch-Mode: cors',
             'Sec-Fetch-Site: same-site',
             'x-csrf-token: ' . $csrfToken
-        ]);
+        ];
+
+        if (!empty($boundAuthToken)) {
+            $retryHeaders[] = 'x-bound-auth-token: ' . $boundAuthToken;
+        }
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $retryHeaders);
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

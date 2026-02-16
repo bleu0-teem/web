@@ -71,14 +71,39 @@ function getRandomCookies($count = 1) {
         ];
     }
     
+    $normalized = [];
+    foreach ($cookies as $entry) {
+        if (is_string($entry) && !empty($entry)) {
+            $normalized[] = [
+                'cookie' => $entry,
+                'bound_auth_token' => null
+            ];
+            continue;
+        }
+
+        if (is_array($entry) && isset($entry['cookie']) && is_string($entry['cookie']) && !empty($entry['cookie'])) {
+            $normalized[] = [
+                'cookie' => $entry['cookie'],
+                'bound_auth_token' => $entry['bound_auth_token'] ?? $entry['bound_auth'] ?? null
+            ];
+        }
+    }
+
+    if (empty($normalized)) {
+        return [
+            'success' => false,
+            'error' => 'No cookies available or invalid JSON format'
+        ];
+    }
+
     // Shuffle and slice to get random cookies
-    shuffle($cookies);
-    $selectedCookies = array_slice($cookies, 0, $count);
+    shuffle($normalized);
+    $selectedCookies = array_slice($normalized, 0, $count);
     
     return [
         'success' => true,
         'cookies' => $selectedCookies,
-        'total_available' => count($cookies)
+        'total_available' => count($normalized)
     ];
 }
 
