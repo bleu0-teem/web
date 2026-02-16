@@ -70,20 +70,51 @@ function getRandomCookies($count = 1) {
             'error' => 'No cookies available or invalid JSON format'
         ];
     }
+
+    $normalizeCookie = function ($raw) {
+        if (!is_string($raw)) {
+            return null;
+        }
+        $v = trim($raw);
+        if ($v === '') {
+            return null;
+        }
+        if ((str_starts_with($v, '"') && str_ends_with($v, '"')) || (str_starts_with($v, "'") && str_ends_with($v, "'"))) {
+            $v = substr($v, 1, -1);
+            $v = trim($v);
+        }
+        if (stripos($v, '.ROBLOSECURITY=') === 0) {
+            $v = substr($v, strlen('.ROBLOSECURITY='));
+            $v = ltrim($v);
+        }
+        if (stripos($v, 'ROBLOSECURITY=') === 0) {
+            $v = substr($v, strlen('ROBLOSECURITY='));
+            $v = ltrim($v);
+        }
+        return $v !== '' ? $v : null;
+    };
     
     $normalized = [];
     foreach ($cookies as $entry) {
         if (is_string($entry) && !empty($entry)) {
+            $cookieValue = $normalizeCookie($entry);
+            if (empty($cookieValue)) {
+                continue;
+            }
             $normalized[] = [
-                'cookie' => $entry,
+                'cookie' => $cookieValue,
                 'bound_auth_token' => null
             ];
             continue;
         }
 
         if (is_array($entry) && isset($entry['cookie']) && is_string($entry['cookie']) && !empty($entry['cookie'])) {
+            $cookieValue = $normalizeCookie($entry['cookie']);
+            if (empty($cookieValue)) {
+                continue;
+            }
             $normalized[] = [
-                'cookie' => $entry['cookie'],
+                'cookie' => $cookieValue,
                 'bound_auth_token' => $entry['bound_auth_token'] ?? $entry['bound_auth'] ?? null
             ];
         }
