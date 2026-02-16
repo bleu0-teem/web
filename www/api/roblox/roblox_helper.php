@@ -352,7 +352,20 @@ function sendActionResponse($status, $message, $data = null) {
         $response['data'] = $data;
     }
     
-    echo json_encode($response);
+    $json = json_encode($response, JSON_INVALID_UTF8_SUBSTITUTE);
+    if ($json === false) {
+        $fallback = [
+            'status' => 500,
+            'message' => 'Failed to encode JSON response',
+            'timestamp' => time(),
+            'error' => json_last_error_msg()
+        ];
+        http_response_code(500);
+        echo json_encode($fallback, JSON_INVALID_UTF8_SUBSTITUTE);
+        exit;
+    }
+
+    echo $json;
     exit;
 }
 
